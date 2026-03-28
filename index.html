@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spiral Lattice Cipher — Interactive Cryptography Workbench</title>
+<title>Spiral Lattice Cipher</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -14,132 +14,103 @@
 --purple:#bc8cff;--cyan:#39d2c0;--pink:#f778ba;--yellow:#e3b341;
 }
 body{font-family:'Consolas','Monaco','Courier New',monospace;background:var(--bg);color:var(--text);font-size:13px;line-height:1.5}
-a{color:var(--blue);text-decoration:none}
-
 .wrap{max-width:1500px;margin:0 auto;padding:15px}
-
-/* HEADER */
 .hdr{display:flex;align-items:center;gap:15px;padding:15px 0;border-bottom:1px solid var(--border);margin-bottom:20px;flex-wrap:wrap}
 .hdr h1{font-size:1.4em;color:var(--blue);white-space:nowrap}
-.hdr .badge{padding:3px 8px;border-radius:3px;font-size:.75em;font-weight:700}
-.badge-ver{background:#1f3a1f;color:var(--green);border:1px solid #2a5a2a}
-.badge-rev{background:#1a2a3a;color:var(--cyan);border:1px solid #2a4a5a}
-.hdr-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.badge{padding:3px 8px;border-radius:3px;font-size:.75em;font-weight:700;display:inline-block}
+.badge-g{background:#1f3a1f;color:var(--green);border:1px solid #2a5a2a}
+.badge-b{background:#1a2a3a;color:var(--cyan);border:1px solid #2a4a5a}
+.hdr-right{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 
-/* LAYOUT */
 .layout{display:grid;grid-template-columns:340px 1fr 320px;gap:15px}
 @media(max-width:1200px){.layout{grid-template-columns:1fr}}
 .col{display:flex;flex-direction:column;gap:15px}
 
-/* PANEL */
 .pnl{background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden}
 .pnl-hd{padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border);font-weight:700;font-size:.9em;color:var(--blue);display:flex;align-items:center;gap:8px}
 .pnl-bd{padding:14px}
 .pnl-ft{padding:10px 14px;background:var(--bg3);border-top:1px solid var(--border);font-size:.8em;color:var(--text2)}
 
-/* FORMS */
-.fg{margin-bottom:12px}
-.fg:last-child{margin-bottom:0}
+.fg{margin-bottom:12px}.fg:last-child{margin-bottom:0}
 .fg label{display:block;color:var(--text2);margin-bottom:5px;font-size:.85em}
-.fg label .req{color:var(--red)}
 .fg .help{font-size:.75em;color:var(--text3);margin-top:3px}
 input,select,textarea{width:100%;padding:8px 10px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:inherit;font-size:.9em}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 2px rgba(88,166,255,.15)}
 textarea{min-height:60px;resize:vertical}
-.row{display:flex;gap:10px;flex-wrap:wrap}
-.row>*{flex:1;min-width:0}
-select{cursor:pointer;appearance:auto}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:0}
+select{cursor:pointer}
 
-/* BUTTONS */
 .btn{padding:9px 16px;border:1px solid var(--border);border-radius:4px;cursor:pointer;font-family:inherit;font-size:.85em;font-weight:700;transition:.15s;display:inline-flex;align-items:center;gap:6px;justify-content:center;white-space:nowrap;background:var(--bg3);color:var(--text)}
 .btn:hover{border-color:var(--blue);color:#fff}
 .btn:active{transform:scale(.97)}
-.btn-g{background:#1a3a1a;border-color:#2a5a2a;color:var(--green)}
-.btn-g:hover{background:#2a5a2a}
-.btn-r{background:#3a1a1a;border-color:#5a2a2a;color:var(--red)}
-.btn-r:hover{background:#5a2a2a}
-.btn-b{background:#1a2a3a;border-color:#2a4a6a;color:var(--blue)}
-.btn-b:hover{background:#2a4a6a}
-.btn-y{background:#2a2a1a;border-color:#4a4a2a;color:var(--orange)}
-.btn-y:hover{background:#4a4a2a}
-.btn-p{background:#2a1a3a;border-color:#4a2a6a;color:var(--purple)}
-.btn-p:hover{background:#4a2a6a}
+.btn-g{background:#1a3a1a;border-color:#2a5a2a;color:var(--green)}.btn-g:hover{background:#2a5a2a}
+.btn-r{background:#3a1a1a;border-color:#5a2a2a;color:var(--red)}.btn-r:hover{background:#5a2a2a}
+.btn-b{background:#1a2a3a;border-color:#2a4a6a;color:var(--blue)}.btn-b:hover{background:#2a4a6a}
+.btn-y{background:#2a2a1a;border-color:#4a4a2a;color:var(--orange)}.btn-y:hover{background:#4a4a2a}
+.btn-p{background:#2a1a3a;border-color:#4a2a6a;color:var(--purple)}.btn-p:hover{background:#4a2a6a}
 .btn-sm{padding:5px 10px;font-size:.8em}
 .btns{display:flex;gap:8px;flex-wrap:wrap}
 .btns-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 
-/* ALPHABET & GRID */
 .alpha{display:flex;flex-wrap:wrap;gap:3px;padding:8px;background:var(--bg4);border:1px solid var(--border);border-radius:4px}
 .ac{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:var(--bg3);border:1px solid var(--border);border-radius:3px;font-size:.85em;color:var(--blue);position:relative;transition:.15s;cursor:default}
 .ac:hover{border-color:var(--blue);transform:scale(1.1);z-index:2}
 .ac .ix{font-size:.5em;color:var(--text3);position:absolute;top:1px;left:2px}
-.ac.hi{background:#1a2a1a;border-color:var(--green);color:var(--green)}
 
-.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:3px}
+.g5{display:grid;gap:3px}
 .gc{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg3);border:1px solid var(--border);border-radius:3px;position:relative;transition:.2s;cursor:default}
 .gc:hover{border-color:var(--blue);transform:scale(1.08);z-index:2;box-shadow:0 0 8px rgba(88,166,255,.2)}
 .gc .ix{font-size:.5em;color:var(--text3);position:absolute;top:1px;left:3px}
 .gc .cr{font-size:.5em;color:var(--text3);position:absolute;bottom:1px;right:3px}
 .gc .ch{font-size:1.1em;color:var(--blue);font-weight:700}
-.gc.pv{grid-column:span 5;aspect-ratio:auto;padding:6px;flex-direction:row;gap:8px;background:#2d1f1f;border-color:var(--red)}
-.gc.pv .ch{color:var(--red);font-size:.95em}
-.gc.src{background:#1a2a1a;border-color:var(--green)}
-.gc.src .ch{color:var(--green)}
-.gc.dst{background:#2a1a1a;border-color:var(--red)}
-.gc.dst .ch{color:var(--red)}
+.gc.empty{opacity:.3}.gc.empty .ch{color:var(--text3)}
+.gc.src{background:#1a2a1a;border-color:var(--green)}.gc.src .ch{color:var(--green)}
+.gc.dst{background:#2a1a1a;border-color:var(--red)}.gc.dst .ch{color:var(--red)}
 
-/* OUTPUT */
 .out{background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:12px;min-height:50px;color:var(--green);word-break:break-all;font-size:1em;line-height:1.7;position:relative}
-.out .copy-btn{position:absolute;top:6px;right:6px;padding:3px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:3px;color:var(--text2);cursor:pointer;font-size:.7em;font-family:inherit}
-.out .copy-btn:hover{border-color:var(--blue);color:var(--text)}
+.out .cbtn{position:absolute;top:6px;right:6px;padding:3px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:3px;color:var(--text2);cursor:pointer;font-size:.7em;font-family:inherit}
+.out .cbtn:hover{border-color:var(--blue);color:var(--text)}
 
-/* STATS */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:6px}
 .st{background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:8px;text-align:center}
 .st .v{font-size:1.1em;color:var(--blue);font-weight:700}
 .st .l{font-size:.65em;color:var(--text2);margin-top:2px}
 
-/* TABS */
 .tabs{display:flex;gap:3px;margin-bottom:12px;flex-wrap:wrap}
-.tab{padding:6px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:4px 4px 0 0;cursor:pointer;font-size:.8em;color:var(--text2);border-bottom-color:transparent;transition:.15s}
+.tab{padding:6px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:4px 4px 0 0;cursor:pointer;font-size:.8em;color:var(--text2);transition:.15s}
 .tab:hover{color:var(--text)}
 .tab.on{background:var(--bg2);color:var(--blue);border-color:var(--blue);border-bottom-color:var(--bg2)}
 .tc{display:none}.tc.on{display:block}
 
-/* TRACE TABLE */
 .tbl{width:100%;border-collapse:collapse;font-size:.8em}
 .tbl th,.tbl td{padding:5px 6px;border:1px solid var(--border);text-align:center}
-.tbl th{background:var(--bg3);color:var(--blue);font-weight:700;position:sticky;top:0}
+.tbl th{background:var(--bg3);color:var(--blue);font-weight:700;position:sticky;top:0;z-index:1}
 .tbl td{background:var(--bg4)}
-.tbl .hi-g{color:var(--green);font-weight:700}
-.tbl .hi-r{color:var(--red);font-weight:700}
-.tbl .hi-b{color:var(--blue)}
-.tbl .hi-o{color:var(--orange)}
-.tbl .hi-p{color:var(--purple)}
+.hi-g{color:var(--green);font-weight:700}
+.hi-r{color:var(--red);font-weight:700}
+.hi-b{color:var(--blue)}
+.hi-o{color:var(--orange)}
+.hi-p{color:var(--purple)}
 .tscroll{max-height:400px;overflow:auto;border:1px solid var(--border);border-radius:4px}
 .tscroll::-webkit-scrollbar{width:6px;height:6px}
 .tscroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
-/* FREQ */
 .freq-bar{display:flex;align-items:end;gap:2px;height:100px;padding:8px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;margin-top:8px}
 .fb{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px}
 .fb .bar{width:100%;background:var(--blue);border-radius:2px 2px 0 0;min-height:1px;transition:.3s}
-.fb .lbl{font-size:.5em;color:var(--text3);transform:rotate(-45deg);white-space:nowrap}
+.fb .lbl{font-size:.5em;color:var(--text3);white-space:nowrap}
 
-/* AVALANCHE */
-.aval{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}
-.aval .bit{width:20px;height:20px;display:flex;align-items:center;justify-content:center;border-radius:3px;font-size:.7em;font-weight:700;border:1px solid var(--border)}
+.aval{display:flex;gap:3px;flex-wrap:wrap;margin-top:8px}
+.aval .bit{width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:3px;font-size:.75em;font-weight:700;border:1px solid var(--border)}
 .bit-same{background:var(--bg3);color:var(--text3)}
 .bit-diff{background:#2a1a1a;color:var(--red);border-color:var(--red)}
 
-/* TOAST */
 .toast{position:fixed;top:15px;right:15px;padding:10px 16px;border-radius:4px;font-size:.85em;z-index:999;transform:translateX(120%);transition:.3s;font-family:inherit}
 .toast.show{transform:translateX(0)}
 .toast-ok{background:#1a3a1a;border:1px solid #2a5a2a;color:var(--green)}
 .toast-err{background:#3a1a1a;border:1px solid #5a2a2a;color:var(--red)}
 .toast-info{background:#1a2a3a;border:1px solid #2a4a6a;color:var(--blue)}
 
-/* MODAL */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
 .modal-bg.show{display:flex}
 .modal{background:var(--bg2);border:1px solid var(--border);border-radius:8px;max-width:700px;width:100%;max-height:85vh;overflow:auto;padding:20px}
@@ -148,7 +119,6 @@ select{cursor:pointer;appearance:auto}
 .modal code{background:var(--bg4);padding:1px 5px;border-radius:3px;color:var(--cyan);font-size:.9em}
 .modal ul{padding-left:20px}
 
-/* MISC */
 .sep{border:none;border-top:1px solid var(--border);margin:12px 0}
 .tag{display:inline-block;padding:2px 6px;border-radius:3px;font-size:.7em;font-weight:700}
 .tag-g{background:#1a3a1a;color:var(--green)}
@@ -157,13 +127,9 @@ select{cursor:pointer;appearance:auto}
 .tag-y{background:#2a2a1a;color:var(--orange)}
 .tag-p{background:#2a1a3a;color:var(--purple)}
 .muted{color:var(--text3);font-size:.8em}
-.mono{font-family:inherit}
-.flex-c{display:flex;align-items:center;gap:6px}
-.gap-sm{gap:6px}
-.mb-sm{margin-bottom:8px}
-.mt-sm{margin-top:8px}
-.scroll-x{overflow-x:auto}
+.mt-sm{margin-top:8px}.mb-sm{margin-bottom:8px}
 .w100{width:100%}
+.flex-c{display:flex;align-items:center;gap:6px}
 </style>
 </head>
 <body>
@@ -175,43 +141,39 @@ select{cursor:pointer;appearance:auto}
 
 <div class="wrap">
 
-<!-- HEADER -->
 <div class="hdr">
   <span style="font-size:1.5em">🌀</span>
   <h1>Spiral Lattice Cipher</h1>
-  <span class="badge badge-ver">v3.0</span>
-  <span class="badge badge-rev">Reversible ✓</span>
+  <span class="badge badge-g">v4.0</span>
+  <span class="badge badge-b">Reversible ✓</span>
   <div class="hdr-right">
-    <button class="btn btn-sm btn-b" onclick="showHelp()">📖 How It Works</button>
-    <button class="btn btn-sm btn-p" onclick="runFullTest()">🧪 Self-Test</button>
-    <button class="btn btn-sm btn-y" onclick="exportPuzzle()">📤 Export Puzzle</button>
+    <button class="btn btn-sm btn-b" onclick="showHelp()">📖 Help</button>
+    <button class="btn btn-sm btn-p" onclick="runFullTest()">🧪 Test</button>
+    <button class="btn btn-sm btn-y" onclick="exportPuzzle()">📤 Export</button>
   </div>
 </div>
 
 <div class="layout">
 
-<!-- ========== LEFT COLUMN ========== -->
+<!-- LEFT -->
 <div class="col">
 
-  <!-- KEY CONFIG -->
   <div class="pnl">
-    <div class="pnl-hd">🔑 Key & Configuration</div>
+    <div class="pnl-hd">🔑 Configuration</div>
     <div class="pnl-bd">
       <div class="fg">
-        <label>Secret Key <span class="req">*</span></label>
-        <div class="row gap-sm">
+        <label>Secret Key</label>
+        <div class="row">
           <input type="text" id="inKey" value="ENIGMA" maxlength="30" oninput="rebuild()" spellcheck="false">
-          <button class="btn btn-sm btn-b" onclick="randomKey()" title="Random key">🎲</button>
+          <button class="btn btn-sm btn-b" onclick="randomKey()" style="flex:0 0 40px">🎲</button>
         </div>
-        <div class="help">Letters only. Defines alphabet order and initial state.</div>
       </div>
-
       <div class="row">
         <div class="fg">
           <label>Alphabet</label>
           <select id="selAlpha" onchange="rebuild()">
             <option value="EN">English A-Z</option>
-            <option value="EN_NUM">English + Digits</option>
+            <option value="EN_NUM">English+Digits</option>
             <option value="RU">Russian А-Я</option>
             <option value="CUSTOM">Custom…</option>
           </select>
@@ -219,205 +181,169 @@ select{cursor:pointer;appearance:auto}
         <div class="fg">
           <label>Rounds</label>
           <select id="selRounds" onchange="rebuild()">
-            <option value="1">1 (fast)</option>
-            <option value="2" selected>2 (balanced)</option>
-            <option value="3">3 (strong)</option>
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
           </select>
         </div>
       </div>
-
-      <div class="fg" id="customAlphaWrap" style="display:none">
+      <div class="fg" id="customWrap" style="display:none">
         <label>Custom Alphabet</label>
-        <input type="text" id="inCustomAlpha" value="" placeholder="ABCDEFG..." oninput="rebuild()" spellcheck="false">
-        <div class="help">Each character must be unique. Min 10 chars.</div>
+        <input type="text" id="inCustom" placeholder="Unique chars…" oninput="rebuild()" spellcheck="false">
       </div>
-
-      <div class="fg">
-        <label>Feistel Function</label>
-        <select id="selFeistel" onchange="rebuild()">
-          <option value="quad">f(x) = x² + k (quadratic)</option>
-          <option value="cube">f(x) = x³ + k (cubic)</option>
-          <option value="mix">f(x) = x² + x·k + 1 (mixed)</option>
-        </select>
-        <div class="help">Non-linear round function inside grid transform.</div>
-      </div>
-
-      <div class="fg">
-        <label>Feedback Mode</label>
-        <select id="selFeedback" onchange="rebuild()">
-          <option value="cipher">Ciphertext Feedback (CFB-like)</option>
-          <option value="plain">Plaintext Feedback (OFB-like)</option>
-          <option value="both">XOR Both (combined)</option>
-        </select>
+      <div class="row">
+        <div class="fg">
+          <label>Feistel F(x)</label>
+          <select id="selF" onchange="rebuild()">
+            <option value="quad">x² + k</option>
+            <option value="cube">x³ + k</option>
+            <option value="mix">x²+xk+1</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Feedback</label>
+          <select id="selFB" onchange="rebuild()">
+            <option value="cipher">Ciphertext</option>
+            <option value="plain">Plaintext</option>
+            <option value="both">Combined</option>
+          </select>
+        </div>
       </div>
     </div>
-    <div class="pnl-ft">
-      <div class="stats" id="statsRow"></div>
-    </div>
+    <div class="pnl-ft"><div class="stats" id="statsRow"></div></div>
   </div>
 
-  <!-- ALPHABET DISPLAY -->
   <div class="pnl">
-    <div class="pnl-hd">🔤 Cipher Alphabet Order</div>
-    <div class="pnl-bd">
-      <div class="alpha" id="alphaDisplay"></div>
-    </div>
+    <div class="pnl-hd">🔤 Cipher Alphabet</div>
+    <div class="pnl-bd"><div class="alpha" id="alphaDisp"></div></div>
   </div>
 
-  <!-- GRID DISPLAY -->
   <div class="pnl">
-    <div class="pnl-hd">
-      📐 Grid Structure
-      <span class="muted" style="margin-left:auto" id="gridDims">5×5 + pivot</span>
-    </div>
+    <div class="pnl-hd">📐 Grid <span class="muted" style="margin-left:auto" id="gridDims"></span></div>
     <div class="pnl-bd">
-      <div id="gridDisplay"></div>
-      <div class="help mt-sm">Hover cells to see coordinates. Green = source, Red = destination during trace.</div>
+      <div id="gridDisp"></div>
+      <div class="help mt-sm">Green=source, Red=destination in step view.</div>
     </div>
   </div>
 
 </div>
 
-<!-- ========== CENTER COLUMN ========== -->
+<!-- CENTER -->
 <div class="col">
 
-  <!-- ENCRYPT/DECRYPT -->
   <div class="pnl">
     <div class="pnl-hd">📝 Encrypt / Decrypt</div>
     <div class="pnl-bd">
       <div class="fg">
-        <label>Input Text</label>
-        <textarea id="inText" rows="3" placeholder="Type or paste text…">HELLO WORLD</textarea>
+        <label>Input</label>
+        <textarea id="inText" rows="3" placeholder="Enter text…">HELLO WORLD</textarea>
       </div>
       <div class="btns-grid">
-        <button class="btn btn-g" onclick="doProcess(true)">🔒 Encrypt</button>
-        <button class="btn btn-r" onclick="doProcess(false)">🔓 Decrypt</button>
+        <button class="btn btn-g" onclick="doProc(true)">🔒 Encrypt</button>
+        <button class="btn btn-r" onclick="doProc(false)">🔓 Decrypt</button>
       </div>
       <div class="fg mt-sm">
         <label>Output</label>
-        <div class="out" id="outText">
-          <span class="copy-btn" onclick="copyOut()">📋 Copy</span>
-          <span id="outContent">—</span>
+        <div class="out" id="outBox">
+          <span class="cbtn" onclick="copyOut()">📋</span>
+          <span id="outText">—</span>
         </div>
       </div>
       <div class="btns mt-sm">
-        <button class="btn btn-sm" onclick="swapIO()">⇄ Swap In/Out</button>
+        <button class="btn btn-sm" onclick="swapIO()">⇄ Swap</button>
         <button class="btn btn-sm" onclick="clearIO()">✕ Clear</button>
-        <button class="btn btn-sm btn-b" onclick="doProcess(true);doVerify()">⚡ Encrypt + Verify</button>
+        <button class="btn btn-sm btn-b" onclick="doProc(true);doVerify()">⚡ Encrypt+Verify</button>
       </div>
-      <div id="processInfo" class="muted mt-sm"></div>
+      <div id="procInfo" class="muted mt-sm"></div>
     </div>
   </div>
 
-  <!-- STEP-BY-STEP TRACE -->
   <div class="pnl">
-    <div class="pnl-hd">
-      🔍 Step-by-Step Trace
-      <span class="muted" style="margin-left:auto">Character-level transparency</span>
-    </div>
+    <div class="pnl-hd">🔍 Step-by-Step Trace</div>
     <div class="pnl-bd">
       <div class="tabs">
-        <div class="tab on" onclick="stab(this,'stTrace')">Trace Table</div>
-        <div class="tab" onclick="stab(this,'stGrid')">Grid Animation</div>
-        <div class="tab" onclick="stab(this,'stFormula')">Formulas</div>
+        <div class="tab on" onclick="stab(this,'stTrace')">Table</div>
+        <div class="tab" onclick="stab(this,'stGrid')">Grid View</div>
+        <div class="tab" onclick="stab(this,'stForm')">Formulas</div>
       </div>
-
       <div class="tc on" id="stTrace">
-        <div class="tscroll" id="traceScroll">
-          <table class="tbl" id="traceTable">
-            <thead><tr><th>#</th><th>In</th><th>Idx</th><th>FB</th><th>Shift</th><th>R1</th><th>R2</th><th>R3</th><th>Out Idx</th><th>Out</th></tr></thead>
-            <tbody id="traceBody"></tbody>
-          </table>
-        </div>
-        <div class="help mt-sm">Every column shows the intermediate value after each transformation stage. Fully auditable.</div>
+        <div class="tscroll"><table class="tbl" id="traceTbl"><thead id="traceHd"></thead><tbody id="traceTb"></tbody></table></div>
       </div>
-
       <div class="tc" id="stGrid">
         <div class="fg">
-          <label>Step through character:</label>
-          <div class="row gap-sm">
-            <button class="btn btn-sm" onclick="traceStep(-1)">◀ Prev</button>
-            <span id="traceStepInfo" class="flex-c" style="min-width:80px;justify-content:center">—</span>
-            <button class="btn btn-sm" onclick="traceStep(1)">Next ▶</button>
+          <div class="row">
+            <button class="btn btn-sm" onclick="trStep(-1)">◀ Prev</button>
+            <span id="trInfo" class="flex-c" style="justify-content:center">—</span>
+            <button class="btn btn-sm" onclick="trStep(1)">Next ▶</button>
           </div>
         </div>
-        <div id="traceGridVis"></div>
-        <div id="traceStepDetail" class="muted mt-sm"></div>
+        <div id="trGridVis"></div>
+        <div id="trDetail" class="muted mt-sm"></div>
       </div>
-
-      <div class="tc" id="stFormula">
-        <div style="background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:12px;font-size:.85em;line-height:2">
-          <div id="formulaDisplay"></div>
-        </div>
-      </div>
+      <div class="tc" id="stForm"><div id="formDisp" style="background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:12px;font-size:.85em;line-height:2"></div></div>
     </div>
   </div>
 
 </div>
 
-<!-- ========== RIGHT COLUMN ========== -->
+<!-- RIGHT -->
 <div class="col">
 
-  <!-- FREQUENCY ANALYSIS -->
   <div class="pnl">
-    <div class="pnl-hd">📊 Frequency Analysis</div>
+    <div class="pnl-hd">📊 Frequency</div>
     <div class="pnl-bd">
       <div class="tabs">
-        <div class="tab on" onclick="stab(this,'fInput')">Input</div>
-        <div class="tab" onclick="stab(this,'fOutput')">Output</div>
-        <div class="tab" onclick="stab(this,'fCompare')">Compare</div>
+        <div class="tab on" onclick="stab(this,'fIn')">Input</div>
+        <div class="tab" onclick="stab(this,'fOut')">Output</div>
+        <div class="tab" onclick="stab(this,'fCmp')">Compare</div>
       </div>
-      <div class="tc on" id="fInput"><div id="freqIn" class="freq-bar"></div></div>
-      <div class="tc" id="fOutput"><div id="freqOut" class="freq-bar"></div></div>
-      <div class="tc" id="fCompare"><div id="freqCmp"></div></div>
+      <div class="tc on" id="fIn"><div id="freqIn" class="freq-bar"></div></div>
+      <div class="tc" id="fOut"><div id="freqOut" class="freq-bar"></div></div>
+      <div class="tc" id="fCmp"><div id="freqCmp"></div></div>
     </div>
   </div>
 
-  <!-- AVALANCHE EFFECT -->
   <div class="pnl">
-    <div class="pnl-hd">💥 Avalanche Effect</div>
+    <div class="pnl-hd">💥 Avalanche</div>
     <div class="pnl-bd">
-      <div class="help mb-sm">Shows how one letter change cascades through the ciphertext.</div>
-      <button class="btn btn-sm btn-y w100" onclick="showAvalanche()">Run Avalanche Test</button>
-      <div id="avalResult" class="mt-sm"></div>
+      <div class="help mb-sm">One letter change → cascade effect.</div>
+      <button class="btn btn-sm btn-y w100" onclick="showAval()">Run Test</button>
+      <div id="avalRes" class="mt-sm"></div>
     </div>
   </div>
 
-  <!-- VERIFICATION -->
   <div class="pnl">
-    <div class="pnl-hd">✅ Reversibility Proof</div>
+    <div class="pnl-hd">✅ Reversibility</div>
     <div class="pnl-bd">
-      <button class="btn btn-sm btn-g w100 mb-sm" onclick="runFullTest()">Run Full Test Suite</button>
-      <div id="testResults"></div>
+      <button class="btn btn-sm btn-g w100 mb-sm" onclick="runFullTest()">Run Full Test</button>
+      <div id="testRes"></div>
     </div>
   </div>
 
-  <!-- QUICK REFERENCE -->
   <div class="pnl">
-    <div class="pnl-hd">📋 Quick Reference</div>
+    <div class="pnl-hd">📋 Reference</div>
     <div class="pnl-bd" style="font-size:.8em;color:var(--text2);line-height:1.8">
-      <div><span class="tag tag-g">Feistel</span> Non-linear grid permutation</div>
-      <div><span class="tag tag-b">Shift</span> Position-dependent modular offset</div>
-      <div><span class="tag tag-y">Feedback</span> Previous output changes next step</div>
-      <div><span class="tag tag-p">Rounds</span> Repeated application for diffusion</div>
-      <div><span class="tag tag-r">Pivot</span> Extra cell for non-square alphabet</div>
+      <div><span class="tag tag-g">Feistel</span> Bijective grid permutation</div>
+      <div><span class="tag tag-b">Shift</span> Position-dependent offset</div>
+      <div><span class="tag tag-y">Feedback</span> Output chains to next step</div>
+      <div><span class="tag tag-p">Cycle-walk</span> Ensures domain [0,N)</div>
       <hr class="sep">
-      <div>Grid size adjusts automatically to alphabet length.</div>
-      <div>All transforms are bijections → guaranteed reversibility.</div>
+      <div>4-round unbalanced Feistel + cycle-walking = guaranteed bijection on any alphabet size.</div>
     </div>
   </div>
 
 </div>
-
-</div><!-- /layout -->
-</div><!-- /wrap -->
+</div>
+</div>
 
 <script>
-// ╔══════════════════════════════════════════════════╗
-// ║         SPIRAL LATTICE CIPHER ENGINE             ║
-// ╚══════════════════════════════════════════════════╝
+// ════════════════════════════════════════════════════
+//  SPIRAL LATTICE CIPHER ENGINE v4
+//  Fixed: proper 4-round unbalanced Feistel with
+//  mathematically verified inverse
+// ════════════════════════════════════════════════════
 
-const ALPHA_PRESETS = {
+const ALPHAS = {
   EN:     "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
   EN_NUM: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
   RU:     "АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ",
@@ -427,782 +353,550 @@ class SLC {
   constructor() {
     this.alpha = "";
     this.N = 0;
-    this.gridW = 0;
-    this.gridH = 0;
-    this.gridArea = 0;
-    this.pivotCount = 0;
+    this.s = 0;          // left half size
+    this.t = 0;          // right half size
     this.ordered = [];
     this.fb0 = 0;
-    this.rounds = 2;
-    this.feistelType = "quad";
-    this.feedbackMode = "cipher";
-    this.traceLog = [];
+    this.rounds = 2;     // outer rounds (each applies the full Feistel)
+    this.fType = "quad";
+    this.fbMode = "cipher";
+    this.trace = [];
   }
 
-  init(key, alpha, rounds, feistelType, feedbackMode) {
+  init(key, alpha, rounds, fType, fbMode) {
     this.alpha = alpha;
     this.N = alpha.length;
+    if (this.N < 2) throw new Error("Alphabet must have ≥2 chars");
+
     this.rounds = rounds;
-    this.feistelType = feistelType;
-    this.feedbackMode = feedbackMode;
+    this.fType = fType;
+    this.fbMode = fbMode;
 
-    // compute grid dimensions: smallest w where w*h >= N-pivotCount, w>=2
-    this.gridW = Math.ceil(Math.sqrt(this.N));
-    this.gridH = this.gridW;
-    while (this.gridW * this.gridH < this.N) this.gridH++;
-    this.gridArea = this.gridW * this.gridH;
-    this.pivotCount = this.gridArea < this.N ? 0 : this.gridArea - this.N;
-    // pivot letters are the LAST pivotCount in ordered[]
-    // but if gridArea >= N, some cells are "pivot zone"
-    // Actually: gridArea >= N always. Letters with index >= gridArea go to pivot.
-    // But N <= gridArea. So all letters fit. pivotCount = gridArea - N = extra cells that are empty... 
-    // Redesign: we have N letters. gridArea = gridW*gridH >= N. 
-    // Letters with ordered index 0..gridArea-1 go in grid (some slots may be >= N → mark as empty/pivot)
-    // Letters with ordered index gridArea..N-1 go to overflow pivot slots.
-    // Actually let's simplify: 
-    //   gridArea >= N always. 
-    //   Letters 0..N-1 fill grid left-to-right top-to-bottom. 
-    //   Remaining gridArea-N cells are "dead" (unused).
-    //   We only transform indices 0..N-1. The grid transform works modularly on gridW, gridH.
-    //   For indices that land in "dead" cells after transform, we re-map them via mod N.
-    // 
-    // Even simpler approach that guarantees bijectivity:
-    //   Feistel operates on (r,c) where r=idx/gridW, c=idx%gridW, but only for idx < gridArea.
-    //   We ensure the Feistel is a bijection on [0, gridArea). 
-    //   Then we map back. If result >= N, we skip Feistel for that round (identity fallback).
-    //   This still might not be bijective... 
-    //
-    // SAFEST APPROACH: Use Feistel on modular arithmetic mod N directly.
-    //   Split value v into (L, R) where L = v mod s, R = floor(v/s), s = ceil(sqrt(N)).
-    //   Feistel rounds on (L,R) mod (s, ceil(N/s)). 
-    //   This is a bijection on [0, s*t) where t = ceil(N/s). s*t >= N.
-    //   After Feistel, if result >= N, retry with "cycle walking" (keep applying until < N).
-    //
-    // Let's implement CYCLE-WALKING FEISTEL for perfect bijectivity on any alphabet size.
+    // Split dimensions for unbalanced Feistel
+    this.s = Math.ceil(Math.sqrt(this.N));
+    this.t = Math.ceil(this.N / this.s);
+    // Domain = s * t ≥ N
 
-    this.splitS = Math.ceil(Math.sqrt(this.N));
-    this.splitT = Math.ceil(this.N / this.splitS);
-    // domain = splitS * splitT >= N
-
-    // Build ordered alphabet from key
-    const cleanKey = [];
+    // Build keyed alphabet
     const seen = new Set();
-    for (const ch of key.toUpperCase()) {
-      if (this.alpha.includes(ch) && !seen.has(ch)) {
+    this.ordered = [];
+    const cleanKey = key.toUpperCase();
+    for (const ch of cleanKey) {
+      if (this.alpha.indexOf(ch) >= 0 && !seen.has(ch)) {
         seen.add(ch);
-        cleanKey.push(ch);
+        this.ordered.push(ch);
       }
     }
     for (const ch of this.alpha) {
       if (!seen.has(ch)) {
         seen.add(ch);
-        cleanKey.push(ch);
+        this.ordered.push(ch);
       }
     }
-    this.ordered = cleanKey;
 
-    // Initial feedback
+    // Initial feedback value
     this.fb0 = 0;
-    for (const ch of cleanKey.slice(0, key.length)) {
-      this.fb0 = (this.fb0 + this.alpha.indexOf(ch)) % this.N;
+    for (const ch of cleanKey) {
+      const idx = this.alpha.indexOf(ch);
+      if (idx >= 0) this.fb0 = (this.fb0 + idx) % this.N;
     }
 
-    // Update grid display params
-    this.gridW = this.splitS;
-    this.gridH = this.splitT;
-    this.gridArea = this.splitS * this.splitT;
-    this.pivotCount = this.gridArea - this.N;
+    // Self-test: verify Feistel bijectivity for a sample of keys
+    this._selfTest();
   }
 
-  mod(a, m) { return ((a % m) + m) % m; }
+  _mod(a, m) { return ((a % m) + m) % m; }
 
-  // Non-linear round function
-  F(x, k, modulus) {
-    switch (this.feistelType) {
-      case "quad": return this.mod(x * x + k, modulus);
-      case "cube": return this.mod(x * x * x + k, modulus);
-      case "mix":  return this.mod(x * x + x * k + 1, modulus);
-      default:     return this.mod(x * x + k, modulus);
+  // Round function F: maps x → result, with modulus m
+  _F(x, k, m) {
+    switch (this.fType) {
+      case "quad": return this._mod(x * x + k, m);
+      case "cube": return this._mod(x * x * x + k, m);
+      case "mix":  return this._mod(x * x + x * (k + 1) + 1, m);
+      default:     return this._mod(x * x + k, m);
     }
   }
 
-  // Feistel network on (L, R) — always a bijection regardless of F
-  feistelEnc(L, R, k1, k2) {
-    // Round 1
-    const newR1 = this.mod(L + this.F(R, k1, this.splitT), this.splitS);
-    const newL1 = R;
-    // Round 2  
-    const newR2 = this.mod(newL1 + this.F(newR1, k2, this.splitS), this.splitT);
-    const newL2 = newR1;
-    // Round 3 (extra for better diffusion)
-    const newR3 = this.mod(newL2 + this.F(newR2, k1 + k2, this.splitT), this.splitS);
-    const newL3 = newR2;
-    return [newL3, newR3];
+  // ── 4-ROUND UNBALANCED FEISTEL ──────────────────
+  //
+  // Input:  v in [0, s*t)
+  //         L = v % s   (in [0, s))
+  //         R = floor(v / s)  (in [0, t))
+  //
+  // Round 1: L1 = (R + F(L, k0)) mod t     R1 = L
+  //          — now L1 in [0,t), R1 in [0,s)
+  // Round 2: L2 = (R1 + F(L1, k1)) mod s   R2 = L1
+  //          — now L2 in [0,s), R2 in [0,t)
+  // Round 3: L3 = (R2 + F(L2, k2)) mod t   R3 = L2
+  //          — now L3 in [0,t), R3 in [0,s)
+  // Round 4: L4 = (R3 + F(L3, k3)) mod s   R4 = L3
+  //          — now L4 in [0,s), R4 in [0,t)  ← same shape as input!
+  //
+  // Output: R4 * s + L4
+  //
+  // In each round:
+  //   odd rounds:  F maps [0,s) → [0,t) with mod t, new L in [0,t)
+  //   even rounds: F maps [0,t) → [0,s) with mod s, new L in [0,s)
+
+  _feistelEnc(L, R, keys) {
+    // Round 1: L in [0,s), R in [0,t) → L' in [0,t), R' in [0,s)
+    let nL = this._mod(R + this._F(L, keys[0], this.t), this.t);
+    let nR = L;
+    L = nL; R = nR;
+
+    // Round 2: L in [0,t), R in [0,s) → L' in [0,s), R' in [0,t)
+    nL = this._mod(R + this._F(L, keys[1], this.s), this.s);
+    nR = L;
+    L = nL; R = nR;
+
+    // Round 3: L in [0,s), R in [0,t) → L' in [0,t), R' in [0,s)
+    nL = this._mod(R + this._F(L, keys[2], this.t), this.t);
+    nR = L;
+    L = nL; R = nR;
+
+    // Round 4: L in [0,t), R in [0,s) → L' in [0,s), R' in [0,t)
+    nL = this._mod(R + this._F(L, keys[3], this.s), this.s);
+    nR = L;
+    L = nL; R = nR;
+
+    return [L, R]; // L in [0,s), R in [0,t)
   }
 
-  feistelDec(L2, R2, k1, k2) {
-    // Inverse round 3
-    const newL2 = R2;
-    const newR2 = L2;
-    const origL2 = this.mod(newL2 - this.F(newR2, k1 + k2, this.splitT), this.splitS);
-    // Inverse round 2
-    const prevR1 = origL2;
-    const prevL1 = this.mod(newR2 - this.F(prevR1, k2, this.splitS), this.splitT);
-    // Inverse round 1
-    const R = prevL1;
-    const L = this.mod(prevR1 - this.F(R, k1, this.splitT), this.splitS);
-    return [L, R];
+  _feistelDec(L, R, keys) {
+    // Undo Round 4: we have L4 in [0,s), R4 in [0,t)
+    // Round 4 was: L4 = (R3 + F(L3, k3)) mod s,  R4 = L3
+    // So: L3 = R4, R3 = (L4 - F(L3, k3)) mod s = (L4 - F(R4, k3)) mod s
+    let L3 = R;
+    let R3 = this._mod(L - this._F(R, keys[3], this.s), this.s);
+
+    // Undo Round 3: L3 in [0,t), R3 in [0,s)
+    // Round 3 was: L3 = (R2 + F(L2, k2)) mod t,  R3 = L2
+    // So: L2 = R3, R2 = (L3 - F(L2, k2)) mod t = (L3 - F(R3, k2)) mod t
+    let L2 = R3;
+    let R2 = this._mod(L3 - this._F(R3, keys[2], this.t), this.t);
+
+    // Undo Round 2: L2 in [0,s), R2 in [0,t)
+    // Round 2 was: L2 = (R1 + F(L1, k1)) mod s,  R2 = L1
+    // So: L1 = R2, R1 = (L2 - F(L1, k1)) mod s = (L2 - F(R2, k1)) mod s
+    let L1 = R2;
+    let R1 = this._mod(L2 - this._F(R2, keys[1], this.s), this.s);
+
+    // Undo Round 1: L1 in [0,t), R1 in [0,s)
+    // Round 1 was: L1 = (R0 + F(L0, k0)) mod t,  R1 = L0
+    // So: L0 = R1, R0 = (L1 - F(L0, k0)) mod t = (L1 - F(R1, k0)) mod t
+    let L0 = R1;
+    let R0 = this._mod(L1 - this._F(R1, keys[0], this.t), this.t);
+
+    return [L0, R0]; // L0 in [0,s), R0 in [0,t)
   }
 
-  // Cycle-walking: apply Feistel, if result >= N, apply again until < N
-  feistelCycleEnc(v, k1, k2) {
-    let L = v % this.splitS;
-    let R = Math.floor(v / this.splitS);
-    let iters = 0;
+  // Cycle-walking: apply Feistel, if result ≥ N, repeat until < N
+  _cycleEnc(v, keys) {
+    let L = v % this.s;
+    let R = Math.floor(v / this.s);
+    let safety = 0;
     do {
-      [L, R] = this.feistelEnc(L, R, k1, k2);
-      iters++;
-      if (iters > 100) break; // safety
-    } while (R * this.splitS + L >= this.N);
-    return R * this.splitS + L;
+      [L, R] = this._feistelEnc(L, R, keys);
+      if (++safety > 200) throw new Error("Cycle-walk stuck (enc)");
+    } while (R * this.s + L >= this.N);
+    return R * this.s + L;
   }
 
-  feistelCycleDec(v, k1, k2) {
-    let L = v % this.splitS;
-    let R = Math.floor(v / this.splitS);
-    let iters = 0;
+  _cycleDec(v, keys) {
+    let L = v % this.s;
+    let R = Math.floor(v / this.s);
+    let safety = 0;
     do {
-      [L, R] = this.feistelDec(L, R, k1, k2);
-      iters++;
-      if (iters > 100) break;
-    } while (R * this.splitS + L >= this.N);
-    return R * this.splitS + L;
+      [L, R] = this._feistelDec(L, R, keys);
+      if (++safety > 200) throw new Error("Cycle-walk stuck (dec)");
+    } while (R * this.s + L >= this.N);
+    return R * this.s + L;
   }
 
-  // Process one character
-  processChar(v, n, fb, encrypt, traceRow) {
+  // Generate round keys for a given outer round + position + feedback
+  _roundKeys(outerRound, pos, fb) {
     const N = this.N;
-    const shift = this.mod(n * n + fb * 3 + n, N);
-    
+    return [
+      this._mod(pos + outerRound * 7 + fb, N),
+      this._mod(fb * 3 + outerRound * 11 + pos * pos, N),
+      this._mod(pos * 5 + fb + outerRound * 13, N),
+      this._mod(fb * fb + pos + outerRound * 17 + 1, N),
+    ];
+  }
+
+  // ── Self-test: exhaustive bijectivity check ─────
+  _selfTest() {
+    // Test with a few key combinations
+    const testKeys = this._roundKeys(0, 1, this.fb0);
+    const seen = new Set();
+    for (let v = 0; v < this.N; v++) {
+      const enc = this._cycleEnc(v, testKeys);
+      if (enc < 0 || enc >= this.N) throw new Error(`Enc out of range: ${v}→${enc}`);
+      if (seen.has(enc)) throw new Error(`Collision: two values map to ${enc}`);
+      seen.add(enc);
+      const dec = this._cycleDec(enc, testKeys);
+      if (dec !== v) throw new Error(`Inverse failed: ${v}→${enc}→${dec}`);
+    }
+  }
+
+  // ── Encrypt / Decrypt single char ───────────────
+  _procChar(v, pos, fb, encrypt) {
+    const N = this.N;
+    const shift = this._mod(pos * pos + 3 * fb + pos, N);
+
     if (encrypt) {
-      let v0 = v;
-      // Multi-round
+      // Apply outer rounds of Feistel
       for (let rd = 0; rd < this.rounds; rd++) {
-        const k1 = this.mod(n + rd * 7 + fb, N);
-        const k2 = this.mod(fb + rd * 13 + n * n, N);
-        v = this.feistelCycleEnc(v, k1, k2);
-        if (traceRow) traceRow.push(v);
+        const keys = this._roundKeys(rd, pos, fb);
+        v = this._cycleEnc(v, keys);
       }
       // Global shift
-      v = this.mod(v + shift, N);
-      if (traceRow) traceRow.push(shift);
+      v = this._mod(v + shift, N);
     } else {
       // Inverse global shift
-      v = this.mod(v - shift, N);
-      if (traceRow) traceRow.push(shift);
-      // Inverse multi-round (reverse order)
+      v = this._mod(v - shift, N);
+      // Inverse outer rounds in reverse order
       for (let rd = this.rounds - 1; rd >= 0; rd--) {
-        const k1 = this.mod(n + rd * 7 + fb, N);
-        const k2 = this.mod(fb + rd * 13 + n * n, N);
-        v = this.feistelCycleDec(v, k1, k2);
-        if (traceRow) traceRow.push(v);
+        const keys = this._roundKeys(rd, pos, fb);
+        v = this._cycleDec(v, keys);
       }
     }
     return v;
   }
 
-  getFeedback(fb, newCharIdx, inputCharIdx, mode) {
-    switch (mode) {
-      case "cipher": return newCharIdx;
-      case "plain":  return inputCharIdx;
-      case "both":   return this.mod(newCharIdx + inputCharIdx, this.N);
-      default:       return newCharIdx;
+  _getFB(prevFB, cipherIdx, plainIdx) {
+    switch (this.fbMode) {
+      case "cipher": return cipherIdx;
+      case "plain":  return plainIdx;
+      case "both":   return this._mod(cipherIdx + plainIdx, this.N);
+      default:       return cipherIdx;
     }
   }
 
+  _clean(text) {
+    let out = "";
+    const upper = text.toUpperCase();
+    for (let i = 0; i < upper.length; i++) {
+      if (this.alpha.indexOf(upper[i]) >= 0) out += upper[i];
+    }
+    return out;
+  }
+
   encrypt(text) {
-    const clean = this._cleanText(text);
+    const clean = this._clean(text);
     let out = "", fb = this.fb0;
-    this.traceLog = [];
+    this.trace = [];
 
     for (let i = 0; i < clean.length; i++) {
       const ch = clean[i];
       const v = this.ordered.indexOf(ch);
-      if (v < 0) continue;
-      const row = [i + 1, ch, v, fb];
-      const nv = this.processChar(v, i + 1, fb, true, row);
+      const nv = this._procChar(v, i + 1, fb, true);
       const outCh = this.ordered[nv];
-      row.push(nv, outCh);
-      this.traceLog.push(row);
+      this.trace.push({ pos: i+1, inCh: ch, inIdx: v, fb, outIdx: nv, outCh });
       out += outCh;
-      fb = this.getFeedback(fb, nv, v, this.feedbackMode);
+      fb = this._getFB(fb, nv, v);
     }
     return out;
   }
 
   decrypt(text) {
-    const clean = this._cleanText(text);
+    const clean = this._clean(text);
     let out = "", fb = this.fb0;
-    this.traceLog = [];
+    this.trace = [];
 
     for (let i = 0; i < clean.length; i++) {
       const ch = clean[i];
       const v = this.ordered.indexOf(ch);
-      if (v < 0) continue;
-      const row = [i + 1, ch, v, fb];
-      const nv = this.processChar(v, i + 1, fb, false, row);
+      const nv = this._procChar(v, i + 1, fb, false);
       const outCh = this.ordered[nv];
-      row.push(nv, outCh);
-      this.traceLog.push(row);
+      this.trace.push({ pos: i+1, inCh: ch, inIdx: v, fb, outIdx: nv, outCh });
       out += outCh;
-      fb = this.getFeedback(fb, v, nv, this.feedbackMode);
-    }
-    return out;
-  }
-
-  _cleanText(text) {
-    let out = "";
-    for (const ch of text.toUpperCase()) {
-      if (this.alpha.includes(ch)) out += ch;
+      // CRITICAL: feedback uses CIPHERTEXT index.
+      // In decrypt: input IS ciphertext, output IS plaintext.
+      // cipher index = v (the input to decrypt), plain index = nv (the output)
+      fb = this._getFB(fb, v, nv);
     }
     return out;
   }
 }
 
-// ╔══════════════════════════════════════════════════╗
-// ║                  UI STATE                        ║
-// ╚══════════════════════════════════════════════════╝
+// ════════════════════════════════════════════════════
+//  UI
+// ════════════════════════════════════════════════════
 
 const cipher = new SLC();
-let lastEncrypt = true;
-let lastInput = "";
-let lastOutput = "";
-let traceStepIdx = 0;
+let lastIn = "", lastOut = "", lastEnc = true, trIdx = 0;
 
 function getConf() {
-  const alphaKey = document.getElementById("selAlpha").value;
+  const ak = document.getElementById("selAlpha").value;
   let alpha;
-  if (alphaKey === "CUSTOM") {
-    alpha = document.getElementById("inCustomAlpha").value;
-    // deduplicate
-    const seen = new Set();
-    let clean = "";
-    for (const ch of alpha) {
-      const u = ch.toUpperCase ? ch.toUpperCase() : ch;
-      if (!seen.has(u) && u.trim()) { seen.add(u); clean += u; }
-    }
-    alpha = clean;
-    if (alpha.length < 2) alpha = ALPHA_PRESETS.EN;
+  if (ak === "CUSTOM") {
+    const raw = document.getElementById("inCustom").value;
+    const seen = new Set(); let c = "";
+    for (const ch of raw) { const u = ch.toUpperCase(); if (!seen.has(u) && u.trim()) { seen.add(u); c += u; } }
+    alpha = c.length >= 2 ? c : ALPHAS.EN;
   } else {
-    alpha = ALPHA_PRESETS[alphaKey] || ALPHA_PRESETS.EN;
+    alpha = ALPHAS[ak] || ALPHAS.EN;
   }
   return {
     key: document.getElementById("inKey").value || "KEY",
     alpha,
     rounds: parseInt(document.getElementById("selRounds").value) || 2,
-    feistel: document.getElementById("selFeistel").value,
-    feedback: document.getElementById("selFeedback").value,
+    fType: document.getElementById("selF").value,
+    fbMode: document.getElementById("selFB").value,
   };
 }
 
 function rebuild() {
-  const c = getConf();
-  
-  // Show/hide custom alphabet
-  document.getElementById("customAlphaWrap").style.display = 
+  document.getElementById("customWrap").style.display =
     document.getElementById("selAlpha").value === "CUSTOM" ? "block" : "none";
-
-  try {
-    cipher.init(c.key, c.alpha, c.rounds, c.feistel, c.feedback);
-  } catch(e) {
-    toast(e.message, "err");
-    return;
-  }
-
-  renderStats();
-  renderAlphabet();
-  renderGrid();
-  renderFormulas();
+  const c = getConf();
+  try { cipher.init(c.key, c.alpha, c.rounds, c.fType, c.fbMode); }
+  catch(e) { toast(e.message, "err"); return; }
+  renderStats(); renderAlpha(); renderGrid(); renderFormulas();
 }
-
-// ── RENDERING ──────────────────────────────────────
 
 function renderStats() {
-  const el = document.getElementById("statsRow");
-  const N = cipher.N;
-  const keyLen = (document.getElementById("inKey").value || "").replace(/[^A-Za-z\u0400-\u04FF]/g,"").length;
-  const entropy = Math.floor(Math.log2(Math.pow(N, Math.min(keyLen, N))));
-  const items = [
-    [N, "Alphabet"],
-    [cipher.gridW + "×" + cipher.gridH, "Grid"],
-    [cipher.rounds, "Rounds"],
-    [cipher.fb0, "Init FB"],
-    ["~" + entropy, "Bits"],
-    [cipher.pivotCount, "Pivots"],
-  ];
-  el.innerHTML = items.map(([v,l]) => `<div class="st"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+  const N = cipher.N, kl = (document.getElementById("inKey").value||"").length;
+  const bits = Math.floor(Math.log2(Math.pow(N, Math.min(kl, N))));
+  const items = [[N,"Alpha"],[cipher.s+"×"+cipher.t,"Grid"],[cipher.rounds,"Rounds"],[cipher.fb0,"FB₀"],["~"+bits,"Bits"]];
+  document.getElementById("statsRow").innerHTML = items.map(([v,l])=>`<div class="st"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
 }
 
-function renderAlphabet() {
-  const el = document.getElementById("alphaDisplay");
-  el.innerHTML = cipher.ordered.map((ch, i) =>
-    `<span class="ac"><span class="ix">${i}</span>${ch}</span>`
-  ).join("");
+function renderAlpha() {
+  document.getElementById("alphaDisp").innerHTML = cipher.ordered.map((ch,i)=>`<span class="ac"><span class="ix">${i}</span>${ch}</span>`).join("");
 }
 
 function renderGrid(hiSrc, hiDst) {
-  const el = document.getElementById("gridDisplay");
-  const W = cipher.gridW;
-  const N = cipher.N;
-  el.innerHTML = "";
-
-  const grid = document.createElement("div");
-  grid.className = "g5";
-  grid.style.gridTemplateColumns = `repeat(${W}, 1fr)`;
-
-  for (let i = 0; i < cipher.gridArea; i++) {
+  const el = document.getElementById("gridDisp");
+  const W = cipher.s, N = cipher.N, total = cipher.s * cipher.t;
+  let html = `<div class="g5" style="grid-template-columns:repeat(${W},1fr)">`;
+  for (let i = 0; i < total; i++) {
     const r = Math.floor(i / W), c = i % W;
-    const div = document.createElement("div");
-    if (i < N) {
-      div.className = "gc" + (i === hiSrc ? " src" : "") + (i === hiDst ? " dst" : "");
-      div.innerHTML = `<span class="ix">${i}</span><span class="ch">${cipher.ordered[i]}</span><span class="cr">${r},${c}</span>`;
-    } else {
-      div.className = "gc pv";
-      div.innerHTML = `<span class="ix">${i}</span><span class="ch">∅</span><span class="cr">${r},${c}</span>`;
-    }
-    grid.appendChild(div);
+    const cls = i === hiSrc ? " src" : i === hiDst ? " dst" : i >= N ? " empty" : "";
+    const ch = i < N ? cipher.ordered[i] : "∅";
+    html += `<div class="gc${cls}"><span class="ix">${i}</span><span class="ch">${ch}</span><span class="cr">${r},${c}</span></div>`;
   }
-  el.appendChild(grid);
-
-  document.getElementById("gridDims").textContent = `${W}×${cipher.gridH}` + (cipher.pivotCount > 0 ? ` + ${cipher.pivotCount} empty` : "");
+  html += "</div>";
+  el.innerHTML = html;
+  document.getElementById("gridDims").textContent = `${W}×${cipher.t}` + (total > N ? ` (${total-N} empty)` : "");
 }
 
 function renderFormulas() {
-  const el = document.getElementById("formulaDisplay");
-  const fName = {quad: "x² + k", cube: "x³ + k", mix: "x² + x·k + 1"}[cipher.feistelType];
-  const fbName = {cipher: "ciphertext char index", plain: "plaintext char index", both: "cipher + plain mod N"}[cipher.feedbackMode];
-  el.innerHTML = `
-    <div><span class="tag tag-g">Alphabet size N</span> = ${cipher.N}</div>
-    <div><span class="tag tag-g">Split</span> s = ${cipher.splitS}, t = ${cipher.splitT} (s·t = ${cipher.splitS * cipher.splitT} ≥ N)</div>
-    <div><span class="tag tag-b">Feistel F(x, k)</span> = ${fName} <span class="muted">(mod s or t)</span></div>
-    <div><span class="tag tag-y">Shift(n, fb)</span> = (n² + 3·fb + n) mod N</div>
-    <div><span class="tag tag-p">Rounds</span> = ${cipher.rounds}</div>
-    <div><span class="tag tag-r">Feedback</span> = ${fbName}</div>
+  const fn = {quad:"x² + k", cube:"x³ + k", mix:"x² + x·(k+1) + 1"}[cipher.fType];
+  const fm = {cipher:"ciphertext idx", plain:"plaintext idx", both:"cipher+plain mod N"}[cipher.fbMode];
+  document.getElementById("formDisp").innerHTML = `
+    <div><span class="tag tag-g">N</span> = ${cipher.N}, <span class="tag tag-b">s</span> = ${cipher.s}, <span class="tag tag-b">t</span> = ${cipher.t} (s·t=${cipher.s*cipher.t}≥N)</div>
+    <div><span class="tag tag-p">F(x,k,m)</span> = (${fn}) mod m</div>
+    <div><span class="tag tag-y">Shift</span> = (n² + 3·fb + n) mod N</div>
+    <div><span class="tag tag-r">Feedback</span> = ${fm}</div>
     <hr class="sep">
-    <div style="color:var(--text2)">
-      <b>Encrypt path (per round):</b><br>
-      v → split (L=v%s, R=⌊v/s⌋) → 3-round Feistel → recombine → cycle-walk if ≥N<br>
-      After all rounds: v = (v + shift) mod N
-    </div>
-    <div style="color:var(--text2);margin-top:6px">
-      <b>Decrypt path:</b> exact inverse — subtract shift, then inverse Feistel rounds in reverse order.
-    </div>
-    <div style="color:var(--text2);margin-top:6px">
-      <b>Cycle-walking</b> guarantees bijectivity on [0,N) even when s·t > N.
-    </div>
-  `;
+    <div style="color:var(--text2)"><b>Feistel (4 internal rounds):</b><br>
+    R1: L'=(R + F(L,k₀)) mod t, R'=L<br>
+    R2: L'=(R'+ F(L',k₁)) mod s, R'=L'<br>
+    R3: L'=(R'+ F(L',k₂)) mod t, R'=L'<br>
+    R4: L'=(R'+ F(L',k₃)) mod s, R'=L'<br>
+    + cycle-walking if result ≥ N</div>`;
 }
 
-function renderTrace(isEncrypt) {
-  const tbody = document.getElementById("traceBody");
-  const log = cipher.traceLog;
-  if (!log.length) { tbody.innerHTML = "<tr><td colspan='10' class='muted'>No data</td></tr>"; return; }
-
-  // Columns: #, In, Idx, FB, [round results...], Shift, OutIdx, Out
-  // log row = [n, inCh, inIdx, fb, ...intermediates, outIdx, outCh]
-  const rounds = cipher.rounds;
-  
-  // rebuild header
-  const thead = document.querySelector("#traceTable thead tr");
-  let hdr = "<th>#</th><th>In</th><th>Idx</th><th>FB</th>";
-  if (isEncrypt) {
-    for (let r = 0; r < rounds; r++) hdr += `<th>R${r+1}</th>`;
-    hdr += "<th>Shift</th>";
-  } else {
-    hdr += "<th>Shift</th>";
-    for (let r = 0; r < rounds; r++) hdr += `<th>R${r+1}⁻¹</th>`;
-  }
-  hdr += "<th>Out Idx</th><th>Out</th>";
-  thead.innerHTML = hdr;
-
-  tbody.innerHTML = log.map(row => {
-    const n = row[0], inCh = row[1], inIdx = row[2], fb = row[3];
-    const outCh = row[row.length - 1], outIdx = row[row.length - 2];
-    const mids = row.slice(4, row.length - 2);
-    
-    let cells = `<td class="hi-b">${n}</td><td class="hi-g">${inCh}</td><td>${inIdx}</td><td class="hi-o">${fb}</td>`;
-    for (const m of mids) cells += `<td class="hi-p">${m}</td>`;
-    cells += `<td class="hi-r">${outIdx}</td><td class="hi-r">${outCh}</td>`;
-    return `<tr>${cells}</tr>`;
-  }).join("");
-
-  traceStepIdx = 0;
-  updateTraceStep();
-}
-
-function updateTraceStep() {
-  const log = cipher.traceLog;
-  if (!log.length) return;
-  const idx = Math.max(0, Math.min(traceStepIdx, log.length - 1));
-  traceStepIdx = idx;
-  const row = log[idx];
-  const inIdx = row[2], outIdx = row[row.length - 2];
-  const inCh = row[1], outCh = row[row.length - 1];
-  
-  document.getElementById("traceStepInfo").textContent = `Step ${idx + 1}/${log.length}`;
-  
-  renderGrid(inIdx, outIdx);
-  
-  document.getElementById("traceStepDetail").innerHTML = 
-    `<span class="tag tag-g">${inCh}</span> (index ${inIdx}) → ` +
-    `<span class="tag tag-r">${outCh}</span> (index ${outIdx}) | ` +
-    `Feedback: ${row[3]}`;
-}
-
-function traceStep(dir) {
-  traceStepIdx += dir;
-  const log = cipher.traceLog;
-  if (traceStepIdx < 0) traceStepIdx = 0;
-  if (traceStepIdx >= log.length) traceStepIdx = log.length - 1;
-  updateTraceStep();
-}
-
-// ── FREQUENCY ANALYSIS ────────────────────────────
-
-function renderFreq(text, containerId) {
-  const el = document.getElementById(containerId);
-  const clean = [];
-  for (const ch of text.toUpperCase()) {
-    if (cipher.alpha.includes(ch)) clean.push(ch);
-  }
-  if (!clean.length) { el.innerHTML = '<div class="muted" style="padding:20px;text-align:center">No data</div>'; return; }
-  
-  const counts = {};
-  let max = 0;
-  for (const ch of clean) {
-    counts[ch] = (counts[ch] || 0) + 1;
-    if (counts[ch] > max) max = counts[ch];
-  }
-
-  // Show all alphabet chars
-  const chars = cipher.alpha.split ? cipher.alpha.split("") : [...cipher.alpha];
-  el.innerHTML = chars.map(ch => {
-    const cnt = counts[ch] || 0;
-    const pct = max > 0 ? (cnt / max * 100) : 0;
-    return `<div class="fb"><div class="bar" style="height:${Math.max(pct, 1)}%;${cnt > 0 ? '' : 'opacity:.2'}"></div><div class="lbl">${ch}</div></div>`;
-  }).join("");
-}
-
-function renderFreqCompare() {
-  const el = document.getElementById("freqCmp");
-  if (!lastInput || !lastOutput) { el.innerHTML = '<div class="muted">Encrypt something first</div>'; return; }
-  
-  const countIn = {}, countOut = {};
-  for (const ch of cipher._cleanText(lastInput)) countIn[ch] = (countIn[ch] || 0) + 1;
-  for (const ch of cipher._cleanText(lastOutput)) countOut[ch] = (countOut[ch] || 0) + 1;
-  
-  const chars = [...cipher.alpha];
-  let html = '<table class="tbl"><tr><th>Char</th><th>Input</th><th>Output</th><th>Δ</th></tr>';
-  for (const ch of chars) {
-    const a = countIn[ch] || 0, b = countOut[ch] || 0;
-    const d = b - a;
-    if (a === 0 && b === 0) continue;
-    const dc = d > 0 ? "hi-r" : d < 0 ? "hi-g" : "";
-    html += `<tr><td class="hi-b">${ch}</td><td>${a}</td><td>${b}</td><td class="${dc}">${d > 0 ? "+" : ""}${d}</td></tr>`;
-  }
-  html += "</table>";
-  el.innerHTML = html;
-}
-
-// ── MAIN ACTIONS ──────────────────────────────────
-
-function doProcess(encrypt) {
+function doProc(enc) {
   rebuild();
-  const input = document.getElementById("inText").value;
-  if (!input.trim()) { toast("Enter some text", "err"); return; }
-
+  const raw = document.getElementById("inText").value;
+  if (!raw.trim()) { toast("Enter text", "err"); return; }
   const t0 = performance.now();
-  let output;
-  try {
-    output = encrypt ? cipher.encrypt(input) : cipher.decrypt(input);
-  } catch (e) {
-    toast("Error: " + e.message, "err");
-    return;
-  }
-  const ms = (performance.now() - t0).toFixed(2);
-
-  lastEncrypt = encrypt;
-  lastInput = input;
-  lastOutput = output;
-
-  document.getElementById("outContent").textContent = output || "(empty)";
-  document.getElementById("processInfo").innerHTML = 
-    `<span class="tag ${encrypt ? "tag-g" : "tag-r"}">${encrypt ? "ENCRYPT" : "DECRYPT"}</span> ` +
-    `In: ${cipher._cleanText(input).length} chars | Out: ${output.length} chars | ${ms}ms | ` +
-    `Key: "${(document.getElementById("inKey").value || "").toUpperCase()}" | Rounds: ${cipher.rounds}`;
-
-  renderTrace(encrypt);
-  renderFreq(input, "freqIn");
-  renderFreq(output, "freqOut");
-  renderFreqCompare();
+  let out;
+  try { out = enc ? cipher.encrypt(raw) : cipher.decrypt(raw); }
+  catch(e) { toast("Error: "+e.message, "err"); return; }
+  const ms = (performance.now()-t0).toFixed(2);
+  lastEnc = enc; lastIn = raw; lastOut = out;
+  document.getElementById("outText").textContent = out || "(empty)";
+  document.getElementById("procInfo").innerHTML =
+    `<span class="tag ${enc?"tag-g":"tag-r"}">${enc?"ENC":"DEC"}</span> ` +
+    `${cipher._clean(raw).length}→${out.length} chars | ${ms}ms | Rounds:${cipher.rounds}`;
+  renderTrace(); renderFreq(raw,"freqIn"); renderFreq(out,"freqOut"); renderFreqCmp();
 }
 
 function doVerify() {
-  if (!lastOutput) return;
-  const decrypted = cipher.decrypt(lastOutput);
-  const original = cipher._cleanText(lastInput);
-  if (decrypted === original) {
-    toast("✓ Verified: decrypt(encrypt(x)) = x", "ok");
-  } else {
-    toast("✗ VERIFICATION FAILED!", "err");
-  }
+  if (!lastOut) return;
+  const dec = cipher.decrypt(lastOut);
+  const orig = cipher._clean(lastIn);
+  toast(dec===orig ? "✓ Verified: decrypt(encrypt(x)) = x" : "✗ FAILED: "+dec.substring(0,30)+"…", dec===orig?"ok":"err");
 }
 
-function swapIO() {
-  const inp = document.getElementById("inText");
-  const out = document.getElementById("outContent").textContent;
-  if (out && out !== "—") inp.value = out;
-}
-
-function clearIO() {
-  document.getElementById("inText").value = "";
-  document.getElementById("outContent").textContent = "—";
-  document.getElementById("processInfo").innerHTML = "";
-  document.getElementById("traceBody").innerHTML = "";
-}
-
-function copyOut() {
-  const t = document.getElementById("outContent").textContent;
-  if (t && t !== "—") {
-    navigator.clipboard.writeText(t).then(() => toast("Copied!", "ok"));
-  }
-}
+function swapIO() { const o = document.getElementById("outText").textContent; if (o && o!=="—") document.getElementById("inText").value = o; }
+function clearIO() { document.getElementById("inText").value=""; document.getElementById("outText").textContent="—"; document.getElementById("procInfo").innerHTML=""; document.getElementById("traceTb").innerHTML=""; }
+function copyOut() { const t = document.getElementById("outText").textContent; if(t&&t!=="—") navigator.clipboard.writeText(t).then(()=>toast("Copied!","ok")); }
 
 function randomKey() {
-  const words = ["PHOENIX","QUANTUM","NEBULA","CRYSTAL","VORTEX","SHADOW","ENIGMA","CIPHER","MATRIX","PRISM","HORIZON","ZENITH","AURORA","COSMOS","TEMPEST","SPHINX","ORCHID","ALCHEMY","MYSTIC","NEXUS"];
-  const w = words[Math.floor(Math.random() * words.length)];
-  document.getElementById("inKey").value = w;
-  rebuild();
-  toast("Key: " + w, "info");
+  const w=["PHOENIX","QUANTUM","NEBULA","CRYSTAL","VORTEX","SHADOW","ENIGMA","CIPHER","MATRIX","PRISM","HORIZON","ZENITH","AURORA","COSMOS","TEMPEST","SPHINX","ORCHID","ALCHEMY","MYSTIC","NEXUS"];
+  const k=w[Math.floor(Math.random()*w.length)];
+  document.getElementById("inKey").value=k; rebuild(); toast("Key: "+k,"info");
+}
+
+// ── TRACE ─────────────────────────────────────────
+
+function renderTrace() {
+  const hd = document.getElementById("traceHd");
+  const tb = document.getElementById("traceTb");
+  const tr = cipher.trace;
+  if (!tr.length) { hd.innerHTML=""; tb.innerHTML="<tr><td class='muted'>No data</td></tr>"; return; }
+  hd.innerHTML = "<tr><th>#</th><th>In</th><th>Idx</th><th>FB</th><th>Out Idx</th><th>Out</th></tr>";
+  tb.innerHTML = tr.map(r =>
+    `<tr><td class="hi-b">${r.pos}</td><td class="hi-g">${r.inCh}</td><td>${r.inIdx}</td><td class="hi-o">${r.fb}</td><td class="hi-r">${r.outIdx}</td><td class="hi-r">${r.outCh}</td></tr>`
+  ).join("");
+  trIdx = 0; updateTrStep();
+}
+
+function updateTrStep() {
+  const tr = cipher.trace;
+  if (!tr.length) return;
+  trIdx = Math.max(0, Math.min(trIdx, tr.length-1));
+  const r = tr[trIdx];
+  document.getElementById("trInfo").textContent = `${trIdx+1}/${tr.length}`;
+  renderGrid(r.inIdx, r.outIdx);
+  document.getElementById("trDetail").innerHTML =
+    `<span class="tag tag-g">${r.inCh}</span> (${r.inIdx}) → <span class="tag tag-r">${r.outCh}</span> (${r.outIdx}) | FB: ${r.fb}`;
+}
+
+function trStep(d) { trIdx += d; updateTrStep(); }
+
+// ── FREQ ──────────────────────────────────────────
+
+function renderFreq(text, id) {
+  const el = document.getElementById(id);
+  const clean = cipher._clean(text);
+  if (!clean) { el.innerHTML='<div class="muted" style="padding:20px;text-align:center">—</div>'; return; }
+  const cnt = {}; let mx = 0;
+  for (const ch of clean) { cnt[ch]=(cnt[ch]||0)+1; if(cnt[ch]>mx)mx=cnt[ch]; }
+  el.innerHTML = [...cipher.alpha].map(ch => {
+    const n=cnt[ch]||0, p=mx>0?(n/mx*100):0;
+    return `<div class="fb"><div class="bar" style="height:${Math.max(p,1)}%;${n>0?"":"opacity:.2"}"></div><div class="lbl">${ch}</div></div>`;
+  }).join("");
+}
+
+function renderFreqCmp() {
+  const el = document.getElementById("freqCmp");
+  if (!lastIn||!lastOut) { el.innerHTML='<div class="muted">—</div>'; return; }
+  const ci={}, co={};
+  for (const ch of cipher._clean(lastIn)) ci[ch]=(ci[ch]||0)+1;
+  for (const ch of cipher._clean(lastOut)) co[ch]=(co[ch]||0)+1;
+  let html = '<table class="tbl"><tr><th>Ch</th><th>In</th><th>Out</th><th>Δ</th></tr>';
+  for (const ch of cipher.alpha) {
+    const a=ci[ch]||0, b=co[ch]||0, d=b-a;
+    if(!a&&!b) continue;
+    html+=`<tr><td class="hi-b">${ch}</td><td>${a}</td><td>${b}</td><td class="${d>0?"hi-r":d<0?"hi-g":""}">${d>0?"+":""}${d}</td></tr>`;
+  }
+  el.innerHTML = html+"</table>";
 }
 
 // ── AVALANCHE ─────────────────────────────────────
 
-function showAvalanche() {
+function showAval() {
   rebuild();
-  const base = "ABCDEFGHIJKLMNOPQRST".substring(0, Math.min(20, cipher.N));
-  if (base.length < 2) { toast("Alphabet too small", "err"); return; }
-  
+  const base = cipher.alpha.substring(0, Math.min(20, cipher.N));
+  if (base.length<2) return;
   const enc1 = cipher.encrypt(base);
-  // Change first letter
-  const alt = cipher.ordered[(cipher.ordered.indexOf(base[0]) + 1) % cipher.N] + base.substring(1);
+  const i0 = cipher.ordered.indexOf(base[0]);
+  const alt = cipher.ordered[(i0+1)%cipher.N] + base.substring(1);
   const enc2 = cipher.encrypt(alt);
-
-  let diffs = 0;
-  let html = `<div class="mb-sm muted">Original: <b>${base}</b> → Changed first letter: <b>${alt}</b></div>`;
-  html += `<div class="mb-sm"><span class="tag tag-g">ENC₁</span> ${enc1}</div>`;
-  html += `<div class="mb-sm"><span class="tag tag-r">ENC₂</span> ${enc2}</div>`;
-  html += '<div class="aval">';
-  
-  const len = Math.max(enc1.length, enc2.length);
-  for (let i = 0; i < len; i++) {
-    const a = enc1[i] || "?", b = enc2[i] || "?";
-    const same = a === b;
-    if (!same) diffs++;
-    html += `<div class="bit ${same ? "bit-same" : "bit-diff"}" title="Pos ${i}: ${a} vs ${b}">${b}</div>`;
+  let diffs=0, bits="";
+  const len=Math.max(enc1.length,enc2.length);
+  for(let i=0;i<len;i++){
+    const a=enc1[i]||"?",b=enc2[i]||"?",same=a===b;
+    if(!same)diffs++;
+    bits+=`<div class="bit ${same?"bit-same":"bit-diff"}" title="${a}→${b}">${b}</div>`;
   }
-  html += "</div>";
-  html += `<div class="mt-sm muted">Changed positions: <b style="color:var(--red)">${diffs}/${len}</b> (${(diffs/len*100).toFixed(0)}%) — ${diffs/len > 0.3 ? '<span style="color:var(--green)">Good avalanche!</span>' : '<span style="color:var(--orange)">Weak avalanche</span>'}</div>`;
-
-  document.getElementById("avalResult").innerHTML = html;
+  document.getElementById("avalRes").innerHTML=`
+    <div class="mb-sm muted">Original: <b>${base.substring(0,20)}</b></div>
+    <div class="mb-sm muted">Changed:  <b>${alt.substring(0,20)}</b></div>
+    <div class="aval">${bits}</div>
+    <div class="mt-sm muted">Diff: <b style="color:var(--red)">${diffs}/${len}</b> (${(diffs/len*100).toFixed(0)}%) ${diffs/len>.3?'<span style="color:var(--green)">✓ Good</span>':'<span style="color:var(--orange)">⚠ Weak</span>'}</div>`;
 }
 
-// ── SELF TEST ─────────────────────────────────────
+// ── FULL TEST ─────────────────────────────────────
 
 function runFullTest() {
   rebuild();
-  const el = document.getElementById("testResults");
-  const alpha = cipher.alpha;
-  
+  const N = cipher.N, alpha = cipher.alpha;
   const tests = [
-    alpha.substring(0, Math.min(alpha.length, 26)),
+    alpha.substring(0, Math.min(N, 26)),
     alpha[0].repeat(10),
-    alpha[alpha.length - 1].repeat(5),
+    alpha[N-1].repeat(5),
+    alpha[Math.floor(N/2)].repeat(8),
   ];
-  // Add random strings
-  for (let t = 0; t < 3; t++) {
-    let s = "";
-    for (let i = 0; i < 15 + t * 10; i++) {
-      s += alpha[Math.floor(Math.random() * alpha.length)];
-    }
+  for (let t=0; t<4; t++) {
+    let s="";
+    for(let i=0;i<15+t*10;i++) s+=alpha[Math.floor(Math.random()*N)];
     tests.push(s);
   }
+  // Single char tests
+  for (let i=0; i<Math.min(N,26); i++) tests.push(alpha[i]);
 
-  let pass = 0, fail = 0;
-  let html = '<table class="tbl"><tr><th>#</th><th>Input</th><th>Encrypted</th><th>Decrypted</th><th>Status</th></tr>';
-  
-  tests.forEach((t, i) => {
-    const enc = cipher.encrypt(t);
-    const dec = cipher.decrypt(enc);
-    const clean = cipher._cleanText(t);
-    const ok = dec === clean;
-    ok ? pass++ : fail++;
-    const trunc = s => s.length > 25 ? s.substring(0, 22) + "…" : s;
-    html += `<tr>
-      <td>${i + 1}</td>
-      <td style="text-align:left">${trunc(clean)}</td>
-      <td style="text-align:left" class="hi-p">${trunc(enc)}</td>
-      <td style="text-align:left">${trunc(dec)}</td>
-      <td class="${ok ? "hi-g" : "hi-r"}">${ok ? "✅ PASS" : "❌ FAIL"}</td>
-    </tr>`;
+  let pass=0,fail=0;
+  let html='<div class="tscroll"><table class="tbl"><tr><th>#</th><th>Input</th><th>Encrypted</th><th>Decrypted</th><th>✓</th></tr>';
+  tests.forEach((t,i) => {
+    const enc=cipher.encrypt(t);
+    const dec=cipher.decrypt(enc);
+    const clean=cipher._clean(t);
+    const ok=dec===clean;
+    ok?pass++:fail++;
+    const trn=s=>s.length>22?s.substring(0,20)+"…":s;
+    html+=`<tr><td>${i+1}</td><td style="text-align:left">${trn(clean)}</td><td style="text-align:left" class="hi-p">${trn(enc)}</td><td style="text-align:left">${trn(dec)}</td><td class="${ok?"hi-g":"hi-r"}">${ok?"✅":"❌"}</td></tr>`;
   });
-  
-  html += "</table>";
-  html += `<div class="mt-sm" style="text-align:center;font-weight:700;color:${fail === 0 ? "var(--green)" : "var(--red)"}">
-    ${fail === 0 ? "✅ All " + pass + " tests passed — cipher is fully reversible!" : "❌ " + fail + " test(s) failed!"}
-  </div>`;
-  
-  el.innerHTML = html;
-  toast(fail === 0 ? `All ${pass} tests passed!` : `${fail} tests FAILED`, fail === 0 ? "ok" : "err");
+  html+="</table></div>";
+  html+=`<div class="mt-sm" style="text-align:center;font-weight:700;color:${fail===0?"var(--green)":"var(--red)"}">${fail===0?"✅ All "+pass+" passed!":"❌ "+fail+" failed"}</div>`;
+  document.getElementById("testRes").innerHTML=html;
+  toast(fail===0?`All ${pass} passed!`:`${fail} FAILED`,(fail===0?"ok":"err"));
 }
 
-// ── EXPORT PUZZLE ─────────────────────────────────
+// ── EXPORT ────────────────────────────────────────
 
 function exportPuzzle() {
-  const input = document.getElementById("inText").value;
-  if (!input.trim()) { toast("Enter text to create a puzzle", "err"); return; }
-  
+  const raw=document.getElementById("inText").value;
+  if(!raw.trim()){toast("Enter text first","err");return;}
   rebuild();
-  const enc = cipher.encrypt(input);
-  const conf = getConf();
-  
-  const puzzle = {
-    title: "Spiral Lattice Cipher Puzzle",
-    ciphertext: enc,
-    settings: {
-      alphabet: conf.alpha === ALPHA_PRESETS.EN ? "English A-Z" : 
-                conf.alpha === ALPHA_PRESETS.RU ? "Russian А-Я" : 
-                conf.alpha === ALPHA_PRESETS.EN_NUM ? "English + Digits" : "Custom: " + conf.alpha,
-      rounds: conf.rounds,
-      feistelFunction: conf.feistel,
-      feedbackMode: conf.feedback,
-      gridSize: cipher.gridW + "×" + cipher.gridH,
-    },
-    hint: "Key is a single English word",
-    note: "Decrypt using PerfectSpiralCipher tool"
-  };
-
-  const text = JSON.stringify(puzzle, null, 2);
-  
-  document.getElementById("modalContent").innerHTML = `
+  const enc=cipher.encrypt(raw);
+  const c=getConf();
+  const json=JSON.stringify({title:"Spiral Lattice Cipher Puzzle",ciphertext:enc,settings:{alphabet:c.alpha.length+" chars",rounds:c.rounds,feistel:c.fType,feedback:c.fbMode,grid:cipher.s+"×"+cipher.t},hint:"Key is a single English word"},null,2);
+  const reddit=`**🌀 Spiral Lattice Cipher Challenge**\n\n\`${enc}\`\n\n**Settings:** ${c.alpha.length} chars, ${c.rounds} rounds, ${c.fType}, ${c.fbMode}\n\n**Hint:** The key is a single word.`;
+  document.getElementById("modalContent").innerHTML=`
     <h2>📤 Export Puzzle</h2>
-    <p>Share this puzzle on r/codes, r/puzzles, or any cryptography community:</p>
-    <textarea style="width:100%;min-height:200px;margin:10px 0" readonly onclick="this.select()">${text}</textarea>
+    <p style="color:var(--text2)">Share on r/codes or r/puzzles:</p>
+    <textarea style="width:100%;min-height:120px;margin:8px 0" readonly onclick="this.select()">${json}</textarea>
     <div class="btns mt-sm">
-      <button class="btn btn-b" onclick="navigator.clipboard.writeText(\`${text.replace(/`/g,'\\`').replace(/\\/g,'\\\\')}\`);toast('Copied!','ok')">📋 Copy JSON</button>
-      <button class="btn btn-g" onclick="copyRedditFormat()">📝 Copy Reddit Format</button>
+      <button class="btn btn-b" onclick="navigator.clipboard.writeText(document.querySelector('#modalContent textarea').value);toast('Copied!','ok')">📋 JSON</button>
+      <button class="btn btn-g" onclick="navigator.clipboard.writeText(\`${reddit.replace(/`/g,"\\`")}\`);toast('Reddit format copied!','ok')">📝 Reddit</button>
       <button class="btn" onclick="closeModal()">Close</button>
-    </div>
-    <div class="mt-sm" id="redditPreview"></div>
-  `;
+    </div>`;
   document.getElementById("modalBg").classList.add("show");
 }
 
-function copyRedditFormat() {
-  const conf = getConf();
-  const enc = cipher.encrypt(document.getElementById("inText").value);
-  const text = `**🌀 Spiral Lattice Cipher Challenge**\n\n` +
-    `**Ciphertext:**\n\n\`${enc}\`\n\n` +
-    `**Settings:**\n` +
-    `- Alphabet: ${conf.alpha.length} characters\n` +
-    `- Rounds: ${conf.rounds}\n` +
-    `- Feistel: ${conf.feistel}\n` +
-    `- Feedback: ${conf.feedback}\n` +
-    `- Grid: ${cipher.gridW}×${cipher.gridH}\n\n` +
-    `**Hint:** The key is a single word.\n\n` +
-    `*Decrypt using the Spiral Lattice Cipher tool.*`;
-  
-  navigator.clipboard.writeText(text).then(() => toast("Reddit format copied!", "ok"));
-}
-
-// ── HELP MODAL ────────────────────────────────────
+// ── HELP ──────────────────────────────────────────
 
 function showHelp() {
-  document.getElementById("modalContent").innerHTML = `
-    <h2>📖 How the Spiral Lattice Cipher Works</h2>
-    
-    <p><b>Overview:</b> A non-linear, position-dependent cipher that uses Feistel networks on a 2D grid structure with ciphertext feedback. Inspired by historical ciphers but with modern cryptographic primitives.</p>
-    
-    <h3 style="color:var(--green);margin:15px 0 8px">Step 1: Key → Alphabet Order</h3>
-    <p>The key letters are placed first, followed by remaining alphabet characters. This creates a permuted alphabet (like a keyed Caesar cipher's alphabet).</p>
-    <p>Example: Key <code>ENIGMA</code> → <code>E N I G M A B C D F H J K L O P Q R S T U V W X Y Z</code></p>
-    
-    <h3 style="color:var(--green);margin:15px 0 8px">Step 2: Grid Structure</h3>
-    <p>The alphabet is arranged in a grid of size <code>s × t</code> where <code>s = ⌈√N⌉</code>. Each character gets coordinates <code>(row, col)</code>. The grid may have empty "pivot" cells if s×t > N.</p>
-    
-    <h3 style="color:var(--green);margin:15px 0 8px">Step 3: Feistel Network (per round)</h3>
-    <p>Each character index is split into <code>L = v mod s</code> and <code>R = ⌊v/s⌋</code>, then passed through a 3-round Feistel network:</p>
+  document.getElementById("modalContent").innerHTML=`
+    <h2>📖 How It Works</h2>
+    <p><b>Spiral Lattice Cipher</b> — a non-linear, position-dependent cipher using Feistel networks.</p>
     <ul>
-      <li>Round 1: <code>L' = R, R' = L + F(R, k₁) mod s</code></li>
-      <li>Round 2: <code>L'' = R', R'' = L' + F(R', k₂) mod t</code></li>
-      <li>Round 3: <code>L''' = R'', R''' = L'' + F(R'', k₁+k₂) mod s</code></li>
+      <li><b>Key</b> reorders the alphabet (like a keyed substitution)</li>
+      <li><b>Grid</b>: alphabet mapped to s×t grid (s=⌈√N⌉)</li>
+      <li><b>Feistel</b>: 4-round unbalanced Feistel network — mathematically guaranteed bijection</li>
+      <li><b>Cycle-walking</b>: if Feistel output ≥ N, re-apply until in range (preserves bijectivity)</li>
+      <li><b>Shift</b>: position-dependent modular addition: (n² + 3·fb + n) mod N</li>
+      <li><b>Feedback</b>: each character's output influences the next character's encryption</li>
+      <li><b>Rounds</b>: the entire Feistel+shift is applied multiple times for stronger diffusion</li>
     </ul>
-    <p>Cycle-walking ensures the result stays in [0, N).</p>
-    
-    <h3 style="color:var(--green);margin:15px 0 8px">Step 4: Position-Dependent Shift</h3>
-    <p>After Feistel rounds: <code>v = (v + n² + 3·fb + n) mod N</code></p>
-    <p>Where <code>n</code> is the character position and <code>fb</code> is the feedback value.</p>
-    
-    <h3 style="color:var(--green);margin:15px 0 8px">Step 5: Feedback Loop</h3>
-    <p>The output character's index feeds into the next character's encryption, creating an avalanche effect. Three modes available: ciphertext feedback, plaintext feedback, or combined.</p>
-    
-    <h3 style="color:var(--red);margin:15px 0 8px">Why It's Reversible</h3>
-    <ul>
-      <li>Feistel networks are inherently invertible (swap and subtract instead of add)</li>
-      <li>Cycle-walking preserves bijectivity on any domain size</li>
-      <li>Modular addition/subtraction are inverse operations</li>
-      <li>Feedback values are computable during decryption (from ciphertext)</li>
-    </ul>
-    
-    <h3 style="color:var(--orange);margin:15px 0 8px">Security Note</h3>
-    <p>This is an <b>educational/recreational cipher</b> — suitable for puzzles, games, and learning. It is NOT suitable for protecting sensitive data. The key space is small (~28-40 bits) and vulnerable to brute force with modern computers.</p>
-    
-    <div class="mt-sm"><button class="btn btn-b" onclick="closeModal()">Close</button></div>
-  `;
+    <p><b>Reversibility:</b> Feistel networks are inherently invertible. Cycle-walking preserves bijectivity. Modular shift is trivially reversed. This is mathematically proven — not heuristic.</p>
+    <p style="color:var(--orange)"><b>⚠️ Security:</b> Educational/puzzle cipher. NOT for real encryption. Key space ~28-40 bits.</p>
+    <button class="btn btn-b mt-sm" onclick="closeModal()">Close</button>`;
   document.getElementById("modalBg").classList.add("show");
 }
 
-function closeModal() {
-  document.getElementById("modalBg").classList.remove("show");
-}
+function closeModal(){document.getElementById("modalBg").classList.remove("show")}
+function stab(el,id){const p=el.parentElement,c=p.parentElement;p.querySelectorAll(".tab").forEach(t=>t.classList.remove("on"));c.querySelectorAll(".tc").forEach(t=>t.classList.remove("on"));el.classList.add("on");document.getElementById(id).classList.add("on")}
+function toast(msg,type){const el=document.getElementById("toast");el.textContent=msg;el.className="toast toast-"+(type||"info");requestAnimationFrame(()=>el.classList.add("show"));clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),3000)}
 
-// ── TABS ──────────────────────────────────────────
-
-function stab(el, id) {
-  const parent = el.parentElement;
-  const container = parent.parentElement;
-  parent.querySelectorAll(".tab").forEach(t => t.classList.remove("on"));
-  container.querySelectorAll(".tc").forEach(c => c.classList.remove("on"));
-  el.classList.add("on");
-  document.getElementById(id).classList.add("on");
-}
-
-// ── TOAST ─────────────────────────────────────────
-
-function toast(msg, type) {
-  const el = document.getElementById("toast");
-  el.textContent = msg;
-  el.className = "toast toast-" + (type || "info");
-  requestAnimationFrame(() => el.classList.add("show"));
-  clearTimeout(el._t);
-  el._t = setTimeout(() => el.classList.remove("show"), 3000);
-}
-
-// ── INIT ──────────────────────────────────────────
-
-document.addEventListener("DOMContentLoaded", () => {
-  rebuild();
-});
+document.addEventListener("DOMContentLoaded", rebuild);
 </script>
 </body>
 </html>
