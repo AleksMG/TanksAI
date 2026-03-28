@@ -1,1526 +1,2630 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Defense Sandbox v3 — Полная визуальная симуляция</title>
-  <style>
-    :root{
-      --bg:#0b1220;
-      --panel:#0f172a;
-      --panel2:#162033;
-      --line:rgba(255,255,255,.08);
-      --text:#e5eefc;
-      --muted:#94a3b8;
-      --accent:#38bdf8;
-      --good:#22c55e;
-      --warn:#f59e0b;
-      --bad:#ef4444;
-      --pink:#fb7185;
-      --orange:#f97316;
-      --cyan:#67e8f9;
-      --yellow:#fde68a;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Inter,Segoe UI,Arial,sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
-    .app{
-      display:grid;
-      grid-template-columns:380px 1fr 300px;
-      min-height:100vh;
-    }
-    .sidebar,.rightbar{
-      background:linear-gradient(180deg,var(--panel),#0b1120);
-      border-right:1px solid var(--line);
-      padding:16px;
-      overflow:auto;
-    }
-    .rightbar{
-      border-right:none;
-      border-left:1px solid var(--line);
-    }
-    .content{
-      position:relative;
-      overflow:hidden;
-      background:#8fc7ff;
-    }
-    h1{
-      margin:0 0 8px;
-      font-size:21px;
-    }
-    .sub{
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.45;
-      margin-bottom:14px;
-    }
-    .card{
-      background:linear-gradient(180deg,var(--panel2),rgba(22,32,51,.78));
-      border:1px solid rgba(255,255,255,.07);
-      border-radius:14px;
-      padding:12px;
-      margin-bottom:12px;
-      box-shadow:0 8px 24px rgba(0,0,0,.18);
-    }
-    .card h2{
-      margin:0 0 10px;
-      font-size:14px;
-    }
-    .row{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-    button,select{
-      border:none;
-      border-radius:10px;
-      padding:10px 12px;
-      color:white;
-      cursor:pointer;
-      font-weight:700;
-      background:#1e293b;
-    }
-    button.primary{background:#0369a1}
-    button.good{background:#15803d}
-    button.warn{background:#b45309}
-    button.bad{background:#b91c1c}
-    .control{
-      display:grid;
-      grid-template-columns:1fr auto;
-      gap:8px;
-      align-items:center;
-      margin-bottom:10px;
-    }
-    .control label{font-size:13px}
-    .control .value{
-      font-size:12px;
-      color:var(--accent);
-      min-width:58px;
-      text-align:right;
-    }
-    .control input[type=range]{
-      grid-column:1 / span 2;
-      width:100%;
-    }
-    .stats{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:8px;
-    }
-    .stat{
-      background:rgba(255,255,255,.04);
-      border-radius:10px;
-      padding:10px;
-      border:1px solid rgba(255,255,255,.05);
-    }
-    .label{font-size:12px;color:var(--muted)}
-    .num{font-size:18px;font-weight:800;margin-top:4px}
-    canvas{
-      width:100%;
-      height:100vh;
-      display:block;
-    }
-    .hud{
-      position:absolute;
-      left:12px;
-      top:12px;
-      background:rgba(15,23,42,.74);
-      color:#fff;
-      border-radius:12px;
-      padding:10px 12px;
-      border:1px solid rgba(255,255,255,.12);
-      font-size:12px;
-      line-height:1.45;
-      backdrop-filter:blur(6px);
-      pointer-events:none;
-    }
-    .mini{
-      position:absolute;
-      right:12px;
-      top:12px;
-      width:220px;
-      height:220px;
-      background:rgba(15,23,42,.76);
-      border:1px solid rgba(255,255,255,.12);
-      border-radius:14px;
-      backdrop-filter:blur(6px);
-      padding:8px;
-    }
-    .mini canvas{
-      width:100%;
-      height:100%;
-      border-radius:10px;
-      display:block;
-      background:rgba(2,6,23,.7);
-    }
-    .legend{
-      color:var(--muted);
-      font-size:12px;
-      line-height:1.5;
-    }
-    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
-    .log{
-      max-height:340px;
-      overflow:auto;
-      font-size:12px;
-      line-height:1.4;
-      color:#dbeafe;
-    }
-    .log-item{
-      border-bottom:1px dashed rgba(255,255,255,.07);
-      padding:6px 0;
-    }
-    .pill{
-      display:inline-block;
-      padding:2px 8px;
-      border-radius:999px;
-      font-size:11px;
-      font-weight:700;
-      margin-right:6px;
-    }
-    .p-good{background:rgba(34,197,94,.18);color:#86efac}
-    .p-warn{background:rgba(245,158,11,.18);color:#fcd34d}
-    .p-bad{background:rgba(239,68,68,.18);color:#fca5a5}
-    .p-info{background:rgba(56,189,248,.18);color:#93c5fd}
-    .small{font-size:11px;color:var(--muted)}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AEGIS-AI PRO v6.0 — Integrated Air Defense System</title>
+<style>
+:root {
+  --bg-primary: #050508;
+  --bg-secondary: #0a0e18;
+  --bg-tertiary: #0d1220;
+  --bg-panel: #080c16;
+  --border-primary: #1a2a4a;
+  --border-active: #00ccff;
+  --text-primary: #c8d8e8;
+  --text-secondary: #667788;
+  --text-accent: #00ccff;
+  --text-success: #00ff88;
+  --text-warning: #ffaa00;
+  --text-danger: #ff4444;
+  --text-ai: #cc88ff;
+  --glow-cyan: rgba(0,204,255,0.15);
+  --glow-green: rgba(0,255,136,0.15);
+  --glow-red: rgba(255,68,68,0.15);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; background:var(--bg-primary); color:var(--text-primary); font-family:'Consolas','Courier New',monospace; }
+
+/* === LAYOUT === */
+.app {
+  display: grid;
+  grid-template-columns: 260px 1fr 280px;
+  grid-template-rows: 44px 1fr 170px;
+  height: 100vh;
+  gap: 1px;
+  background: #0a0a14;
+}
+
+/* === HEADER === */
+.header {
+  grid-column: 1 / -1;
+  background: linear-gradient(90deg, #080818 0%, #101838 50%, #080818 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border-primary);
+  z-index: 10;
+}
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.header-title h1 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-accent);
+  letter-spacing: 2px;
+  text-shadow: 0 0 12px rgba(0,204,255,0.3);
+}
+.header-logo {
+  width: 28px; height: 28px;
+  border: 2px solid var(--text-accent);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  color: var(--text-accent);
+  text-shadow: 0 0 8px var(--text-accent);
+}
+.status-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.status-badge {
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  border: 1px solid;
+  letter-spacing: 0.5px;
+  transition: all 0.3s;
+}
+.badge-ok { border-color: var(--text-success); color: var(--text-success); background: var(--glow-green); }
+.badge-warn { border-color: var(--text-warning); color: var(--text-warning); background: rgba(255,170,0,0.1); animation: pulse-warn 1.2s infinite; }
+.badge-crit { border-color: var(--text-danger); color: var(--text-danger); background: var(--glow-red); animation: pulse-crit 0.6s infinite; }
+@keyframes pulse-warn { 0%,100%{opacity:1} 50%{opacity:0.6} }
+@keyframes pulse-crit { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* === PANELS === */
+.panel-left, .panel-right {
+  background: var(--bg-secondary);
+  overflow-y: auto;
+  overflow-x: hidden;
+  font-size: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: #1a2a4a transparent;
+}
+.panel-left { border-right: 1px solid var(--border-primary); padding: 6px; }
+.panel-right { border-left: 1px solid var(--border-primary); padding: 6px; }
+.panel-left::-webkit-scrollbar, .panel-right::-webkit-scrollbar { width: 4px; }
+.panel-left::-webkit-scrollbar-thumb, .panel-right::-webkit-scrollbar-thumb { background: #1a2a4a; border-radius: 2px; }
+
+.panel-bottom {
+  grid-column: 1 / -1;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-primary);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 1px;
+  padding: 3px;
+}
+
+/* === MAIN VIEW === */
+.main-view {
+  position: relative;
+  background: var(--bg-primary);
+  overflow: hidden;
+  cursor: crosshair;
+}
+.main-view canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* === SECTION === */
+.section {
+  margin-bottom: 6px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-primary);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.section-title {
+  color: var(--text-accent);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 8px;
+  background: linear-gradient(90deg, #081828, #0a1020);
+  border-bottom: 1px solid var(--border-primary);
+  border-left: 3px solid var(--text-accent);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  user-select: none;
+}
+.section-body { padding: 4px; }
+
+/* === CONTROLS === */
+.control-row {
+  padding: 3px 6px;
+}
+.control-row label {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 9px;
+  margin-bottom: 2px;
+  user-select: none;
+}
+.control-row label span { color: var(--text-accent); font-weight: 600; }
+input[type=range] {
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  background: var(--border-primary);
+  border-radius: 2px;
+  outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px; height: 12px;
+  background: var(--text-accent);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 4px var(--text-accent);
+}
+.checkbox-row {
+  padding: 2px 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.checkbox-row input[type=checkbox] {
+  accent-color: var(--text-accent);
+  width: 13px; height: 13px;
+  cursor: pointer;
+}
+.checkbox-row label {
+  color: var(--text-secondary);
+  font-size: 9px;
+  cursor: pointer;
+  user-select: none;
+}
+.button-row {
+  display: flex;
+  gap: 3px;
+  padding: 4px 6px;
+  flex-wrap: wrap;
+}
+button {
+  background: linear-gradient(180deg, #0a1828, #081020);
+  color: var(--text-accent);
+  border: 1px solid rgba(0,204,255,0.25);
+  padding: 4px 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 9px;
+  font-weight: 600;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+  transition: all 0.15s;
+}
+button:hover {
+  background: linear-gradient(180deg, #0c2040, #0a1838);
+  border-color: var(--text-accent);
+  box-shadow: 0 0 8px rgba(0,204,255,0.2);
+}
+button:active { transform: scale(0.97); }
+button.active {
+  background: rgba(0,204,255,0.15);
+  border-color: var(--text-accent);
+  box-shadow: 0 0 12px rgba(0,204,255,0.3);
+}
+button.btn-danger {
+  color: var(--text-danger);
+  border-color: rgba(255,68,68,0.25);
+}
+button.btn-danger:hover { border-color: var(--text-danger); }
+
+/* === DATA DISPLAY === */
+.data-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 6px;
+  border-bottom: 1px solid rgba(26,42,74,0.3);
+  font-size: 10px;
+}
+.data-row:last-child { border-bottom: none; }
+.data-label { color: var(--text-secondary); }
+.data-value { color: var(--text-success); font-weight: 600; }
+.data-value.warn { color: var(--text-warning); }
+.data-value.danger { color: var(--text-danger); }
+
+/* === STATS GRID === */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 3px;
+  padding: 4px;
+}
+.stat-card {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  border-radius: 3px;
+  padding: 6px 4px;
+  text-align: center;
+}
+.stat-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-accent);
+  line-height: 1;
+}
+.stat-label {
+  font-size: 7px;
+  color: var(--text-secondary);
+  margin-top: 3px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* === METER === */
+.meter {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 3px 6px;
+}
+.meter-label {
+  width: 55px;
+  font-size: 8px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+.meter-bar {
+  flex: 1;
+  height: 5px;
+  background: var(--border-primary);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.meter-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+.meter-value {
+  width: 40px;
+  font-size: 8px;
+  color: var(--text-success);
+  text-align: right;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* === TARGET LIST === */
+.target-item {
+  padding: 3px 5px;
+  margin: 2px 0;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  border-radius: 3px;
+  font-size: 9px;
+  transition: border-color 0.2s;
+}
+.target-item:hover { border-color: var(--text-accent); }
+.target-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+}
+.target-info {
+  color: var(--text-secondary);
+  font-size: 8px;
+}
+.threat-bar {
+  height: 3px;
+  background: var(--border-primary);
+  border-radius: 2px;
+  margin-top: 2px;
+  overflow: hidden;
+}
+.threat-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s;
+}
+
+/* === LOG === */
+.log-container {
+  height: 100%;
+  overflow-y: auto;
+  font-size: 8px;
+  padding: 3px;
+  background: #030608;
+  scrollbar-width: thin;
+  scrollbar-color: #1a2a4a transparent;
+}
+.log-entry {
+  padding: 1px 4px;
+  border-bottom: 1px solid rgba(10,16,24,0.5);
+  line-height: 1.4;
+}
+.log-entry.log-hit { color: var(--text-success); }
+.log-entry.log-launch { color: var(--text-accent); }
+.log-entry.log-miss { color: var(--text-danger); }
+.log-entry.log-warn { color: var(--text-warning); }
+.log-entry.log-ai { color: var(--text-ai); }
+.log-entry.log-sys { color: var(--text-secondary); }
+
+/* === CHART CANVAS === */
+.chart-canvas {
+  width: 100%;
+  height: 100%;
+  background: #030810;
+  border: 1px solid var(--border-primary);
+  border-radius: 3px;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 1200px) {
+  .app { grid-template-columns: 200px 1fr 220px; }
+}
+</style>
 </head>
 <body>
+
 <div class="app">
-  <aside class="sidebar">
-    <h1>Defense Sandbox v3</h1>
-    <div class="sub">
-      Безопасная учебно-игровая симуляция многопозиционной системы обнаружения и перехвата объектов:
-      радары, установки, боезапас, пуски, треки, эффекты, журнал событий и визуальные сценарии.
+
+<!-- ============ HEADER ============ -->
+<div class="header">
+  <div class="header-title">
+    <div class="header-logo">⬡</div>
+    <h1>AEGIS-AI INTEGRATED AIR DEFENSE v6.0</h1>
+  </div>
+  <div class="status-bar">
+    <span class="status-badge badge-ok" id="badgeSys">● SYS ONLINE</span>
+    <span class="status-badge badge-ok" id="badgeAI">◆ AI ACTIVE</span>
+    <span class="status-badge badge-ok" id="badgeThreat">▲ ALL CLEAR</span>
+    <span class="status-badge badge-ok" id="badgeTime">T+ 0.0s</span>
+    <span class="status-badge badge-ok" id="badgeFPS">60 FPS</span>
+  </div>
+</div>
+
+<!-- ============ LEFT PANEL ============ -->
+<div class="panel-left">
+
+  <!-- Simulation Controls -->
+  <div class="section">
+    <div class="section-title">⚙ Simulation Control</div>
+    <div class="section-body">
+      <div class="button-row">
+        <button id="btnPlay" onclick="toggleSim()">▶ START</button>
+        <button onclick="resetSim()">⟳ RESET</button>
+        <button onclick="launchWave()">🚀 WAVE</button>
+        <button onclick="launchSingle()">● SINGLE</button>
+        <button onclick="launchMassive()">💥 MASSIVE</button>
+      </div>
+      <div class="control-row">
+        <label>Sim Speed: <span id="dispSpeed">1.0</span>x</label>
+        <input type="range" min="0.1" max="10" step="0.1" value="1" oninput="CONFIG.simSpeed=+this.value;O('dispSpeed',this.value)">
+      </div>
+      <div class="control-row">
+        <label>Wave Interval: <span id="dispInterval">5</span>s</label>
+        <input type="range" min="1" max="30" step="1" value="5" id="cfgInterval" oninput="O('dispInterval',this.value)">
+      </div>
+      <div class="control-row">
+        <label>Wave Size: <span id="dispWaveSize">6</span></label>
+        <input type="range" min="1" max="30" step="1" value="6" id="cfgWaveSize" oninput="O('dispWaveSize',this.value)">
+      </div>
+      <div class="checkbox-row"><input type="checkbox" id="cfgAutoWave" checked><label for="cfgAutoWave">Auto Waves</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="cfgAI" checked><label for="cfgAI">AI Control</label></div>
     </div>
+  </div>
 
-    <div class="card">
-      <h2>Управление</h2>
-      <div class="row">
-        <button id="startBtn" class="primary">Старт</button>
-        <button id="pauseBtn">Пауза</button>
-        <button id="resetBtn" class="bad">Сброс</button>
-      </div>
-      <div class="row" style="margin-top:8px">
-        <button id="burstBtn" class="warn">Залп</button>
-        <button id="waveBtn" class="good">Сценарий атаки</button>
-      </div>
+  <!-- Visual Options -->
+  <div class="section">
+    <div class="section-title">👁 Visual Options</div>
+    <div class="section-body">
+      <div class="checkbox-row"><input type="checkbox" id="cfgTrails" checked><label for="cfgTrails">Missile Trails</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="cfgPredictions" checked><label for="cfgPredictions">AI Predictions</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="cfgZones" checked><label for="cfgZones">Defense Zones</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="cfgLabels" checked><label for="cfgLabels">Target Labels</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="cfgSmoke" checked><label for="cfgSmoke">Smoke & Particles</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="cfgGrid" checked><label for="cfgGrid">Range Grid</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="cfgGlow" checked><label for="cfgGlow">Glow Effects</label></div>
     </div>
+  </div>
 
-    <div class="card">
-      <h2>Настройки среды</h2>
-
-      <div class="control">
-        <label>Частота появления целей</label>
-        <div class="value" id="spawnRateVal"></div>
-        <input id="spawnRate" type="range" min="0" max="5" step="0.1" value="1.4">
+  <!-- Enemy Configuration -->
+  <div class="section">
+    <div class="section-title">🎯 Threat Configuration</div>
+    <div class="section-body">
+      <div class="control-row">
+        <label>Min Speed: <span id="dispMinSpd">200</span> m/s</label>
+        <input type="range" min="50" max="1500" step="50" value="200" id="cfgMinSpd" oninput="O('dispMinSpd',this.value)">
       </div>
-
-      <div class="control">
-        <label>Макс. целей</label>
-        <div class="value" id="maxTargetsVal"></div>
-        <input id="maxTargets" type="range" min="5" max="80" step="1" value="28">
+      <div class="control-row">
+        <label>Max Speed: <span id="dispMaxSpd">1000</span> m/s</label>
+        <input type="range" min="200" max="4000" step="50" value="1000" id="cfgMaxSpd" oninput="O('dispMaxSpd',this.value)">
       </div>
-
-      <div class="control">
-        <label>Скорость перехватчика</label>
-        <div class="value" id="interceptorSpeedVal"></div>
-        <input id="interceptorSpeed" type="range" min="140" max="520" step="5" value="320">
-      </div>
-
-      <div class="control">
-        <label>Радиус перехвата</label>
-        <div class="value" id="killRadiusVal"></div>
-        <input id="killRadius" type="range" min="8" max="40" step="1" value="18">
-      </div>
-
-      <div class="control">
-        <label>Темп пуска</label>
-        <div class="value" id="fireCooldownVal"></div>
-        <input id="fireCooldown" type="range" min="0.08" max="1.2" step="0.02" value="0.22">
-      </div>
-
-      <div class="control">
-        <label>Макс. активных перехватчиков</label>
-        <div class="value" id="maxInterceptorsVal"></div>
-        <input id="maxInterceptors" type="range" min="1" max="24" step="1" value="12">
-      </div>
-
-      <div class="control">
-        <label>Показывать треки</label>
-        <div class="value"></div>
-        <input id="showTracks" type="checkbox" checked>
-      </div>
-
-      <div class="control">
-        <label>Показывать прогноз</label>
-        <div class="value"></div>
-        <input id="showGuides" type="checkbox" checked>
-      </div>
-
-      <div class="control">
-        <label>Показывать мини-карту</label>
-        <div class="value"></div>
-        <input id="showMini" type="checkbox" checked>
-      </div>
+      <div class="checkbox-row"><input type="checkbox" id="cfgTypeBallistic" checked><label for="cfgTypeBallistic">Ballistic (SRBM)</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="cfgTypeCruise" checked><label for="cfgTypeCruise">Cruise (LACM)</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="cfgTypeManeuvering" checked><label for="cfgTypeManeuvering">Maneuvering (ASBM)</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="cfgTypeHypersonic"><label for="cfgTypeHypersonic">Hypersonic (HGV)</label></div>
+      <div class="checkbox-row"><input type="checkbox" id="cfgTypeDecoy"><label for="cfgTypeDecoy">Decoys (CM)</label></div>
     </div>
+  </div>
 
-    <div class="card">
-      <h2>Сценарий</h2>
-      <div class="control">
-        <label>Тип атаки</label>
-        <div class="value"></div>
-        <select id="scenarioSelect">
-          <option value="mixed">Смешанный</option>
-          <option value="top">Сверху</option>
-          <option value="sides">С флангов</option>
-          <option value="fast">Быстрые цели</option>
-          <option value="curve">Маневрирующие</option>
-          <option value="dense">Плотный залп</option>
-        </select>
+  <!-- Defense Configuration -->
+  <div class="section">
+    <div class="section-title">🛡 Defense Configuration</div>
+    <div class="section-body">
+      <div class="control-row">
+        <label>Launch Units: <span id="dispLaunchers">4</span></label>
+        <input type="range" min="1" max="8" step="1" value="4" id="cfgLaunchers" oninput="rebuildLaunchers(+this.value);O('dispLaunchers',this.value)">
       </div>
-    </div>
-
-    <div class="card">
-      <h2>Метрики</h2>
-      <div class="stats">
-        <div class="stat"><div class="label">Сбито</div><div class="num" id="hitsNum">0</div></div>
-        <div class="stat"><div class="label">Прорывов</div><div class="num" id="leaksNum">0</div></div>
-        <div class="stat"><div class="label">Целей</div><div class="num" id="targetsNum">0</div></div>
-        <div class="stat"><div class="label">Перехватчиков</div><div class="num" id="intsNum">0</div></div>
-        <div class="stat"><div class="label">Пусков</div><div class="num" id="shotsNum">0</div></div>
-        <div class="stat"><div class="label">Точность</div><div class="num" id="accNum">0%</div></div>
+      <div class="control-row">
+        <label>Missiles per Unit: <span id="dispMPU">8</span></label>
+        <input type="range" min="2" max="24" step="1" value="8" id="cfgMPU" oninput="O('dispMPU',this.value)">
       </div>
-    </div>
-
-    <div class="card">
-      <h2>Обозначения</h2>
-      <div class="legend">
-        • Красные/оранжевые объекты — цели разных типов<br>
-        • Голубые — перехватчики<br>
-        • Бело-серые объекты на земле — установки<br>
-        • Полукруги — обзор радара<br>
-        • Зеленые линии — прогнозируемый перехват<br>
-        • Пунктир — расчетные/сопровождающие траектории
+      <div class="control-row">
+        <label>Interceptor Speed: <span id="dispIntSpd">1400</span> m/s</label>
+        <input type="range" min="400" max="5000" step="100" value="1400" id="cfgIntSpd" oninput="O('dispIntSpd',this.value)">
+      </div>
+      <div class="control-row">
+        <label>Reload Time: <span id="dispReload">2.5</span>s</label>
+        <input type="range" min="0.5" max="15" step="0.5" value="2.5" id="cfgReload" oninput="O('dispReload',this.value)">
+      </div>
+      <div class="control-row">
+        <label>Kill Radius: <span id="dispKillR">35</span>m</label>
+        <input type="range" min="5" max="150" step="5" value="35" id="cfgKillR" oninput="O('dispKillR',this.value)">
       </div>
     </div>
-  </aside>
+  </div>
 
-  <main class="content">
-    <canvas id="canvas"></canvas>
-    <div class="hud mono" id="hud"></div>
-    <div class="mini" id="miniWrap">
-      <canvas id="miniMap"></canvas>
+  <!-- AI Configuration -->
+  <div class="section">
+    <div class="section-title">🧠 AI Transformer Config</div>
+    <div class="section-body">
+      <div class="control-row">
+        <label>Learning Rate: <span id="dispLR">0.003</span></label>
+        <input type="range" min="0.0001" max="0.03" step="0.0001" value="0.003" id="cfgLR" oninput="O('dispLR',(+this.value).toFixed(4))">
+      </div>
+      <div class="control-row">
+        <label>Prediction Horizon: <span id="dispHorizon">3.0</span>s</label>
+        <input type="range" min="0.5" max="12" step="0.5" value="3" id="cfgHorizon" oninput="O('dispHorizon',this.value)">
+      </div>
+      <div class="control-row">
+        <label>Discount γ: <span id="dispGamma">0.99</span></label>
+        <input type="range" min="0.9" max="0.999" step="0.001" value="0.99" id="cfgGamma" oninput="O('dispGamma',this.value)">
+      </div>
+      <div class="control-row">
+        <label>Batch Size: <span id="dispBatch">32</span></label>
+        <input type="range" min="8" max="128" step="8" value="32" id="cfgBatch" oninput="O('dispBatch',this.value)">
+      </div>
+      <div class="button-row">
+        <button onclick="resetAI()">⟳ Reset AI</button>
+        <button onclick="trainBurst(50)">⚡×50</button>
+        <button onclick="trainBurst(500)">⚡×500</button>
+      </div>
+      <div class="data-row"><span class="data-label">Parameters</span><span class="data-value" id="dispParams">0</span></div>
+      <div class="data-row"><span class="data-label">Replay Buffer</span><span class="data-value" id="dispBuffer">0</span></div>
     </div>
-  </main>
+  </div>
+</div>
 
-  <aside class="rightbar">
-    <div class="card">
-      <h2>Состояние установок</h2>
-      <div id="batteryPanel" class="small"></div>
-    </div>
+<!-- ============ MAIN CANVAS ============ -->
+<div class="main-view" id="mainViewport">
+  <canvas id="mainCanvas"></canvas>
+</div>
 
-    <div class="card">
-      <h2>Журнал событий</h2>
-      <div id="eventLog" class="log"></div>
+<!-- ============ RIGHT PANEL ============ -->
+<div class="panel-right">
+
+  <!-- Statistics -->
+  <div class="section">
+    <div class="section-title">📊 Combat Statistics</div>
+    <div class="section-body">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-value" id="statIncoming">0</div><div class="stat-label">Incoming</div></div>
+        <div class="stat-card"><div class="stat-value" id="statKills">0</div><div class="stat-label">Kills</div></div>
+        <div class="stat-card"><div class="stat-value" id="statLeakers">0</div><div class="stat-label">Leakers</div></div>
+        <div class="stat-card"><div class="stat-value" id="statAccuracy">0%</div><div class="stat-label">Accuracy</div></div>
+        <div class="stat-card"><div class="stat-value" id="statFired">0</div><div class="stat-label">Fired</div></div>
+        <div class="stat-card"><div class="stat-value" id="statEfficiency">0%</div><div class="stat-label">Efficiency</div></div>
+      </div>
     </div>
-  </aside>
+  </div>
+
+  <!-- Active Targets -->
+  <div class="section">
+    <div class="section-title">🎯 Active Threat Tracks</div>
+    <div class="section-body" id="targetListContainer" style="max-height:155px;overflow-y:auto">
+    </div>
+  </div>
+
+  <!-- AI Status -->
+  <div class="section">
+    <div class="section-title">🧠 AI Transformer State</div>
+    <div class="section-body">
+      <div class="meter"><span class="meter-label">Confidence</span><div class="meter-bar"><div class="meter-fill" id="mtrConf" style="width:0;background:var(--text-accent)"></div></div><span class="meter-value" id="mtrConfV">0%</span></div>
+      <div class="meter"><span class="meter-label">Policy Loss</span><div class="meter-bar"><div class="meter-fill" id="mtrPLoss" style="width:50%;background:var(--text-warning)"></div></div><span class="meter-value" id="mtrPLossV">1.00</span></div>
+      <div class="meter"><span class="meter-label">Value Loss</span><div class="meter-bar"><div class="meter-fill" id="mtrVLoss" style="width:50%;background:#ff4488"></div></div><span class="meter-value" id="mtrVLossV">1.00</span></div>
+      <div class="meter"><span class="meter-label">Grad Norm</span><div class="meter-bar"><div class="meter-fill" id="mtrGrad" style="width:0;background:#88ff00"></div></div><span class="meter-value" id="mtrGradV">0.0</span></div>
+      <div class="meter"><span class="meter-label">Epochs</span><div class="meter-bar"><div class="meter-fill" id="mtrEpoch" style="width:0;background:var(--text-ai)"></div></div><span class="meter-value" id="mtrEpochV">0</span></div>
+      <div class="meter"><span class="meter-label">Inference</span><div class="meter-bar"><div class="meter-fill" id="mtrInf" style="width:0;background:var(--text-success)"></div></div><span class="meter-value" id="mtrInfV">0ms</span></div>
+    </div>
+  </div>
+
+  <!-- Launcher Status -->
+  <div class="section">
+    <div class="section-title">🚀 Launcher Status</div>
+    <div class="section-body" id="launcherStatusContainer"></div>
+  </div>
+
+  <!-- Radar Info -->
+  <div class="section">
+    <div class="section-title">📡 Radar Status</div>
+    <div class="section-body">
+      <div class="data-row"><span class="data-label">Scan Rate</span><span class="data-value">360°/4s</span></div>
+      <div class="data-row"><span class="data-label">Max Range</span><span class="data-value">1200m</span></div>
+      <div class="data-row"><span class="data-label">Tracks</span><span class="data-value" id="radarTracks">0</span></div>
+      <div class="data-row"><span class="data-label">SNR</span><span class="data-value" id="radarSNR">--</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ BOTTOM PANEL ============ -->
+<div class="panel-bottom">
+  <div class="section"><div class="section-title">📈 Intercept Rate</div><div class="section-body" style="padding:0"><canvas id="chartAccuracy" class="chart-canvas"></canvas></div></div>
+  <div class="section"><div class="section-title">📉 Training Loss</div><div class="section-body" style="padding:0"><canvas id="chartLoss" class="chart-canvas"></canvas></div></div>
+  <div class="section"><div class="section-title">🧠 Attention Map</div><div class="section-body" style="padding:0"><canvas id="chartAttention" class="chart-canvas"></canvas></div></div>
+  <div class="section"><div class="section-title">📋 Event Log</div><div class="section-body" style="padding:0"><div class="log-container" id="logContainer"></div></div></div>
+</div>
+
 </div>
 
 <script>
-(() => {
-  "use strict";
+"use strict";
 
-  // =========================
-  // Utility
-  // =========================
-  const $ = id => document.getElementById(id);
-  const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
-  const lerp = (a,b,t) => a + (b-a)*t;
-  const rand = (a,b) => a + Math.random() * (b-a);
-  const chance = p => Math.random() < p;
-  const dist = (ax,ay,bx,by) => Math.hypot(ax-bx, ay-by);
-  const nowSec = () => performance.now() / 1000;
-  function norm(x,y){
-    const d = Math.hypot(x,y) || 1e-6;
-    return { x:x/d, y:y/d, d };
-  }
-  function format(n){ return Number.isFinite(n) ? n.toFixed(1) : "0.0"; }
+// ================================================================
+// MATH CORE
+// ================================================================
+const { sin, cos, sqrt, atan2, PI, abs, min, max, floor, ceil, random, exp, pow, hypot, round, tanh, sign } = Math;
+const TAU = PI * 2;
+const DEG = PI / 180;
+const RAD = 180 / PI;
 
-  // =========================
-  // Canvas Setup
-  // =========================
-  const canvas = $("canvas");
-  const ctx = canvas.getContext("2d");
-  const miniCanvas = $("miniMap");
-  const miniCtx = miniCanvas.getContext("2d");
+function rand(a = 0, b = 1) { return a + (b - a) * random(); }
+function randInt(a, b) { return floor(rand(a, b + 0.999)); }
+function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
+function lerp(a, b, t) { return a + (b - a) * t; }
+function vec2(x, y) { return { x, y }; }
+function dist(a, b) { return hypot(a.x - b.x, a.y - b.y); }
+function hexAlpha(a) { return round(clamp(a, 0, 255)).toString(16).padStart(2, '0'); }
 
-  let W=0, H=0, DPR=Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+const $ = id => document.getElementById(id);
+const O = (id, v) => { const el = $(id); if (el) el.textContent = v; };
 
-  function fitCanvas(c, context, w, h){
-    c.width = Math.floor(w * DPR);
-    c.height = Math.floor(h * DPR);
-    context.setTransform(DPR,0,0,DPR,0,0);
-  }
-  function resize(){
-    W = canvas.clientWidth;
-    H = canvas.clientHeight;
-    fitCanvas(canvas, ctx, W, H);
+// ================================================================
+// GLOBAL CONFIG
+// ================================================================
+const CONFIG = {
+  worldSize: 1800,
+  simSpeed: 1,
+  baseX: 900,
+  baseY: 1500,
+};
+const WORLD = CONFIG.worldSize;
+const BASE = { x: CONFIG.baseX, y: CONFIG.baseY };
 
-    const mw = miniCanvas.clientWidth || 204;
-    const mh = miniCanvas.clientHeight || 204;
-    fitCanvas(miniCanvas, miniCtx, mw, mh);
-  }
-  window.addEventListener("resize", resize);
-  resize();
+// ================================================================
+// THREAT TYPES DATABASE
+// ================================================================
+const THREAT_DB = {
+  0: { name: 'SRBM', fullName: 'Баллистическая', color: '#ff4444', glowColor: '#ff222240', flameColor: '#ff8800', flameInner: '#ffdd44', speedRange: [250, 750], gravity: 8, size: 5.5, trailWidth: 1.5 },
+  1: { name: 'LACM', fullName: 'Крылатая', color: '#ffaa00', glowColor: '#ffaa0040', flameColor: '#ffcc44', flameInner: '#ffffff', speedRange: [150, 500], gravity: 0, size: 4.5, trailWidth: 1.2 },
+  2: { name: 'ASBM', fullName: 'Маневрирующая', color: '#ff00ff', glowColor: '#ff00ff40', flameColor: '#ff66ff', flameInner: '#ffaaff', speedRange: [300, 850], gravity: 3, size: 5, trailWidth: 1.3 },
+  3: { name: 'HGV', fullName: 'Гиперзвуковая', color: '#ff0066', glowColor: '#ff006640', flameColor: '#ff4488', flameInner: '#ffccdd', speedRange: [1000, 2800], gravity: 2, size: 6, trailWidth: 1.8 },
+  4: { name: 'DECOY', fullName: 'Ложная цель', color: '#888888', glowColor: '#88888840', flameColor: '#aaaaaa', flameInner: '#cccccc', speedRange: [100, 350], gravity: 5, size: 3.5, trailWidth: 0.8 },
+};
 
-  // =========================
-  // UI bindings
-  // =========================
-  const ui = {
-    startBtn:$("startBtn"),
-    pauseBtn:$("pauseBtn"),
-    resetBtn:$("resetBtn"),
-    burstBtn:$("burstBtn"),
-    waveBtn:$("waveBtn"),
-    spawnRate:$("spawnRate"),
-    maxTargets:$("maxTargets"),
-    interceptorSpeed:$("interceptorSpeed"),
-    killRadius:$("killRadius"),
-    fireCooldown:$("fireCooldown"),
-    maxInterceptors:$("maxInterceptors"),
-    showTracks:$("showTracks"),
-    showGuides:$("showGuides"),
-    showMini:$("showMini"),
-    scenarioSelect:$("scenarioSelect"),
+// ================================================================
+// AI TRANSFORMER NETWORK
+// ================================================================
+class TransformerAI {
+  constructor() {
+    this.INPUT_DIM = 20;
+    this.EMBED_DIM = 48;
+    this.FF_DIM = 96;
+    this.OUTPUT_DIM = 6;
 
-    spawnRateVal:$("spawnRateVal"),
-    maxTargetsVal:$("maxTargetsVal"),
-    interceptorSpeedVal:$("interceptorSpeedVal"),
-    killRadiusVal:$("killRadiusVal"),
-    fireCooldownVal:$("fireCooldownVal"),
-    maxInterceptorsVal:$("maxInterceptorsVal"),
+    // Input projection
+    this.Wi = this._initWeight(this.INPUT_DIM, this.EMBED_DIM);
+    this.bi = new Float32Array(this.EMBED_DIM);
 
-    hitsNum:$("hitsNum"),
-    leaksNum:$("leaksNum"),
-    targetsNum:$("targetsNum"),
-    intsNum:$("intsNum"),
-    shotsNum:$("shotsNum"),
-    accNum:$("accNum"),
+    // Self-attention QKV
+    this.Wq = this._initWeight(this.EMBED_DIM, this.EMBED_DIM);
+    this.Wk = this._initWeight(this.EMBED_DIM, this.EMBED_DIM);
+    this.Wv = this._initWeight(this.EMBED_DIM, this.EMBED_DIM);
+    this.Wo = this._initWeight(this.EMBED_DIM, this.EMBED_DIM);
 
-    hud:$("hud"),
-    miniWrap:$("miniWrap"),
-    eventLog:$("eventLog"),
-    batteryPanel:$("batteryPanel")
-  };
+    // Layer 2 attention
+    this.Wq2 = this._initWeight(this.EMBED_DIM, this.EMBED_DIM);
+    this.Wk2 = this._initWeight(this.EMBED_DIM, this.EMBED_DIM);
+    this.Wv2 = this._initWeight(this.EMBED_DIM, this.EMBED_DIM);
+    this.Wo2 = this._initWeight(this.EMBED_DIM, this.EMBED_DIM);
 
-  const settings = {
-    running:true,
-    spawnRate:parseFloat(ui.spawnRate.value),
-    maxTargets:parseInt(ui.maxTargets.value,10),
-    interceptorSpeed:parseFloat(ui.interceptorSpeed.value),
-    killRadius:parseFloat(ui.killRadius.value),
-    fireCooldown:parseFloat(ui.fireCooldown.value),
-    maxInterceptors:parseInt(ui.maxInterceptors.value,10),
-    showTracks:ui.showTracks.checked,
-    showGuides:ui.showGuides.checked,
-    showMini:ui.showMini.checked,
-    scenario:ui.scenarioSelect.value
-  };
+    // FFN layer 1
+    this.Wf1 = this._initWeight(this.EMBED_DIM, this.FF_DIM);
+    this.bf1 = new Float32Array(this.FF_DIM);
+    this.Wf2 = this._initWeight(this.FF_DIM, this.EMBED_DIM);
+    this.bf2 = new Float32Array(this.EMBED_DIM);
 
-  function syncUI(){
-    ui.spawnRateVal.textContent = settings.spawnRate.toFixed(1) + "/с";
-    ui.maxTargetsVal.textContent = settings.maxTargets;
-    ui.interceptorSpeedVal.textContent = settings.interceptorSpeed.toFixed(0);
-    ui.killRadiusVal.textContent = settings.killRadius.toFixed(0) + " px";
-    ui.fireCooldownVal.textContent = settings.fireCooldown.toFixed(2) + " c";
-    ui.maxInterceptorsVal.textContent = settings.maxInterceptors;
-    ui.miniWrap.style.display = settings.showMini ? "block" : "none";
-  }
-  syncUI();
+    // FFN layer 2
+    this.Wf3 = this._initWeight(this.EMBED_DIM, this.FF_DIM);
+    this.bf3 = new Float32Array(this.FF_DIM);
+    this.Wf4 = this._initWeight(this.FF_DIM, this.EMBED_DIM);
+    this.bf4 = new Float32Array(this.EMBED_DIM);
 
-  [
-    ["spawnRate","spawnRate",parseFloat],
-    ["maxTargets","maxTargets",v=>parseInt(v,10)],
-    ["interceptorSpeed","interceptorSpeed",parseFloat],
-    ["killRadius","killRadius",parseFloat],
-    ["fireCooldown","fireCooldown",parseFloat],
-    ["maxInterceptors","maxInterceptors",v=>parseInt(v,10)]
-  ].forEach(([id,key,cast])=>{
-    ui[id].addEventListener("input",()=>{
-      settings[key] = cast(ui[id].value);
-      syncUI();
-    });
-  });
+    // Policy head
+    this.Wp1 = this._initWeight(this.EMBED_DIM, 32);
+    this.bp1 = new Float32Array(32);
+    this.Wp2 = this._initWeight(32, this.OUTPUT_DIM);
+    this.bp2 = new Float32Array(this.OUTPUT_DIM);
 
-  ui.showTracks.addEventListener("change",()=>settings.showTracks = ui.showTracks.checked);
-  ui.showGuides.addEventListener("change",()=>settings.showGuides = ui.showGuides.checked);
-  ui.showMini.addEventListener("change",()=>{ settings.showMini = ui.showMini.checked; syncUI(); });
-  ui.scenarioSelect.addEventListener("change",()=> settings.scenario = ui.scenarioSelect.value);
+    // Value head
+    this.Wvh1 = this._initWeight(this.EMBED_DIM, 32);
+    this.bvh1 = new Float32Array(32);
+    this.Wvh2 = this._initWeight(32, 1);
+    this.bvh2 = new Float32Array(1);
 
-  // =========================
-  // Event Log
-  // =========================
-  const eventStore = [];
-  function logEvent(type, text){
-    const item = { t: world.time, type, text };
-    eventStore.unshift(item);
-    while(eventStore.length > 60) eventStore.pop();
-    renderEventLog();
-  }
-  function renderEventLog(){
-    ui.eventLog.innerHTML = eventStore.map(e=>{
-      const cls =
-        e.type === "hit" ? "p-good" :
-        e.type === "leak" ? "p-bad" :
-        e.type === "launch" ? "p-info" :
-        "p-warn";
-      return `<div class="log-item">
-        <span class="pill ${cls}">${e.type.toUpperCase()}</span>
-        <span class="mono">t=${e.t.toFixed(1)}</span> ${e.text}
-      </div>`;
-    }).join("");
+    // World model head
+    this.Www1 = this._initWeight(this.EMBED_DIM, 32);
+    this.bww1 = new Float32Array(32);
+    this.Www2 = this._initWeight(32, 4);
+    this.bww2 = new Float32Array(4);
+
+    // Training state
+    this.epoch = 0;
+    this.policyLoss = 1.0;
+    this.valueLoss = 1.0;
+    this.gradientNorm = 0;
+    this.confidence = 0;
+    this.inferenceTime = 0;
+    this.lastAttentionMap = null;
+
+    // Adam optimizer state
+    this._allWeights = this._collectWeights();
+    this._adamM = this._allWeights.map(w => new Float32Array(w.length));
+    this._adamV = this._allWeights.map(w => new Float32Array(w.length));
+    this._adamStep = 0;
+
+    // Experience replay
+    this.replayBuffer = [];
+    this.maxReplaySize = 5000;
   }
 
-  // =========================
-  // Core world state
-  // =========================
-  const world = {
-    time:0,
-    spawnAccum:0,
-    globalFireAccum:0,
-    nextId:1,
-    nextMissileId:1,
-    hits:0,
-    leaks:0,
-    shots:0,
-    targets:[],
-    interceptors:[],
-    particles:[],
-    smoke:[],
-    shockwaves:[],
-    trails:[],
-    guide:null,
-    cloudsSeed:[],
-    batteries:[]
-  };
-
-  function seedClouds(){
-    world.cloudsSeed = [];
-    for(let i=0;i<8;i++){
-      world.cloudsSeed.push({
-        x: rand(0, W),
-        y: rand(40, H*0.35),
-        s: rand(0.7, 1.4),
-        phase: rand(0, Math.PI*2)
-      });
-    }
+  _initWeight(rows, cols) {
+    const w = new Float32Array(rows * cols);
+    const scale = sqrt(2.0 / rows);
+    for (let i = 0; i < w.length; i++) w[i] = (random() - 0.5) * scale;
+    return w;
   }
 
-  // =========================
-  // Domain classes / factories
-  // =========================
-  function createBattery(id, x, y){
-    return {
-      id,
-      x, y,
-      bodyW: 86,
-      bodyH: 24,
-      towerH: 28,
-      launcherAngle: -Math.PI/3.5,
-      radarSweep: rand(-0.3, 0.3),
-      radarRange: 330,
-      innerRange: 180,
-      fireCooldownAcc: 0,
-      cooldown: settings.fireCooldown,
-      stock: 10,
-      maxStock: 10,
-      reloadTimer: 0,
-      reloadDuration: 7.5,
-      assignedCount: 0,
-      selectedTarget:null,
-      health: 100
-    };
-  }
-
-  function initBatteries(){
-    world.batteries = [
-      createBattery("PU-1", W*0.24, H-78),
-      createBattery("PU-2", W*0.50, H-74),
-      createBattery("PU-3", W*0.76, H-80)
+  _collectWeights() {
+    return [
+      this.Wi, this.bi, this.Wq, this.Wk, this.Wv, this.Wo,
+      this.Wq2, this.Wk2, this.Wv2, this.Wo2,
+      this.Wf1, this.bf1, this.Wf2, this.bf2,
+      this.Wf3, this.bf3, this.Wf4, this.bf4,
+      this.Wp1, this.bp1, this.Wp2, this.bp2,
+      this.Wvh1, this.bvh1, this.Wvh2, this.bvh2,
+      this.Www1, this.bww1, this.Www2, this.bww2,
     ];
   }
 
-  function createTarget(custom={}){
-    const scenario = settings.scenario;
-    let x, y;
+  countParameters() {
+    let total = 0;
+    for (const w of this._allWeights) total += w.length;
+    return total;
+  }
 
-    if(custom.x !== undefined && custom.y !== undefined){
-      x = custom.x; y = custom.y;
-    }else{
-      if(scenario === "top"){
-        x = rand(30, W-30); y = -30;
-      } else if(scenario === "sides"){
-        if(chance(0.5)){ x = -30; y = rand(20, H*0.45); }
-        else { x = W+30; y = rand(20, H*0.45); }
-      } else {
-        const side = Math.random();
-        if(side<0.45){ x=rand(30,W-30); y=-30; }
-        else if(side<0.72){ x=-30; y=rand(20,H*0.45); }
-        else { x=W+30; y=rand(20,H*0.45); }
+  // Matrix multiply: A[m×k] × B[k×n] → C[m×n]
+  _matmul(A, m, k, B, n, C) {
+    for (let i = 0; i < m; i++) {
+      for (let j = 0; j < n; j++) {
+        let sum = 0;
+        const rowOff = i * k;
+        for (let p = 0; p < k; p++) sum += A[rowOff + p] * B[p * n + j];
+        C[i * n + j] = sum;
+      }
+    }
+  }
+
+  // Add bias: A[m×n] += b[n]
+  _addBias(A, b, m, n) {
+    for (let i = 0; i < m; i++) {
+      const off = i * n;
+      for (let j = 0; j < n; j++) A[off + j] += b[j];
+    }
+  }
+
+  // GELU activation in-place
+  _gelu(A) {
+    const c = sqrt(2 / PI);
+    for (let i = 0; i < A.length; i++) {
+      const x = A[i];
+      A[i] = 0.5 * x * (1 + tanh(c * (x + 0.044715 * x * x * x)));
+    }
+  }
+
+  // Sigmoid
+  _sigmoid(x) { return 1 / (1 + exp(-clamp(x, -15, 15))); }
+
+  // Softmax over rows
+  _softmaxRows(A, rows, cols) {
+    for (let i = 0; i < rows; i++) {
+      const off = i * cols;
+      let mx = -1e9;
+      for (let j = 0; j < cols; j++) mx = max(mx, A[off + j]);
+      let sum = 0;
+      for (let j = 0; j < cols; j++) { A[off + j] = exp(A[off + j] - mx); sum += A[off + j]; }
+      const inv = 1 / (sum + 1e-10);
+      for (let j = 0; j < cols; j++) A[off + j] *= inv;
+    }
+  }
+
+  // Layer normalization
+  _layerNorm(A, rows, cols) {
+    for (let i = 0; i < rows; i++) {
+      const off = i * cols;
+      let mean = 0;
+      for (let j = 0; j < cols; j++) mean += A[off + j];
+      mean /= cols;
+      let variance = 0;
+      for (let j = 0; j < cols; j++) { const d = A[off + j] - mean; variance += d * d; }
+      const invStd = 1 / sqrt(variance / cols + 1e-5);
+      for (let j = 0; j < cols; j++) A[off + j] = (A[off + j] - mean) * invStd;
+    }
+  }
+
+  // Self-attention block
+  _selfAttention(H, n, d, Wq, Wk, Wv, Wo) {
+    const Q = new Float32Array(n * d);
+    const K = new Float32Array(n * d);
+    const V = new Float32Array(n * d);
+    this._matmul(H, n, d, Wq, d, Q);
+    this._matmul(H, n, d, Wk, d, K);
+    this._matmul(H, n, d, Wv, d, V);
+
+    const scale = 1 / sqrt(d);
+    const scores = new Float32Array(n * n);
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        let s = 0;
+        for (let k = 0; k < d; k++) s += Q[i * d + k] * K[j * d + k];
+        scores[i * n + j] = s * scale;
+      }
+    }
+    this._softmaxRows(scores, n, n);
+
+    const attended = new Float32Array(n * d);
+    this._matmul(scores, n, n, V, d, attended);
+
+    const projected = new Float32Array(n * d);
+    this._matmul(attended, n, d, Wo, d, projected);
+
+    return { projected, scores };
+  }
+
+  // Full forward pass
+  forward(features, nTargets) {
+    const t0 = performance.now();
+    const D = this.EMBED_DIM;
+    const n = nTargets;
+
+    // 1. Input projection + GELU
+    const H = new Float32Array(n * D);
+    this._matmul(features, n, this.INPUT_DIM, this.Wi, D, H);
+    this._addBias(H, this.bi, n, D);
+    this._gelu(H);
+
+    // 2. Add sinusoidal positional encoding
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < D; j += 2) {
+        const freq = 1 / pow(10000, j / D);
+        H[i * D + j] += sin(i * freq) * 0.1;
+        if (j + 1 < D) H[i * D + j + 1] += cos(i * freq) * 0.1;
       }
     }
 
-    const centerBattery = world.batteries[1] || {x:W*0.5,y:H-70};
-    const toBase = norm(centerBattery.x-x, centerBattery.y-y);
+    // 3. Layer 1: LayerNorm → Self-Attention → Residual
+    const H1norm = new Float32Array(H);
+    this._layerNorm(H1norm, n, D);
+    const attn1 = this._selfAttention(H1norm, n, D, this.Wq, this.Wk, this.Wv, this.Wo);
+    const H1 = new Float32Array(n * D);
+    for (let i = 0; i < H1.length; i++) H1[i] = H[i] + attn1.projected[i]; // residual
 
-    let type;
-    if(custom.type) type = custom.type;
-    else {
-      if(scenario === "fast") type = chance(0.7) ? "fast" : "std";
-      else if(scenario === "curve") type = chance(0.7) ? "curve" : "std";
-      else if(scenario === "dense") type = chance(0.4) ? "fast" : (chance(0.5) ? "curve" : "std");
-      else type = chance(0.25) ? "fast" : (chance(0.35) ? "curve" : "std");
+    // 4. Layer 1: LayerNorm → FFN → Residual
+    const H1ffn = new Float32Array(H1);
+    this._layerNorm(H1ffn, n, D);
+    const ff1 = new Float32Array(n * this.FF_DIM);
+    this._matmul(H1ffn, n, D, this.Wf1, this.FF_DIM, ff1);
+    this._addBias(ff1, this.bf1, n, this.FF_DIM);
+    this._gelu(ff1);
+    const ff1out = new Float32Array(n * D);
+    this._matmul(ff1, n, this.FF_DIM, this.Wf2, D, ff1out);
+    this._addBias(ff1out, this.bf2, n, D);
+    const H2 = new Float32Array(n * D);
+    for (let i = 0; i < H2.length; i++) H2[i] = H1[i] + ff1out[i]; // residual
+
+    // 5. Layer 2: LayerNorm → Self-Attention → Residual
+    const H2norm = new Float32Array(H2);
+    this._layerNorm(H2norm, n, D);
+    const attn2 = this._selfAttention(H2norm, n, D, this.Wq2, this.Wk2, this.Wv2, this.Wo2);
+    const H3 = new Float32Array(n * D);
+    for (let i = 0; i < H3.length; i++) H3[i] = H2[i] + attn2.projected[i];
+
+    // 6. Layer 2: FFN
+    const H3ffn = new Float32Array(H3);
+    this._layerNorm(H3ffn, n, D);
+    const ff3 = new Float32Array(n * this.FF_DIM);
+    this._matmul(H3ffn, n, D, this.Wf3, this.FF_DIM, ff3);
+    this._addBias(ff3, this.bf3, n, this.FF_DIM);
+    this._gelu(ff3);
+    const ff3out = new Float32Array(n * D);
+    this._matmul(ff3, n, this.FF_DIM, this.Wf4, D, ff3out);
+    this._addBias(ff3out, this.bf4, n, D);
+    const H4 = new Float32Array(n * D);
+    for (let i = 0; i < H4.length; i++) H4[i] = H3[i] + ff3out[i];
+
+    // 7. Final LayerNorm
+    this._layerNorm(H4, n, D);
+
+    // 8. Policy head
+    const ph1 = new Float32Array(n * 32);
+    this._matmul(H4, n, D, this.Wp1, 32, ph1);
+    this._addBias(ph1, this.bp1, n, 32);
+    this._gelu(ph1);
+    const policy = new Float32Array(n * this.OUTPUT_DIM);
+    this._matmul(ph1, n, 32, this.Wp2, this.OUTPUT_DIM, policy);
+    this._addBias(policy, this.bp2, n, this.OUTPUT_DIM);
+
+    // 9. Value head (mean pool → value)
+    const pooled = new Float32Array(D);
+    for (let i = 0; i < n; i++) for (let j = 0; j < D; j++) pooled[j] += H4[i * D + j] / n;
+    const vh1 = new Float32Array(32);
+    for (let i = 0; i < 32; i++) {
+      let s = this.bvh1[i];
+      for (let j = 0; j < D; j++) s += pooled[j] * this.Wvh1[j * 32 + i];
+      vh1[i] = max(0, s); // ReLU
+    }
+    let value = this.bvh2[0];
+    for (let i = 0; i < 32; i++) value += vh1[i] * this.Wvh2[i];
+
+    // 10. World model head
+    const wm = new Float32Array(n * 4);
+    const wmh1 = new Float32Array(n * 32);
+    this._matmul(H4, n, D, this.Www1, 32, wmh1);
+    this._addBias(wmh1, this.bww1, n, 32);
+    this._gelu(wmh1);
+    this._matmul(wmh1, n, 32, this.Www2, 4, wm);
+    this._addBias(wm, this.bww2, n, 4);
+
+    // Store attention map from last layer
+    this.lastAttentionMap = { data: attn2.scores, size: n };
+
+    this.inferenceTime = performance.now() - t0;
+    return { policy, value, worldModel: wm };
+  }
+
+  makeDecisions(targets) {
+    if (!targets.length) return [];
+    const n = targets.length;
+    const features = new Float32Array(n * this.INPUT_DIM);
+
+    for (let i = 0; i < n; i++) {
+      const t = targets[i];
+      const dBase = hypot(t.x - BASE.x, t.y - BASE.y);
+      const speed = hypot(t.vx, t.vy);
+      const heading = atan2(t.vy, t.vx);
+      const closingRate = -((t.x - BASE.x) * t.vx + (t.y - BASE.y) * t.vy) / (dBase * speed + 1);
+      const timeToBase = dBase / (speed * max(0.1, closingRate) + 1);
+
+      const off = i * this.INPUT_DIM;
+      features[off + 0] = t.x / WORLD;
+      features[off + 1] = t.y / WORLD;
+      features[off + 2] = t.vx / 2000;
+      features[off + 3] = t.vy / 2000;
+      features[off + 4] = (t.ax || 0) / 300;
+      features[off + 5] = (t.ay || 0) / 300;
+      features[off + 6] = speed / 2000;
+      features[off + 7] = heading / PI;
+      features[off + 8] = dBase / WORLD;
+      features[off + 9] = t.threat || 0.5;
+      features[off + 10] = t.type / 4;
+      features[off + 11] = min((simTime - t.spawnTime) / 60, 1);
+      features[off + 12] = t.maneuvering ? 1 : 0;
+      features[off + 13] = closingRate;
+      features[off + 14] = t.engaged ? 1 : 0;
+      features[off + 15] = t.assignedCount / 3;
+      features[off + 16] = simTime / 300;
+      features[off + 17] = timeToBase / 30;
+      features[off + 18] = t.type === 4 ? 1 : 0; // decoy indicator
+      features[off + 19] = t.covarianceEstimate / 50;
     }
 
-    const speedBase = type==="fast" ? rand(95,165) : rand(50,120);
+    const { policy, value, worldModel } = this.forward(features, n);
+    const horizon = +$('cfgHorizon').value;
 
-    return {
-      id: world.nextId++,
+    let totalConfidence = 0;
+    const decisions = targets.map((t, i) => {
+      const off = i * this.OUTPUT_DIM;
+      const priority = this._sigmoid(policy[off + 0]);
+      const nMissiles = clamp(round(1 + 2 * this._sigmoid(policy[off + 1])), 1, 3);
+      const timeOffset = policy[off + 2] * 3;
+      const interceptDx = worldModel[i * 4 + 0];
+      const interceptDy = worldModel[i * 4 + 1];
+      const confidence = this._sigmoid(policy[off + 5]);
+      totalConfidence += confidence;
+
+      return {
+        target: t,
+        priority,
+        nMissiles,
+        timeOffset,
+        interceptX: t.x + interceptDx * horizon * 400,
+        interceptY: t.y + interceptDy * horizon * 400,
+        predictedVx: worldModel[i * 4 + 0] * 1000,
+        predictedVy: worldModel[i * 4 + 1] * 1000,
+        confidence,
+        stateValue: value,
+      };
+    });
+
+    this.confidence = n > 0 ? totalConfidence / n : 0;
+    return decisions.sort((a, b) => b.priority - a.priority);
+  }
+
+  addExperience(exp) {
+    this.replayBuffer.push(exp);
+    if (this.replayBuffer.length > this.maxReplaySize) this.replayBuffer.shift();
+  }
+
+  train(iterations = 1) {
+    const batchSize = +$('cfgBatch').value;
+    if (this.replayBuffer.length < batchSize) return;
+    const lr = +$('cfgLR').value;
+
+    for (let iter = 0; iter < iterations; iter++) {
+      this._adamStep++;
+      const grads = this._allWeights.map(w => new Float32Array(w.length));
+      let totalPLoss = 0, totalVLoss = 0;
+      let samplesUsed = 0;
+
+      for (let b = 0; b < batchSize; b++) {
+        const sample = this.replayBuffer[randInt(0, this.replayBuffer.length - 1)];
+        if (!sample.features || sample.features.length !== this.INPUT_DIM) continue;
+
+        try {
+          const feats = new Float32Array(this.INPUT_DIM);
+          feats.set(sample.features);
+          const { policy, value } = this.forward(feats, 1);
+
+          const predicted = this._sigmoid(policy[0]);
+          const target = sample.actualThreat;
+          const error = predicted - target;
+          const reward = sample.reward || 0;
+
+          totalPLoss += error * error;
+          totalVLoss += (value - reward) * (value - reward);
+          samplesUsed++;
+
+          // Compute approximate gradients via SPSA
+          const epsilon = 0.001;
+          const perturbCount = min(3, floor(this._allWeights.length));
+
+          for (let wi = 0; wi < this._allWeights.length; wi++) {
+            const w = this._allWeights[wi];
+            const nPerturb = min(4, w.length);
+            for (let p = 0; p < nPerturb; p++) {
+              const idx = randInt(0, w.length - 1);
+              const original = w[idx];
+
+              w[idx] = original + epsilon;
+              const { policy: p2, value: v2 } = this.forward(feats, 1);
+              const pred2 = this._sigmoid(p2[0]);
+              const err2 = pred2 - target;
+              const loss_plus = err2 * err2 + 0.5 * (v2 - reward) * (v2 - reward) - reward * pred2 * 0.3;
+
+              const loss_base = error * error + 0.5 * (value - reward) * (value - reward) - reward * predicted * 0.3;
+
+              grads[wi][idx] += (loss_plus - loss_base) / epsilon;
+              w[idx] = original;
+            }
+          }
+        } catch (e) {
+          // Skip bad samples
+        }
+      }
+
+      if (samplesUsed === 0) continue;
+
+      // Gradient clipping
+      let gNorm = 0;
+      for (const g of grads) for (let i = 0; i < g.length; i++) gNorm += g[i] * g[i];
+      gNorm = sqrt(gNorm);
+      const maxNorm = 2.0;
+      const clipScale = gNorm > maxNorm ? maxNorm / gNorm : 1;
+
+      // Adam update
+      const beta1 = 0.9, beta2 = 0.999, eps = 1e-8;
+      for (let wi = 0; wi < this._allWeights.length; wi++) {
+        const w = this._allWeights[wi];
+        const g = grads[wi];
+        const m = this._adamM[wi];
+        const v = this._adamV[wi];
+        for (let i = 0; i < w.length; i++) {
+          const gi = g[i] * clipScale / samplesUsed;
+          m[i] = beta1 * m[i] + (1 - beta1) * gi;
+          v[i] = beta2 * v[i] + (1 - beta2) * gi * gi;
+          const mHat = m[i] / (1 - pow(beta1, this._adamStep));
+          const vHat = v[i] / (1 - pow(beta2, this._adamStep));
+          w[i] -= lr * mHat / (sqrt(vHat) + eps);
+          w[i] = clamp(w[i], -4, 4);
+        }
+      }
+
+      this.policyLoss = totalPLoss / samplesUsed;
+      this.valueLoss = totalVLoss / samplesUsed;
+      this.gradientNorm = gNorm * clipScale;
+      this.epoch++;
+    }
+  }
+}
+
+// ================================================================
+// BALLISTIC SOLVER
+// ================================================================
+class BallisticSolver {
+  static solve(target, launchPos, interceptorSpeed) {
+    let bestPoint = null;
+    let bestError = Infinity;
+    const gravity = THREAT_DB[target.type]?.gravity || 0;
+
+    for (let step = 1; step <= 80; step++) {
+      const t = step * 0.4;
+      const px = target.x + target.vx * t + 0.5 * (target.ax || 0) * t * t;
+      const py = target.y + target.vy * t + 0.5 * ((target.ay || 0) + gravity) * t * t;
+
+      // Maneuvering prediction
+      let mx = 0, my = 0;
+      if (target.maneuvering) {
+        mx = sin(t * (target.maneuverFreq || 1) * TAU) * (target.maneuverAmplitude || 100) * t * 0.1;
+        my = cos(t * (target.maneuverFreq || 1) * TAU) * (target.maneuverAmplitude || 100) * t * 0.1;
+      }
+
+      const finalX = px + mx;
+      const finalY = py + my;
+      const distance = hypot(finalX - launchPos.x, finalY - launchPos.y);
+      const interceptTime = distance / interceptorSpeed;
+      const error = abs(interceptTime - t);
+
+      if (error < bestError && interceptTime <= t * 1.4) {
+        bestError = error;
+        bestPoint = { x: finalX, y: finalY, time: t, distance };
+      }
+    }
+    return bestPoint;
+  }
+}
+
+// ================================================================
+// SIMULATION STATE
+// ================================================================
+let simRunning = false;
+let simTime = 0;
+let frameCount = 0;
+let lastWaveTime = 0;
+let fps = 0;
+
+const stats = { launched: 0, kills: 0, leakers: 0, fired: 0 };
+
+let enemies = [];
+let interceptors = [];
+let explosions = [];
+let particles = [];
+let debris = [];
+let launchers = [];
+
+let ai = new TransformerAI();
+let aiDecisions = [];
+
+let historyAccuracy = [];
+let historyLoss = [];
+
+let canvas, ctx, viewWidth, viewHeight, scaleX, scaleY;
+
+let radarSweepAngle = 0;
+let starField = null;
+
+// ================================================================
+// INITIALIZATION
+// ================================================================
+function init() {
+  canvas = $('mainCanvas');
+  ctx = canvas.getContext('2d');
+
+  function resize() {
+    const container = $('mainViewport');
+    viewWidth = container.clientWidth;
+    viewHeight = container.clientHeight;
+    canvas.width = viewWidth;
+    canvas.height = viewHeight;
+    scaleX = viewWidth / WORLD;
+    scaleY = viewHeight / WORLD;
+    starField = null; // regenerate
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  rebuildLaunchers(4);
+  O('dispParams', ai.countParameters().toLocaleString());
+
+  requestAnimationFrame(mainLoop);
+  logEvent('System initialized. AEGIS-AI v6.0 online.', 'log-sys');
+}
+
+function rebuildLaunchers(count) {
+  launchers = [];
+  const spacing = WORLD * 0.5 / (count + 1);
+  const startX = WORLD * 0.25;
+  const missilesPer = +$('cfgMPU').value;
+  for (let i = 0; i < count; i++) {
+    launchers.push({
+      id: i,
+      x: startX + spacing * (i + 1),
+      y: BASE.y + 50,
+      missiles: missilesPer,
+      maxMissiles: missilesPer,
+      reloadTimer: 0,
+      status: 'ready',
+      turretAngle: -PI / 2,
+      fireAnimation: 0,
+      lastFireTime: 0,
+    });
+  }
+}
+
+// ================================================================
+// SPAWNING
+// ================================================================
+function spawnEnemy(forcedType = null) {
+  const availableTypes = [];
+  if ($('cfgTypeBallistic').checked) availableTypes.push(0);
+  if ($('cfgTypeCruise').checked) availableTypes.push(1);
+  if ($('cfgTypeManeuvering').checked) availableTypes.push(2);
+  if ($('cfgTypeHypersonic').checked) availableTypes.push(3);
+  if ($('cfgTypeDecoy').checked) availableTypes.push(4);
+  if (availableTypes.length === 0) availableTypes.push(0);
+
+  const type = forcedType !== null ? forcedType : availableTypes[randInt(0, availableTypes.length - 1)];
+  const typeData = THREAT_DB[type];
+  const speed = clamp(rand(typeData.speedRange[0], typeData.speedRange[1]), +$('cfgMinSpd').value, +$('cfgMaxSpd').value);
+
+  // Spawn from edges
+  const edge = randInt(0, 2);
+  let x, y;
+  if (edge === 0) { x = rand(100, WORLD - 100); y = rand(-120, -20); }
+  else if (edge === 1) { x = rand(-120, -20); y = rand(100, WORLD * 0.45); }
+  else { x = rand(WORLD + 20, WORLD + 120); y = rand(100, WORLD * 0.45); }
+
+  // Aim toward base
+  const targetX = BASE.x + rand(-350, 350);
+  const targetY = BASE.y + rand(-180, 60);
+  const angle = atan2(targetY - y, targetX - x);
+
+  const enemy = {
+    id: 'T' + (++stats.launched),
+    x, y,
+    vx: cos(angle) * speed,
+    vy: sin(angle) * speed,
+    ax: 0, ay: 0,
+    speed,
+    type,
+    alive: true,
+    spawnTime: simTime,
+    trail: [],
+    threat: 0.5,
+    maneuvering: type === 2,
+    maneuverTimer: 0,
+    maneuverFreq: rand(0.3, 2.5),
+    maneuverAmplitude: rand(40, 220),
+    engaged: false,
+    assignedCount: 0,
+    covarianceEstimate: 8,
+    flameFlicker: rand(0.7, 1.3),
+    size: typeData.size,
+  };
+
+  // Type-specific initialization
+  if (type === 0) {
+    enemy.vy = -speed * 0.2;
+    enemy.vx = (targetX - x) / hypot(targetX - x, targetY - y) * speed;
+    enemy.ay = rand(3, 12);
+  }
+  if (type === 1) {
+    enemy.y = rand(WORLD * 0.3, WORLD * 0.65);
+    enemy.vy = rand(-15, 15);
+  }
+  if (type === 3) {
+    enemy.speed = rand(1200, 2800);
+    enemy.vx = cos(angle) * enemy.speed;
+    enemy.vy = sin(angle) * enemy.speed;
+  }
+
+  enemies.push(enemy);
+  logEvent(`⚠ Detected: ${enemy.id} [${typeData.name}] V=${round(speed)}m/s`, 'log-warn');
+}
+
+function launchWave() {
+  const count = +$('cfgWaveSize').value;
+  for (let i = 0; i < count; i++) setTimeout(() => spawnEnemy(), i * 120);
+  logEvent(`WAVE ATTACK: ${count} inbound threats`, 'log-warn');
+}
+
+function launchSingle() { spawnEnemy(); }
+
+function launchMassive() {
+  for (let i = 0; i < 25; i++) setTimeout(() => spawnEnemy(), i * 60);
+  logEvent('MASSIVE STRIKE: 25 threats inbound!', 'log-warn');
+}
+
+// ================================================================
+// INTERCEPTOR LAUNCH
+// ================================================================
+function launchInterceptor(launcher, target, interceptPoint) {
+  if (launcher.missiles <= 0 || launcher.status !== 'ready') return false;
+
+  const intSpeed = +$('cfgIntSpd').value;
+  const angle = atan2(interceptPoint.y - launcher.y, interceptPoint.x - launcher.x);
+
+  const missile = {
+    id: 'M' + (++stats.fired),
+    x: launcher.x,
+    y: launcher.y - 8,
+    vx: cos(angle) * intSpeed,
+    vy: sin(angle) * intSpeed,
+    speed: intSpeed,
+    target,
+    alive: true,
+    age: 0,
+    trail: [],
+    interceptPoint,
+    launchTime: simTime,
+    guidancePhase: 'midcourse',
+    prevLOS: atan2(target.y - launcher.y, target.x - launcher.x),
+    flameFlicker: rand(0.6, 1.0),
+    smokeTimer: 0,
+  };
+
+  interceptors.push(missile);
+  launcher.missiles--;
+  launcher.status = 'reloading';
+  launcher.reloadTimer = +$('cfgReload').value;
+  launcher.fireAnimation = 1.0;
+  launcher.lastFireTime = simTime;
+
+  target.engaged = true;
+  target.assignedCount++;
+
+  createExplosion(launcher.x, launcher.y - 8, '#00ccff', 12, 0.4);
+  createLaunchSmoke(launcher.x, launcher.y);
+
+  logEvent(`→ LAUNCH: ${missile.id} → ${target.id} from PU-${launcher.id}`, 'log-launch');
+  return true;
+}
+
+// ================================================================
+// PROPORTIONAL NAVIGATION GUIDANCE
+// ================================================================
+function updateGuidance(missile, dt) {
+  const target = missile.target;
+  if (!target || !target.alive) {
+    missile.alive = false;
+    return;
+  }
+
+  const dx = target.x - missile.x;
+  const dy = target.y - missile.y;
+  const range = hypot(dx, dy);
+  const LOS = atan2(dy, dx);
+  const LOSrate = (LOS - missile.prevLOS) / dt;
+  missile.prevLOS = LOS;
+
+  const closingVelocity = -((dx * (target.vx - missile.vx) + dy * (target.vy - missile.vy)) / range);
+
+  // Switch to terminal guidance when close
+  if (range < 250 && missile.guidancePhase === 'midcourse') {
+    missile.guidancePhase = 'terminal';
+  }
+
+  const N = missile.guidancePhase === 'terminal' ? 5.0 : 3.5;
+  const accelCommand = N * closingVelocity * LOSrate;
+
+  const velAngle = atan2(missile.vy, missile.vx);
+  let accelX = -sin(velAngle) * accelCommand;
+  let accelY = cos(velAngle) * accelCommand;
+
+  // Limit acceleration
+  const accelMag = hypot(accelX, accelY);
+  const maxAccel = 500;
+  if (accelMag > maxAccel) {
+    const scale = maxAccel / accelMag;
+    accelX *= scale;
+    accelY *= scale;
+  }
+
+  missile.vx += accelX * dt;
+  missile.vy += accelY * dt;
+
+  // Maintain speed
+  const currentSpeed = hypot(missile.vx, missile.vy);
+  if (currentSpeed > 0) {
+    missile.vx = missile.vx / currentSpeed * missile.speed;
+    missile.vy = missile.vy / currentSpeed * missile.speed;
+  }
+
+  // Kill check
+  const killRadius = +$('cfgKillR').value;
+  if (range < killRadius) {
+    target.alive = false;
+    missile.alive = false;
+    stats.kills++;
+
+    createExplosion((target.x + missile.x) / 2, (target.y + missile.y) / 2, '#ff8800', 40, 1.5);
+    createExplosion((target.x + missile.x) / 2, (target.y + missile.y) / 2, '#ffffff', 18, 0.4);
+    createDebris((target.x + missile.x) / 2, (target.y + missile.y) / 2, 15);
+
+    logEvent(`✓ KILL: ${missile.id} destroyed ${target.id} at ${round(range)}m`, 'log-hit');
+
+    ai.addExperience(createExperience(target, true, range));
+    return;
+  }
+
+  // Timeout or out of bounds
+  if (missile.age > 35 || missile.x < -300 || missile.x > WORLD + 300 || missile.y < -300 || missile.y > WORLD + 300) {
+    missile.alive = false;
+    logEvent(`✗ MISS: ${missile.id} self-destruct`, 'log-miss');
+  }
+}
+
+// ================================================================
+// EXPERIENCE CREATION FOR AI
+// ================================================================
+function createExperience(target, wasHit, interceptError) {
+  const dBase = hypot(target.x - BASE.x, target.y - BASE.y);
+  const speed = hypot(target.vx, target.vy);
+  const heading = atan2(target.vy, target.vx);
+  const closingRate = -((target.x - BASE.x) * target.vx + (target.y - BASE.y) * target.vy) / (dBase * speed + 1);
+
+  const reward = wasHit ? (1.0 + dBase / WORLD * 0.5) : (dBase < 50 ? -2.0 : -0.5);
+
+  const features = new Float32Array(ai.INPUT_DIM);
+  features[0] = target.x / WORLD;
+  features[1] = target.y / WORLD;
+  features[2] = target.vx / 2000;
+  features[3] = target.vy / 2000;
+  features[4] = (target.ax || 0) / 300;
+  features[5] = (target.ay || 0) / 300;
+  features[6] = speed / 2000;
+  features[7] = heading / PI;
+  features[8] = dBase / WORLD;
+  features[9] = target.threat;
+  features[10] = target.type / 4;
+  features[11] = min((simTime - target.spawnTime) / 60, 1);
+  features[12] = target.maneuvering ? 1 : 0;
+  features[13] = closingRate;
+  features[14] = target.engaged ? 1 : 0;
+  features[15] = target.assignedCount / 3;
+  features[16] = simTime / 300;
+  features[17] = dBase / (speed * max(0.1, closingRate) + 1) / 30;
+  features[18] = target.type === 4 ? 1 : 0;
+  features[19] = target.covarianceEstimate / 50;
+
+  return {
+    features,
+    actualThreat: target.threat,
+    wasHit,
+    interceptError: interceptError || 999,
+    reward,
+    actualDx: target.vx / 1000,
+    actualDy: target.vy / 1000,
+  };
+}
+
+// ================================================================
+// EFFECTS
+// ================================================================
+function createExplosion(x, y, color, size, duration) {
+  explosions.push({ x, y, color, size, duration, elapsed: 0 });
+  const count = size > 20 ? 35 : 18;
+  if (!$('cfgSmoke').checked) return;
+  for (let i = 0; i < count; i++) {
+    const angle = rand(0, TAU);
+    const speed = rand(30, 220);
+    particles.push({
       x, y,
-      vx: toBase.x*speedBase,
-      vy: toBase.y*speedBase,
-      prevVx: toBase.x*speedBase,
-      prevVy: toBase.y*speedBase,
-      speed: speedBase,
-      type,
-      radius: type==="fast" ? 7.4 : type==="curve" ? 6.8 : 6.2,
-      age:0,
-      drift:rand(-1,1),
-      maneuverAmp:rand(10,34),
-      maneuverFreq:rand(0.6,1.9),
-      assigned:0,
-      alive:true,
-      hp:1,
-      trail:[]
-    };
+      vx: cos(angle) * speed,
+      vy: sin(angle) * speed,
+      life: rand(0.2, 1.2),
+      maxLife: 1.2,
+      color,
+      size: rand(1, 4),
+      type: 'spark',
+    });
+  }
+}
+
+function createLaunchSmoke(x, y) {
+  if (!$('cfgSmoke').checked) return;
+  for (let i = 0; i < 30; i++) {
+    const angle = rand(PI * 0.2, PI * 0.8);
+    const speed = rand(15, 90);
+    particles.push({
+      x, y,
+      vx: cos(angle) * speed,
+      vy: -abs(sin(angle)) * speed * 0.4,
+      life: rand(0.4, 2.0),
+      maxLife: 2.0,
+      color: '#aaaaaa',
+      size: rand(2, 6),
+      type: 'smoke',
+    });
+  }
+}
+
+function createDebris(x, y, count) {
+  for (let i = 0; i < count; i++) {
+    const angle = rand(0, TAU);
+    const speed = rand(60, 280);
+    debris.push({
+      x, y,
+      vx: cos(angle) * speed,
+      vy: sin(angle) * speed,
+      life: rand(0.5, 2.5),
+      maxLife: 2.5,
+      size: rand(1, 5),
+      rotation: rand(0, TAU),
+      rotationSpeed: rand(-10, 10),
+    });
+  }
+}
+
+// ================================================================
+// AI DECISION CYCLE
+// ================================================================
+function runAICycle() {
+  // Update threat levels for all enemies
+  for (const enemy of enemies) {
+    if (!enemy.alive) continue;
+    const dBase = hypot(enemy.x - BASE.x, enemy.y - BASE.y);
+    const speed = hypot(enemy.vx, enemy.vy);
+    const closingRate = -((enemy.x - BASE.x) * enemy.vx + (enemy.y - BASE.y) * enemy.vy) / (dBase * speed + 1);
+    enemy.threat = clamp(
+      0.22 * (1 - dBase / WORLD) +
+      0.22 * (speed / 1500) +
+      0.22 * max(0, closingRate) +
+      0.15 * (enemy.maneuvering ? 1 : 0) +
+      0.10 * (enemy.type === 3 ? 1 : 0) +
+      0.09 * (enemy.type === 4 ? -0.5 : 0),
+      0, 1
+    );
   }
 
-  function createInterceptor(battery, target, pred){
-    const launchY = battery.y - battery.towerH - 6;
-    const dir = norm(pred.x-battery.x, pred.y-launchY);
-    return {
-      id: world.nextMissileId++,
-      batteryId:battery.id,
-      x:battery.x,
-      y:launchY,
-      vx:dir.x*settings.interceptorSpeed,
-      vy:dir.y*settings.interceptorSpeed,
-      speed:settings.interceptorSpeed,
-      radius:4.8,
-      life:0,
-      ttl:6.8,
-      targetRef:target,
-      predX:pred.x,
-      predY:pred.y,
-      dead:false,
-      trail:[]
-    };
+  const activeTargets = enemies.filter(e => e.alive);
+  if (activeTargets.length === 0) return;
+
+  if ($('cfgAI').checked) {
+    // AI makes decisions
+    aiDecisions = ai.makeDecisions(activeTargets);
+
+    for (const decision of aiDecisions) {
+      const target = decision.target;
+      if (!target.alive || target.assignedCount >= 2) continue;
+      if (target.type === 4) continue; // Skip decoys
+
+      const dBase = hypot(target.x - BASE.x, target.y - BASE.y);
+      if (dBase > WORLD * 1.1 || dBase < 20) continue;
+
+      const closingRate = -((target.x - BASE.x) * target.vx + (target.y - BASE.y) * target.vy) / (dBase * hypot(target.vx, target.vy) + 1);
+      if (closingRate < -0.3 && dBase > WORLD * 0.5) continue;
+      if (decision.priority < 0.2) continue;
+
+      // Find best launcher
+      let bestLauncher = null;
+      let bestDistance = Infinity;
+      for (const launcher of launchers) {
+        if (launcher.missiles > 0 && launcher.status === 'ready') {
+          const d = hypot(launcher.x - target.x, launcher.y - target.y);
+          if (d < bestDistance) {
+            bestDistance = d;
+            bestLauncher = launcher;
+          }
+        }
+      }
+
+      if (bestLauncher) {
+        const interceptPoint = BallisticSolver.solve(target, bestLauncher, +$('cfgIntSpd').value);
+        if (interceptPoint) {
+          launchInterceptor(bestLauncher, target, interceptPoint);
+          break; // One launch per cycle
+        }
+      }
+    }
+  } else {
+    // Greedy fallback
+    const sorted = [...activeTargets]
+      .filter(e => !e.engaged && e.type !== 4)
+      .sort((a, b) => hypot(a.x - BASE.x, a.y - BASE.y) - hypot(b.x - BASE.x, b.y - BASE.y));
+
+    for (const target of sorted) {
+      const d = hypot(target.x - BASE.x, target.y - BASE.y);
+      if (d > WORLD * 0.7) continue;
+
+      let bestLauncher = null;
+      for (const l of launchers) {
+        if (l.missiles > 0 && l.status === 'ready') {
+          if (!bestLauncher || l.missiles > bestLauncher.missiles) bestLauncher = l;
+        }
+      }
+
+      if (bestLauncher) {
+        const ip = BallisticSolver.solve(target, bestLauncher, +$('cfgIntSpd').value);
+        if (ip) { launchInterceptor(bestLauncher, target, ip); break; }
+      }
+    }
+  }
+}
+
+// ================================================================
+// SIMULATION UPDATE
+// ================================================================
+function updateSimulation(dt) {
+  // === UPDATE ENEMIES ===
+  for (const enemy of enemies) {
+    if (!enemy.alive) continue;
+
+    // Type-specific physics
+    if (enemy.type === 2) {
+      enemy.maneuverTimer += dt;
+      const maneuverForce = sin(enemy.maneuverTimer * enemy.maneuverFreq * TAU) * enemy.maneuverAmplitude;
+      const heading = atan2(enemy.vy, enemy.vx);
+      enemy.ax = cos(heading + PI / 2) * maneuverForce;
+      enemy.ay = sin(heading + PI / 2) * maneuverForce;
+    }
+    if (enemy.type === 0) {
+      enemy.ay = (enemy.ay || 0) + THREAT_DB[0].gravity * dt * 0.3;
+    }
+
+    enemy.vx += (enemy.ax || 0) * dt;
+    enemy.vy += (enemy.ay || 0) * dt;
+    enemy.x += enemy.vx * dt;
+    enemy.y += enemy.vy * dt;
+
+    // Trail
+    if ($('cfgTrails').checked) {
+      enemy.trail.push({ x: enemy.x, y: enemy.y });
+      while (enemy.trail.length > 100) enemy.trail.shift();
+    }
+
+    // Base hit check
+    const dBase = hypot(enemy.x - BASE.x, enemy.y - BASE.y);
+    if (dBase < 22) {
+      enemy.alive = false;
+      stats.leakers++;
+      createExplosion(enemy.x, enemy.y, '#ff0000', 45, 2.0);
+      createExplosion(BASE.x, BASE.y, '#ff4400', 25, 1.2);
+      createDebris(enemy.x, enemy.y, 20);
+      logEvent(`✗ LEAKER: ${enemy.id} hit the base!`, 'log-miss');
+      ai.addExperience(createExperience(enemy, false, 999));
+    }
+
+    // Out of bounds
+    if (enemy.x < -350 || enemy.x > WORLD + 350 || enemy.y < -350 || enemy.y > WORLD + 350) {
+      enemy.alive = false;
+    }
   }
 
-  // =========================
-  // Simulation services
-  // =========================
-  function resetWorld(){
-    world.time = 0;
-    world.spawnAccum = 0;
-    world.globalFireAccum = 0;
-    world.nextId = 1;
-    world.nextMissileId = 1;
-    world.hits = 0;
-    world.leaks = 0;
-    world.shots = 0;
-    world.targets = [];
-    world.interceptors = [];
-    world.particles = [];
-    world.smoke = [];
-    world.shockwaves = [];
-    world.trails = [];
-    world.guide = null;
-    seedClouds();
-    initBatteries();
-    eventStore.length = 0;
-    logEvent("info","Система инициализирована");
-    spawnBurst(8);
-  }
+  // === UPDATE INTERCEPTORS ===
+  for (const missile of interceptors) {
+    if (!missile.alive) continue;
+    missile.age += dt;
+    updateGuidance(missile, dt);
+    missile.x += missile.vx * dt;
+    missile.y += missile.vy * dt;
 
-  function spawnTarget(custom={}){
-    if(world.targets.length >= settings.maxTargets) return;
-    const t = createTarget(custom);
-    world.targets.push(t);
-  }
+    if ($('cfgTrails').checked) {
+      missile.trail.push({ x: missile.x, y: missile.y });
+      while (missile.trail.length > 70) missile.trail.shift();
+    }
 
-  function spawnBurst(n){
-    for(let i=0;i<n;i++) spawnTarget();
-    logEvent("warn",`Сформирован залп: ${n} целей`);
-  }
-
-  function spawnScenarioWave(){
-    const type = settings.scenario;
-    if(type === "dense"){
-      for(let i=0;i<18;i++){
-        spawnTarget({
-          x: rand(40, W-40),
-          y: -rand(20,120),
-          type: chance(0.5) ? "fast" : "curve"
+    // Smoke trail
+    if ($('cfgSmoke').checked) {
+      missile.smokeTimer -= dt;
+      if (missile.smokeTimer <= 0) {
+        missile.smokeTimer = 0.04;
+        particles.push({
+          x: missile.x - missile.vx * 0.008,
+          y: missile.y - missile.vy * 0.008,
+          vx: rand(-8, 8), vy: rand(-8, 8),
+          life: rand(0.3, 0.9), maxLife: 0.9,
+          color: '#999', size: rand(1, 2.5), type: 'smoke',
         });
       }
-    } else if(type === "top"){
-      for(let i=0;i<14;i++) spawnTarget({ x: rand(30,W-30), y: -rand(20,120) });
-    } else if(type === "sides"){
-      for(let i=0;i<14;i++){
-        if(i%2===0) spawnTarget({ x:-rand(20,120), y:rand(20,H*0.4) });
-        else spawnTarget({ x:W+rand(20,120), y:rand(20,H*0.4) });
+    }
+  }
+
+  // === UPDATE LAUNCHERS ===
+  for (const launcher of launchers) {
+    if (launcher.status === 'reloading') {
+      launcher.reloadTimer -= dt;
+      if (launcher.reloadTimer <= 0) {
+        launcher.status = 'ready';
+        launcher.reloadTimer = 0;
       }
-    } else if(type === "fast"){
-      for(let i=0;i<14;i++) spawnTarget({ type:"fast" });
-    } else if(type === "curve"){
-      for(let i=0;i<14;i++) spawnTarget({ type:"curve" });
+    }
+    if (launcher.fireAnimation > 0) {
+      launcher.fireAnimation = max(0, launcher.fireAnimation - dt * 3);
+    }
+  }
+
+  // === UPDATE EFFECTS ===
+  for (const ex of explosions) ex.elapsed += dt;
+  explosions = explosions.filter(e => e.elapsed < e.duration);
+
+  for (const p of particles) {
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    if (p.type === 'smoke') {
+      p.vx *= 0.92;
+      p.vy *= 0.92;
+      p.vy -= 15 * dt;
     } else {
-      spawnBurst(14);
+      p.vx *= 0.96;
+      p.vy *= 0.96;
+      p.vy += 25 * dt;
+    }
+    p.life -= dt;
+  }
+  particles = particles.filter(p => p.life > 0);
+
+  for (const d of debris) {
+    d.x += d.vx * dt;
+    d.y += d.vy * dt;
+    d.vy += 80 * dt;
+    d.rotation += d.rotationSpeed * dt;
+    d.life -= dt;
+  }
+  debris = debris.filter(d => d.life > 0);
+
+  // === CLEANUP ===
+  enemies = enemies.filter(e => e.alive);
+  interceptors = interceptors.filter(m => m.alive);
+
+  // === AI CYCLE (every ~5 frames) ===
+  if (frameCount % 5 === 0) runAICycle();
+
+  // === TRAINING (every ~40 frames) ===
+  if (frameCount % 40 === 0 && ai.replayBuffer.length > 40) ai.train(1);
+
+  // === AUTO WAVES ===
+  if ($('cfgAutoWave').checked) {
+    const interval = +$('cfgInterval').value;
+    if (simTime - lastWaveTime > interval) {
+      lastWaveTime = simTime;
+      const count = randInt(1, +$('cfgWaveSize').value);
+      for (let i = 0; i < count; i++) setTimeout(() => spawnEnemy(), i * 90);
     }
   }
 
-  function predictIntercept(sx,sy, tx,ty,tvx,tvy, speed){
-    const rx = tx - sx;
-    const ry = ty - sy;
-    const a = tvx*tvx + tvy*tvy - speed*speed;
-    const b = 2 * (rx*tvx + ry*tvy);
-    const c = rx*rx + ry*ry;
-    let t = null;
+  // === RADAR ===
+  radarSweepAngle = (radarSweepAngle + dt * 1.8) % TAU;
+}
 
-    if(Math.abs(a) < 1e-6){
-      if(Math.abs(b) > 1e-6) t = -c/b;
+// ================================================================
+// RENDERING
+// ================================================================
+function render() {
+  const C = ctx;
+  const W = viewWidth;
+  const H = viewHeight;
+  const sx = scaleX;
+  const sy = scaleY;
+  const bx = BASE.x * sx;
+  const by = BASE.y * sy;
+
+  C.clearRect(0, 0, W, H);
+
+  // ======== SKY ========
+  const skyGrad = C.createLinearGradient(0, 0, 0, H);
+  skyGrad.addColorStop(0, '#020308');
+  skyGrad.addColorStop(0.4, '#060810');
+  skyGrad.addColorStop(0.7, '#0a1018');
+  skyGrad.addColorStop(0.85, '#0c1a10');
+  skyGrad.addColorStop(1, '#081408');
+  C.fillStyle = skyGrad;
+  C.fillRect(0, 0, W, H);
+
+  // ======== STARS ========
+  if (!starField) {
+    starField = [];
+    for (let i = 0; i < 120; i++) {
+      starField.push({ x: rand(0, W), y: rand(0, H * 0.75), s: rand(0.3, 1.8), b: rand(0.3, 1), p: rand(0, TAU) });
+    }
+  }
+  for (const star of starField) {
+    const brightness = star.b * (0.6 + 0.4 * sin(simTime * 1.5 + star.p));
+    C.beginPath();
+    C.arc(star.x, star.y, star.s, 0, TAU);
+    C.fillStyle = `rgba(200,220,255,${brightness})`;
+    C.fill();
+  }
+
+  // ======== GRID ========
+  if ($('cfgGrid').checked) {
+    C.strokeStyle = 'rgba(10,24,40,0.12)';
+    C.lineWidth = 0.5;
+    for (let x = 0; x <= WORLD; x += 100) {
+      C.beginPath(); C.moveTo(x * sx, 0); C.lineTo(x * sx, H); C.stroke();
+    }
+    for (let y = 0; y <= WORLD; y += 100) {
+      C.beginPath(); C.moveTo(0, y * sy); C.lineTo(W, y * sy); C.stroke();
+    }
+
+    // Range circles
+    C.lineWidth = 1;
+    for (let r = 200; r <= 1200; r += 200) {
+      C.beginPath(); C.arc(bx, by, r * sx, 0, TAU);
+      C.strokeStyle = `rgba(0,100,140,${0.08 - (r / 1200) * 0.04})`;
+      C.stroke();
+
+      // Range labels
+      C.fillStyle = 'rgba(0,150,200,0.2)';
+      C.font = '8px monospace';
+      C.fillText(r + 'm', bx + r * sx * 0.71 + 3, by - r * sy * 0.71 - 3);
+    }
+  }
+
+  // ======== GROUND ========
+  const groundY = (BASE.y + 60) * sy;
+  C.fillStyle = '#0a160a';
+  C.fillRect(0, groundY, W, H - groundY);
+
+  const groundLineGrad = C.createLinearGradient(0, groundY, W, groundY);
+  groundLineGrad.addColorStop(0, '#1a3a1a00');
+  groundLineGrad.addColorStop(0.5, '#1a4a1a');
+  groundLineGrad.addColorStop(1, '#1a3a1a00');
+  C.strokeStyle = groundLineGrad;
+  C.lineWidth = 2;
+  C.beginPath(); C.moveTo(0, groundY); C.lineTo(W, groundY); C.stroke();
+
+  // ======== DEFENSE ZONES ========
+  if ($('cfgZones').checked) {
+    // Outer detection zone
+    C.beginPath();
+    C.arc(bx, by, WORLD * 0.6 * sx, PI * 0.05, PI * 0.95);
+    C.strokeStyle = 'rgba(0,255,136,0.15)';
+    C.lineWidth = 1;
+    C.setLineDash([6, 10]);
+    C.stroke();
+    C.setLineDash([]);
+
+    // Inner kill zone
+    C.beginPath();
+    C.arc(bx, by, WORLD * 0.3 * sx, 0, TAU);
+    C.strokeStyle = 'rgba(255,136,0,0.12)';
+    C.lineWidth = 1;
+    C.setLineDash([4, 8]);
+    C.stroke();
+    C.setLineDash([]);
+
+    // Zone labels
+    C.fillStyle = 'rgba(0,255,136,0.15)';
+    C.font = '9px monospace';
+    C.fillText('DETECTION ENVELOPE', bx + WORLD * 0.58 * sx, by - 15);
+    C.fillStyle = 'rgba(255,136,0,0.15)';
+    C.fillText('ENGAGEMENT ZONE', bx + WORLD * 0.28 * sx, by - 15);
+  }
+
+  // ======== RADAR SWEEP ========
+  C.save();
+  C.globalAlpha = 0.06;
+  C.beginPath();
+  C.moveTo(bx, by);
+  C.arc(bx, by, WORLD * 0.8 * sx, radarSweepAngle - 0.2, radarSweepAngle);
+  C.closePath();
+  C.fillStyle = '#00ff88';
+  C.fill();
+  C.restore();
+
+  // ======== TRAILS ========
+  if ($('cfgTrails').checked) {
+    // Enemy trails
+    for (const enemy of enemies) {
+      if (enemy.trail.length < 2) continue;
+      const typeData = THREAT_DB[enemy.type];
+      for (let i = 1; i < enemy.trail.length; i++) {
+        const alpha = (i / enemy.trail.length) * 0.35;
+        C.beginPath();
+        C.moveTo(enemy.trail[i - 1].x * sx, enemy.trail[i - 1].y * sy);
+        C.lineTo(enemy.trail[i].x * sx, enemy.trail[i].y * sy);
+        C.strokeStyle = typeData.color;
+        C.globalAlpha = alpha;
+        C.lineWidth = typeData.trailWidth * (0.3 + 0.7 * i / enemy.trail.length);
+        C.stroke();
+      }
+      C.globalAlpha = 1;
+    }
+
+    // Interceptor trails
+    for (const missile of interceptors) {
+      if (missile.trail.length < 2) continue;
+      for (let i = 1; i < missile.trail.length; i++) {
+        const alpha = (i / missile.trail.length) * 0.4;
+        C.beginPath();
+        C.moveTo(missile.trail[i - 1].x * sx, missile.trail[i - 1].y * sy);
+        C.lineTo(missile.trail[i].x * sx, missile.trail[i].y * sy);
+        C.strokeStyle = '#00ccff';
+        C.globalAlpha = alpha;
+        C.lineWidth = 1.2 * (0.3 + 0.7 * i / missile.trail.length);
+        C.stroke();
+      }
+      C.globalAlpha = 1;
+    }
+  }
+
+  // ======== AI PREDICTIONS ========
+  if ($('cfgPredictions').checked) {
+    for (const dec of aiDecisions) {
+      if (!dec.target.alive) continue;
+      const tx = dec.target.x * sx;
+      const ty = dec.target.y * sy;
+      const ix = clamp(dec.interceptX, 0, WORLD) * sx;
+      const iy = clamp(dec.interceptY, 0, WORLD) * sy;
+
+      // Prediction arc
+      C.beginPath();
+      C.moveTo(tx, ty);
+      C.lineTo(ix, iy);
+      C.strokeStyle = `rgba(180,120,255,${dec.confidence * 0.5})`;
+      C.lineWidth = 1;
+      C.setLineDash([3, 4]);
+      C.stroke();
+      C.setLineDash([]);
+
+      // Intercept point marker
+      C.strokeStyle = `rgba(180,120,255,${dec.confidence * 0.8})`;
+      C.lineWidth = 1.5;
+      C.beginPath(); C.arc(ix, iy, 7, 0, TAU); C.stroke();
+      C.beginPath(); C.moveTo(ix - 5, iy); C.lineTo(ix + 5, iy); C.stroke();
+      C.beginPath(); C.moveTo(ix, iy - 5); C.lineTo(ix, iy + 5); C.stroke();
+
+      // Priority text
+      if (dec.priority > 0.3 && $('cfgLabels').checked) {
+        C.fillStyle = `rgba(255,${round(255 * (1 - dec.priority))},0,0.9)`;
+        C.font = 'bold 9px monospace';
+        C.fillText(`P:${(dec.priority * 100) | 0}%`, tx + 14, ty - 14);
+        C.fillStyle = `rgba(180,120,255,0.7)`;
+        C.font = '8px monospace';
+        C.fillText(`C:${(dec.confidence * 100) | 0}%`, tx + 14, ty - 4);
+      }
+    }
+  }
+
+  // ======== BASE ========
+  C.save();
+  C.translate(bx, by);
+
+  // Radar dish
+  C.save();
+  C.rotate(sin(simTime * 0.5) * 0.3);
+  C.strokeStyle = '#00ff88';
+  C.lineWidth = 2;
+  C.beginPath();
+  C.arc(0, -18, 14, PI + 0.5, TAU - 0.5);
+  C.stroke();
+  C.beginPath();
+  C.moveTo(0, -4);
+  C.lineTo(0, -18);
+  C.stroke();
+  C.restore();
+
+  // Building
+  C.fillStyle = '#1a3a2a';
+  C.strokeStyle = '#00ff88';
+  C.lineWidth = 1.5;
+  C.fillRect(-24, -4, 48, 16);
+  C.strokeRect(-24, -4, 48, 16);
+
+  // Windows
+  C.fillStyle = '#00ff8866';
+  for (let i = -18; i <= 12; i += 10) {
+    C.fillRect(i, 0, 6, 5);
+  }
+
+  // Antenna
+  C.strokeStyle = '#00ff8888';
+  C.lineWidth = 1;
+  C.beginPath(); C.moveTo(0, -4); C.lineTo(0, -30); C.stroke();
+  C.beginPath(); C.arc(0, -30, 3, 0, TAU); C.fillStyle = '#00ff88'; C.fill();
+
+  // Perimeter
+  C.beginPath(); C.arc(0, 0, 30, 0, TAU);
+  C.strokeStyle = '#00ff8844';
+  C.lineWidth = 1;
+  C.setLineDash([3, 5]);
+  C.stroke();
+  C.setLineDash([]);
+
+  // Label
+  C.fillStyle = '#00ff88';
+  C.font = 'bold 10px monospace';
+  C.textAlign = 'center';
+  C.fillText('HQ AEGIS', 0, 28);
+  C.textAlign = 'left';
+
+  C.restore();
+
+  // ======== LAUNCHERS ========
+  for (const launcher of launchers) {
+    const lx = launcher.x * sx;
+    const ly = launcher.y * sy;
+
+    C.save();
+    C.translate(lx, ly);
+
+    // Platform base
+    C.fillStyle = '#182818';
+    C.strokeStyle = launcher.status === 'ready' ? '#00ff88' : '#ffaa00';
+    C.lineWidth = 1.5;
+    C.fillRect(-16, -6, 32, 18);
+    C.strokeRect(-16, -6, 32, 18);
+
+    // VLS cells visualization
+    const cellSize = 5;
+    const cols = 4;
+    const rows = ceil(launcher.maxMissiles / cols);
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const idx = r * cols + c;
+        if (idx >= launcher.maxMissiles) break;
+        const cx = -12 + c * (cellSize + 2);
+        const cy = -4 + r * (cellSize + 1);
+        C.fillStyle = idx < launcher.missiles ? '#00ff8866' : '#33333366';
+        C.fillRect(cx, cy, cellSize, cellSize);
+        C.strokeStyle = '#ffffff22';
+        C.lineWidth = 0.5;
+        C.strokeRect(cx, cy, cellSize, cellSize);
+      }
+    }
+
+    // Turret
+    let turretTarget = -PI / 2;
+    let nearestDist = Infinity;
+    for (const enemy of enemies) {
+      const d = hypot(enemy.x - launcher.x, enemy.y - launcher.y);
+      if (d < nearestDist) {
+        nearestDist = d;
+        turretTarget = atan2(enemy.y - launcher.y, enemy.x - launcher.x);
+      }
+    }
+    launcher.turretAngle = lerp(launcher.turretAngle, turretTarget, 0.07);
+
+    C.save();
+    C.rotate(launcher.turretAngle);
+    C.fillStyle = '#3a6a3a';
+    C.fillRect(0, -3, 20, 6);
+    C.fillStyle = '#4a8a4a';
+    C.fillRect(16, -2.5, 8, 5);
+
+    // Muzzle flash
+    if (launcher.fireAnimation > 0) {
+      const flashSize = 6 + launcher.fireAnimation * 15;
+      const flashGrad = C.createRadialGradient(24, 0, 0, 24, 0, flashSize);
+      flashGrad.addColorStop(0, `rgba(0,255,200,${launcher.fireAnimation})`);
+      flashGrad.addColorStop(0.5, `rgba(0,200,255,${launcher.fireAnimation * 0.5})`);
+      flashGrad.addColorStop(1, 'transparent');
+      C.beginPath(); C.arc(24, 0, flashSize, 0, TAU);
+      C.fillStyle = flashGrad;
+      C.fill();
+    }
+    C.restore();
+
+    // Status text
+    C.fillStyle = launcher.status === 'ready' ? '#00ff88' : '#ffaa00';
+    C.font = 'bold 8px monospace';
+    C.textAlign = 'center';
+    C.fillText(`PU-${launcher.id}`, 0, 24);
+    if (launcher.status === 'reloading') {
+      C.fillStyle = '#ffaa00';
+      C.font = '8px monospace';
+      C.fillText(`⟳ ${launcher.reloadTimer.toFixed(1)}s`, 0, 33);
+    }
+    C.textAlign = 'left';
+    C.restore();
+  }
+
+  // ======== ENEMIES ========
+  for (const enemy of enemies) {
+    const ex = enemy.x * sx;
+    const ey = enemy.y * sy;
+    const typeData = THREAT_DB[enemy.type];
+    const heading = atan2(enemy.vy, enemy.vx);
+    const sz = enemy.size;
+
+    // Glow
+    if ($('cfgGlow').checked) {
+      const glowSize = 12 + enemy.threat * 18;
+      const glowGrad = C.createRadialGradient(ex, ey, 0, ex, ey, glowSize);
+      glowGrad.addColorStop(0, typeData.glowColor);
+      glowGrad.addColorStop(1, 'transparent');
+      C.beginPath(); C.arc(ex, ey, glowSize, 0, TAU);
+      C.fillStyle = glowGrad; C.fill();
+    }
+
+    C.save();
+    C.translate(ex, ey);
+    C.rotate(heading);
+
+    // Missile body
+    C.beginPath();
+    C.moveTo(sz * 2.2, 0);
+    C.lineTo(sz * 0.6, -sz * 0.85);
+    C.lineTo(-sz * 1.0, -sz * 0.65);
+    C.lineTo(-sz * 1.4, -sz);
+    C.lineTo(-sz * 1.1, -sz * 0.35);
+    C.lineTo(-sz * 1.6, 0);
+    C.lineTo(-sz * 1.1, sz * 0.35);
+    C.lineTo(-sz * 1.4, sz);
+    C.lineTo(-sz * 1.0, sz * 0.65);
+    C.lineTo(sz * 0.6, sz * 0.85);
+    C.closePath();
+    C.fillStyle = typeData.color;
+    C.fill();
+    C.strokeStyle = 'rgba(255,255,255,0.2)';
+    C.lineWidth = 0.5;
+    C.stroke();
+
+    // Nosecone highlight
+    C.beginPath();
+    C.moveTo(sz * 2.2, 0);
+    C.lineTo(sz * 1.0, -sz * 0.3);
+    C.lineTo(sz * 1.0, sz * 0.3);
+    C.closePath();
+    C.fillStyle = 'rgba(255,255,255,0.15)';
+    C.fill();
+
+    // Engine flame
+    const fl = enemy.flameFlicker * (1 + rand(-0.15, 0.15));
+    C.beginPath();
+    C.moveTo(-sz * 1.6, 0);
+    C.lineTo(-sz * 1.6 - sz * fl * 2.5, -sz * 0.45 * fl);
+    C.lineTo(-sz * 1.6 - sz * fl * 3.5, 0);
+    C.lineTo(-sz * 1.6 - sz * fl * 2.5, sz * 0.45 * fl);
+    C.closePath();
+    C.fillStyle = typeData.flameColor;
+    C.fill();
+
+    // Inner flame core
+    C.beginPath();
+    C.moveTo(-sz * 1.6, 0);
+    C.lineTo(-sz * 1.6 - sz * fl * 1.2, -sz * 0.2 * fl);
+    C.lineTo(-sz * 1.6 - sz * fl * 1.8, 0);
+    C.lineTo(-sz * 1.6 - sz * fl * 1.2, sz * 0.2 * fl);
+    C.closePath();
+    C.fillStyle = typeData.flameInner;
+    C.fill();
+
+    C.restore();
+
+    // Velocity vector
+    C.beginPath();
+    C.moveTo(ex, ey);
+    const vLen = 0.035;
+    C.lineTo(ex + enemy.vx * vLen * sx, ey + enemy.vy * vLen * sy);
+    C.strokeStyle = typeData.color + '55';
+    C.lineWidth = 1;
+    C.stroke();
+    C.beginPath();
+    C.arc(ex + enemy.vx * vLen * sx, ey + enemy.vy * vLen * sy, 2, 0, TAU);
+    C.fillStyle = typeData.color + '88';
+    C.fill();
+
+    // Threat ring
+    if (enemy.threat > 0.45) {
+      C.beginPath();
+      C.arc(ex, ey, sz * 3.5 + 4, 0, TAU * enemy.threat);
+      C.strokeStyle = enemy.threat > 0.7 ? '#ff4444' : '#ffaa00';
+      C.lineWidth = 2;
+      C.stroke();
+    }
+
+    // Labels
+    if ($('cfgLabels').checked) {
+      const labelX = ex + sz * 3.5;
+      const labelY = ey - sz * 2.5;
+      C.fillStyle = typeData.color;
+      C.font = 'bold 8px monospace';
+      C.fillText(enemy.id, labelX, labelY);
+      C.fillStyle = '#aaaaaa';
+      C.font = '7px monospace';
+      const speed = round(hypot(enemy.vx, enemy.vy));
+      C.fillText(`${typeData.name} V:${speed}`, labelX, labelY + 10);
+      C.fillText(`THR:${(enemy.threat * 100) | 0}%`, labelX, labelY + 19);
+      if (enemy.engaged) {
+        C.fillStyle = '#00ccff';
+        C.fillText('⚔ ENGAGED', labelX, labelY + 28);
+      }
+    }
+  }
+
+  // ======== INTERCEPTORS ========
+  for (const missile of interceptors) {
+    const mx = missile.x * sx;
+    const my = missile.y * sy;
+    const heading = atan2(missile.vy, missile.vx);
+    const isTerminal = missile.guidancePhase === 'terminal';
+
+    // Glow
+    if ($('cfgGlow').checked) {
+      const glowGrad = C.createRadialGradient(mx, my, 0, mx, my, 14);
+      glowGrad.addColorStop(0, isTerminal ? 'rgba(0,255,136,0.3)' : 'rgba(0,204,255,0.3)');
+      glowGrad.addColorStop(1, 'transparent');
+      C.beginPath(); C.arc(mx, my, 14, 0, TAU);
+      C.fillStyle = glowGrad; C.fill();
+    }
+
+    C.save();
+    C.translate(mx, my);
+    C.rotate(heading);
+
+    // Missile body
+    C.beginPath();
+    C.moveTo(8, 0);
+    C.lineTo(3, -3);
+    C.lineTo(-3, -2.5);
+    C.lineTo(-5, -4.5);
+    C.lineTo(-4, -1.5);
+    C.lineTo(-7, 0);
+    C.lineTo(-4, 1.5);
+    C.lineTo(-5, 4.5);
+    C.lineTo(-3, 2.5);
+    C.lineTo(3, 3);
+    C.closePath();
+    C.fillStyle = isTerminal ? '#00ff88' : '#00ccff';
+    C.fill();
+    C.strokeStyle = 'rgba(255,255,255,0.2)';
+    C.lineWidth = 0.5;
+    C.stroke();
+
+    // Engine flame
+    const fl = missile.flameFlicker * (1 + rand(-0.2, 0.2));
+    C.beginPath();
+    C.moveTo(-7, 0);
+    C.lineTo(-7 - fl * 10, -2 * fl);
+    C.lineTo(-7 - fl * 14, 0);
+    C.lineTo(-7 - fl * 10, 2 * fl);
+    C.closePath();
+    C.fillStyle = '#00ffcc';
+    C.fill();
+
+    // Inner flame
+    C.beginPath();
+    C.moveTo(-7, 0);
+    C.lineTo(-7 - fl * 5, -1 * fl);
+    C.lineTo(-7 - fl * 7, 0);
+    C.lineTo(-7 - fl * 5, 1 * fl);
+    C.closePath();
+    C.fillStyle = '#ffffff88';
+    C.fill();
+
+    C.restore();
+
+    // Guidance line
+    if (missile.target && missile.target.alive) {
+      C.beginPath();
+      C.moveTo(mx, my);
+      C.lineTo(missile.target.x * sx, missile.target.y * sy);
+      C.strokeStyle = isTerminal ? 'rgba(0,255,136,0.12)' : 'rgba(0,204,255,0.1)';
+      C.lineWidth = 0.5;
+      C.setLineDash([2, 4]);
+      C.stroke();
+      C.setLineDash([]);
+    }
+
+    // Labels
+    if ($('cfgLabels').checked) {
+      C.fillStyle = isTerminal ? '#00ff88' : '#00ccff';
+      C.font = '7px monospace';
+      C.fillText(missile.id, mx + 10, my - 5);
+      C.fillStyle = '#888';
+      C.fillText(isTerminal ? 'TERMINAL' : 'MIDCOURSE', mx + 10, my + 4);
+    }
+  }
+
+  // ======== EXPLOSIONS ========
+  for (const ex of explosions) {
+    const progress = ex.elapsed / ex.duration;
+    const radius = ex.size * (1 + progress * 3) * (1 - progress * 0.3);
+    const alpha = 1 - progress;
+
+    // Multi-layer fireball
+    const grad = C.createRadialGradient(ex.x * sx, ex.y * sy, 0, ex.x * sx, ex.y * sy, radius);
+    grad.addColorStop(0, `rgba(255,255,220,${alpha})`);
+    grad.addColorStop(0.2, ex.color + hexAlpha(alpha * 255));
+    grad.addColorStop(0.6, ex.color + hexAlpha(alpha * 150));
+    grad.addColorStop(1, 'transparent');
+    C.beginPath();
+    C.arc(ex.x * sx, ex.y * sy, radius, 0, TAU);
+    C.fillStyle = grad;
+    C.fill();
+
+    // Shockwave ring
+    if (ex.size > 15) {
+      C.beginPath();
+      C.arc(ex.x * sx, ex.y * sy, radius * 2.2 * progress, 0, TAU);
+      C.strokeStyle = ex.color + hexAlpha(alpha * 60);
+      C.lineWidth = 2 + (1 - progress) * 2;
+      C.stroke();
+    }
+  }
+
+  // ======== DEBRIS ========
+  for (const d of debris) {
+    const alpha = clamp(d.life / d.maxLife, 0, 1);
+    C.save();
+    C.translate(d.x * sx, d.y * sy);
+    C.rotate(d.rotation);
+    C.fillStyle = `rgba(200,150,80,${alpha})`;
+    C.fillRect(-d.size, -d.size * 0.5, d.size * 2, d.size);
+    C.restore();
+  }
+
+  // ======== PARTICLES ========
+  for (const p of particles) {
+    const alpha = clamp(p.life / p.maxLife, 0, 1);
+    if (p.type === 'smoke') {
+      const smokeSize = p.size * (2 - alpha);
+      C.beginPath();
+      C.arc(p.x * sx, p.y * sy, smokeSize, 0, TAU);
+      C.fillStyle = `rgba(160,160,160,${alpha * 0.25})`;
+      C.fill();
     } else {
-      const disc = b*b - 4*a*c;
-      if(disc >= 0){
-        const d = Math.sqrt(disc);
-        const t1 = (-b - d) / (2*a);
-        const t2 = (-b + d) / (2*a);
-        const arr = [t1,t2].filter(v => v > 0);
-        if(arr.length) t = Math.min(...arr);
-      }
-    }
-
-    if(!t || !isFinite(t) || t < 0){
-      t = Math.hypot(rx,ry) / Math.max(1, speed);
-    }
-
-    return { t, x: tx + tvx*t, y: ty + tvy*t };
-  }
-
-  function evaluateThreat(target, battery){
-    const dBase = dist(target.x, target.y, battery.x, battery.y);
-    const eta = dBase / Math.max(1, target.speed);
-    const curve = Math.hypot(target.vx-target.prevVx, target.vy-target.prevVy);
-    const inRadar = dBase < battery.radarRange ? 1 : 0.3;
-    const score =
-      (1/Math.max(0.2, eta))*2.8 +
-      (target.speed/170)*1.4 +
-      (1 - clamp(dBase/Math.max(W,H),0,1))*1.6 +
-      clamp(curve/20,0,2)*0.75 +
-      inRadar*0.8 -
-      target.assigned*0.9;
-    const pred = predictIntercept(battery.x, battery.y-battery.towerH, target.x, target.y, target.vx, target.vy, settings.interceptorSpeed);
-    const feasible = pred.t < 6.0 && battery.stock > 0;
-    return { score, pred, feasible, eta, dBase };
-  }
-
-  function chooseAssignments(){
-    world.guide = null;
-    for(const b of world.batteries){
-      b.selectedTarget = null;
-      b.assignedCount = 0;
-    }
-
-    let globalBest = null;
-
-    for(const battery of world.batteries){
-      let best = null;
-      for(const t of world.targets){
-        if(!t.alive) continue;
-        const e = evaluateThreat(t, battery);
-        if(!e.feasible) continue;
-        if(!best || e.score > best.score){
-          best = { battery, target:t, score:e.score, pred:e.pred, eta:e.eta };
-        }
-        if(!globalBest || e.score > globalBest.score){
-          globalBest = { battery, target:t, score:e.score, pred:e.pred, eta:e.eta };
-        }
-      }
-      battery.selectedTarget = best ? best.target : null;
-    }
-
-    world.guide = globalBest;
-  }
-
-  function fireFromBattery(battery, selection){
-    if(!selection || battery.stock <= 0) return;
-    const missile = createInterceptor(battery, selection.target, selection.pred);
-    world.interceptors.push(missile);
-    selection.target.assigned += 1;
-    battery.stock -= 1;
-    battery.fireCooldownAcc = 0;
-    world.shots++;
-
-    // muzzle flash / launch effect
-    for(let i=0;i<18;i++){
-      const a = rand(-Math.PI, 0);
-      const s = rand(25, 90);
-      world.particles.push({
-        x:battery.x + rand(-6,6),
-        y:battery.y - battery.towerH - 6,
-        vx:Math.cos(a)*s*0.32,
-        vy:Math.sin(a)*s*0.32 - rand(12,48),
-        life:0,
-        ttl:rand(0.2,0.5),
-        color:"rgba(255,220,120,1)",
-        size:rand(1.8,4.0)
-      });
-    }
-
-    logEvent("launch",`${battery.id} выполнила пуск по T${selection.target.id}`);
-  }
-
-  function addExplosion(x,y,palette="hit",count=26){
-    let colors;
-    if(palette === "hit"){
-      colors = [
-        "rgba(255,240,180,1)",
-        "rgba(255,210,90,1)",
-        "rgba(255,130,70,1)",
-        "rgba(255,255,255,1)"
-      ];
-    } else if(palette === "leak"){
-      colors = [
-        "rgba(255,80,80,1)",
-        "rgba(255,140,90,1)",
-        "rgba(255,220,220,1)"
-      ];
-    } else {
-      colors = ["rgba(180,220,255,1)"];
-    }
-    for(let i=0;i<count;i++){
-      const a = Math.random()*Math.PI*2;
-      const s = rand(18, 160);
-      world.particles.push({
-        x,y,
-        vx:Math.cos(a)*s,
-        vy:Math.sin(a)*s,
-        life:0,
-        ttl:rand(0.3,1.0),
-        color:colors[(Math.random()*colors.length)|0],
-        size:rand(1.8,5.8)
-      });
-    }
-    world.shockwaves.push({ x,y, life:0, ttl:0.45, r:6, maxR:42 });
-  }
-
-  function addSmoke(x,y, r=rand(4,8), alpha=rand(0.18,0.42)){
-    world.smoke.push({ x,y,r,life:0,ttl:rand(0.35,0.95),alpha });
-  }
-
-  function pushTrailPoint(arr, x, y, max=24){
-    arr.push({x,y});
-    if(arr.length > max) arr.shift();
-  }
-
-  // =========================
-  // Update
-  // =========================
-  function updateTarget(t,dt){
-    t.age += dt;
-    t.prevVx = t.vx;
-    t.prevVy = t.vy;
-
-    const primary = world.batteries[1] || world.batteries[0];
-    const toBase = norm(primary.x - t.x, primary.y - t.y);
-
-    if(t.type === "curve"){
-      const nx = -toBase.y, ny = toBase.x;
-      const lateral = Math.sin(t.age*t.maneuverFreq*2 + t.id*0.39) * t.maneuverAmp;
-      const dvx = toBase.x*t.speed + nx*lateral;
-      const dvy = toBase.y*t.speed + ny*lateral;
-      t.vx += (dvx - t.vx) * Math.min(1, dt*1.6);
-      t.vy += (dvy - t.vy) * Math.min(1, dt*1.6);
-    } else if(t.type === "fast"){
-      t.speed += Math.sin(t.age*2.4+t.id) * 5 * dt;
-      t.speed = clamp(t.speed, 95, 185);
-      t.vx = toBase.x * t.speed;
-      t.vy = toBase.y * t.speed;
-    } else {
-      const nx = -toBase.y, ny = toBase.x;
-      t.vx += (toBase.x*t.speed + nx*t.drift*7 - t.vx) * Math.min(1, dt*0.78);
-      t.vy += (toBase.y*t.speed + ny*t.drift*7 - t.vy) * Math.min(1, dt*0.78);
-    }
-
-    t.x += t.vx * dt;
-    t.y += t.vy * dt;
-    pushTrailPoint(t.trail, t.x, t.y, 28);
-  }
-
-  function updateInterceptor(m,dt){
-    m.life += dt;
-
-    const t = m.targetRef;
-    if(t && t.alive){
-      const pred = predictIntercept(m.x, m.y, t.x, t.y, t.vx, t.vy, m.speed);
-      m.predX = pred.x;
-      m.predY = pred.y;
-      const d = norm(pred.x - m.x, pred.y - m.y);
-      const dvx = d.x * m.speed;
-      const dvy = d.y * m.speed;
-      m.vx += (dvx - m.vx) * Math.min(1, dt*4.2);
-      m.vy += (dvy - m.vy) * Math.min(1, dt*4.2);
-    }
-
-    m.x += m.vx * dt;
-    m.y += m.vy * dt;
-    pushTrailPoint(m.trail, m.x, m.y, 22);
-    if(chance(0.82)) addSmoke(m.x, m.y, rand(3.5,6.5), rand(0.14,0.28));
-  }
-
-  function updateBattery(battery,dt){
-    battery.fireCooldownAcc += dt;
-    battery.radarSweep += dt * 1.25;
-
-    if(battery.stock <= 0){
-      battery.reloadTimer += dt;
-      if(battery.reloadTimer >= battery.reloadDuration){
-        battery.stock = battery.maxStock;
-        battery.reloadTimer = 0;
-        logEvent("info",`${battery.id} завершила перезарядку`);
-      }
+      C.beginPath();
+      C.arc(p.x * sx, p.y * sy, p.size * alpha, 0, TAU);
+      C.fillStyle = p.color + hexAlpha(alpha * 220);
+      C.fill();
     }
   }
 
-  function processAutoDefense(){
-    chooseAssignments();
+  // ======== HUD OVERLAY ========
+  C.fillStyle = 'rgba(0,204,255,0.4)';
+  C.font = '9px monospace';
+  C.fillText(`T+${simTime.toFixed(1)}s  |  FPS: ${fps}  |  AI: ${ai.inferenceTime.toFixed(1)}ms  |  Epoch: ${ai.epoch}  |  Buffer: ${ai.replayBuffer.length}`, 8, 16);
+  C.fillText(`Targets: ${enemies.length}  |  Interceptors: ${interceptors.length}  |  Particles: ${particles.length}`, 8, 28);
 
-    const totalActive = world.interceptors.length;
-    for(const battery of world.batteries){
-      if(totalActive >= settings.maxInterceptors) break;
-      if(battery.stock <= 0) continue;
-      if(battery.fireCooldownAcc < settings.fireCooldown) continue;
-      if(!battery.selectedTarget) continue;
+  // Compass
+  C.save();
+  C.translate(W - 45, 45);
+  C.beginPath(); C.arc(0, 0, 28, 0, TAU);
+  C.strokeStyle = 'rgba(26,58,92,0.5)';
+  C.lineWidth = 1;
+  C.stroke();
+  const compassLabels = ['N', 'E', 'S', 'W'];
+  for (let i = 0; i < 4; i++) {
+    const a = i * PI / 2 - PI / 2;
+    C.fillStyle = 'rgba(0,204,255,0.4)';
+    C.font = '8px monospace';
+    C.textAlign = 'center';
+    C.fillText(compassLabels[i], cos(a) * 34, sin(a) * 34 + 3);
+  }
+  C.textAlign = 'left';
+  C.restore();
 
-      const selection = {
-        battery,
-        target: battery.selectedTarget,
-        ...evaluateThreat(battery.selectedTarget, battery)
-      };
-      if(selection.feasible){
-        fireFromBattery(battery, selection);
-      }
+  // Scale bar
+  C.strokeStyle = 'rgba(0,204,255,0.25)';
+  C.lineWidth = 1;
+  const scaleLen = 300 * sx;
+  C.beginPath(); C.moveTo(12, H - 18); C.lineTo(12 + scaleLen, H - 18); C.stroke();
+  C.beginPath(); C.moveTo(12, H - 22); C.lineTo(12, H - 14); C.stroke();
+  C.beginPath(); C.moveTo(12 + scaleLen, H - 22); C.lineTo(12 + scaleLen, H - 14); C.stroke();
+  C.fillStyle = 'rgba(0,204,255,0.3)';
+  C.font = '8px monospace';
+  C.fillText('300m', 12 + scaleLen / 2 - 12, H - 22);
+}
+
+// ================================================================
+// UI UPDATES
+// ================================================================
+function updateUI() {
+  // Stats
+  O('statIncoming', stats.launched);
+  O('statKills', stats.kills);
+  O('statLeakers', stats.leakers);
+  O('statFired', stats.fired);
+
+  const total = stats.kills + stats.leakers;
+  const accuracy = total > 0 ? round(stats.kills / total * 100) : 0;
+  $('statAccuracy').textContent = accuracy + '%';
+  $('statAccuracy').className = 'stat-value' + (accuracy < 50 ? ' danger' : accuracy < 75 ? ' warn' : '');
+
+  const efficiency = stats.fired > 0 ? round(stats.kills / stats.fired * 100) : 0;
+  O('statEfficiency', efficiency + '%');
+
+  // Threat badge
+  let maxThreat = 0;
+  for (const e of enemies) maxThreat = max(maxThreat, e.threat);
+  const badge = $('badgeThreat');
+  if (maxThreat > 0.7) { badge.textContent = '▲ CRITICAL'; badge.className = 'status-badge badge-crit'; }
+  else if (maxThreat > 0.3) { badge.textContent = '▲ ELEVATED'; badge.className = 'status-badge badge-warn'; }
+  else if (enemies.length > 0) { badge.textContent = '▲ LOW'; badge.className = 'status-badge badge-ok'; }
+  else { badge.textContent = '▲ ALL CLEAR'; badge.className = 'status-badge badge-ok'; }
+
+  O('badgeTime', `T+ ${simTime.toFixed(1)}s`);
+  O('radarTracks', enemies.length);
+
+  // Target list
+  const sorted = [...enemies].sort((a, b) => b.threat - a.threat);
+  let targetHTML = '';
+  for (const t of sorted.slice(0, 8)) {
+    const d = round(hypot(t.x - BASE.x, t.y - BASE.y));
+    const spd = round(hypot(t.vx, t.vy));
+    const threatPct = round(t.threat * 100);
+    const tColor = t.threat > 0.7 ? '#ff4444' : t.threat > 0.4 ? '#ffaa00' : '#00ff88';
+    const typeData = THREAT_DB[t.type];
+    targetHTML += `<div class="target-item" style="border-left:3px solid ${tColor}">
+      <div class="target-header">
+        <span style="color:${tColor};font-weight:600">● ${t.id}</span>
+        <span style="color:#556688">${typeData.name}</span>
+      </div>
+      <div class="target-info">D:${d}m V:${spd}m/s ${t.engaged ? '⚔' : ''} ${t.maneuvering ? '↻' : ''}</div>
+      <div class="threat-bar"><div class="threat-fill" style="width:${threatPct}%;background:${tColor}"></div></div>
+    </div>`;
+  }
+  $('targetListContainer').innerHTML = targetHTML;
+
+  // Launcher status
+  let launcherHTML = '';
+  for (const l of launchers) {
+    const color = l.status === 'ready' ? '#00ff88' : '#ffaa00';
+    launcherHTML += `<div class="data-row">
+      <span class="data-label">PU-${l.id}</span>
+      <span class="data-value" style="color:${color}">${l.missiles}/${l.maxMissiles} ${l.status === 'reloading' ? '⟳' + l.reloadTimer.toFixed(1) + 's' : '✓'}</span>
+    </div>`;
+  }
+  $('launcherStatusContainer').innerHTML = launcherHTML;
+
+  // AI meters
+  $('mtrConf').style.width = (ai.confidence * 100) + '%';
+  O('mtrConfV', round(ai.confidence * 100) + '%');
+  $('mtrPLoss').style.width = min(100, ai.policyLoss * 30) + '%';
+  O('mtrPLossV', ai.policyLoss.toFixed(4));
+  $('mtrVLoss').style.width = min(100, ai.valueLoss * 30) + '%';
+  O('mtrVLossV', ai.valueLoss.toFixed(4));
+  $('mtrGrad').style.width = min(100, ai.gradientNorm * 10) + '%';
+  O('mtrGradV', ai.gradientNorm.toFixed(3));
+  $('mtrEpoch').style.width = min(100, ai.epoch / 5) + '%';
+  O('mtrEpochV', ai.epoch);
+  $('mtrInf').style.width = min(100, ai.inferenceTime / 25 * 100) + '%';
+  O('mtrInfV', round(ai.inferenceTime) + 'ms');
+  O('dispBuffer', ai.replayBuffer.length);
+
+  // Charts (update periodically)
+  if (frameCount % 20 === 0) {
+    historyAccuracy.push(accuracy);
+    if (historyAccuracy.length > 120) historyAccuracy.shift();
+    historyLoss.push(ai.policyLoss);
+    if (historyLoss.length > 120) historyLoss.shift();
+
+    renderMiniChart('chartAccuracy', historyAccuracy, '#00ff88', '%');
+    renderMiniChart('chartLoss', historyLoss, '#ff8800', '');
+    renderAttentionMap('chartAttention');
+  }
+}
+
+// ================================================================
+// MINI CHARTS
+// ================================================================
+function renderMiniChart(canvasId, data, color, suffix) {
+  const cvs = $(canvasId);
+  if (!cvs) return;
+  const rect = cvs.parentElement.getBoundingClientRect();
+  cvs.width = rect.width;
+  cvs.height = rect.height;
+  const c = cvs.getContext('2d');
+  const w = cvs.width, h = cvs.height;
+
+  c.clearRect(0, 0, w, h);
+  if (data.length < 2) return;
+
+  const maxVal = max(...data, 0.01);
+  const minVal = min(...data, 0);
+  const range = maxVal - minVal || 1;
+
+  // Grid lines
+  c.strokeStyle = 'rgba(26,42,74,0.3)';
+  c.lineWidth = 0.5;
+  for (let i = 0; i < 4; i++) {
+    const y = h * i / 3;
+    c.beginPath(); c.moveTo(0, y); c.lineTo(w, y); c.stroke();
+  }
+
+  // Data line
+  c.beginPath();
+  for (let i = 0; i < data.length; i++) {
+    const x = (i / (data.length - 1)) * w;
+    const y = h - ((data[i] - minVal) / range) * h * 0.85 - h * 0.05;
+    if (i === 0) c.moveTo(x, y); else c.lineTo(x, y);
+  }
+  c.strokeStyle = color;
+  c.lineWidth = 1.5;
+  c.stroke();
+
+  // Fill area
+  c.lineTo(w, h);
+  c.lineTo(0, h);
+  c.closePath();
+  c.fillStyle = color + '12';
+  c.fill();
+
+  // Current value
+  c.fillStyle = color;
+  c.font = 'bold 9px monospace';
+  c.fillText(data[data.length - 1].toFixed(2) + suffix, 3, 11);
+}
+
+function renderAttentionMap(canvasId) {
+  const cvs = $(canvasId);
+  if (!cvs || !ai.lastAttentionMap) return;
+  const rect = cvs.parentElement.getBoundingClientRect();
+  cvs.width = rect.width;
+  cvs.height = rect.height;
+  const c = cvs.getContext('2d');
+  const w = cvs.width, h = cvs.height;
+
+  c.clearRect(0, 0, w, h);
+
+  const attn = ai.lastAttentionMap;
+  const n = attn.size;
+  if (n < 1 || n > 20) return;
+
+  const cellSize = min(w / n, h / n, 14);
+  const offsetX = (w - n * cellSize) / 2;
+  const offsetY = (h - n * cellSize) / 2;
+
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      const v = clamp(attn.data[i * n + j], 0, 1);
+      const r = round(v * 255);
+      const g = round(v * 80);
+      const b = round(255 - v * 200);
+      c.fillStyle = `rgb(${r},${g},${b})`;
+      c.fillRect(offsetX + j * cellSize, offsetY + i * cellSize, cellSize - 1, cellSize - 1);
     }
   }
 
-  function processCollisions(){
-    for(const m of world.interceptors){
-      if(m.dead) continue;
+  c.fillStyle = '#667788';
+  c.font = '7px monospace';
+  c.fillText(`Attention ${n}×${n}`, 3, h - 3);
+}
 
-      for(const t of world.targets){
-        if(!t.alive) continue;
-        const d = dist(m.x,m.y,t.x,t.y);
-        if(d <= settings.killRadius + t.radius){
-          t.alive = false;
-          m.dead = true;
-          world.hits++;
-          addExplosion(t.x,t.y,"hit",26);
-          logEvent("hit",`T${t.id} перехвачена (${m.batteryId})`);
-          break;
-        }
-      }
+// ================================================================
+// EVENT LOG
+// ================================================================
+function logEvent(message, cssClass = '') {
+  const container = $('logContainer');
+  const entry = document.createElement('div');
+  entry.className = 'log-entry ' + cssClass;
+  entry.textContent = `[${simTime.toFixed(1)}] ${message}`;
+  container.appendChild(entry);
+  container.scrollTop = container.scrollHeight;
+  while (container.children.length > 300) container.removeChild(container.firstChild);
+}
 
-      if(!m.dead && (m.life > m.ttl || m.x<-100 || m.x>W+100 || m.y<-100 || m.y>H+100)){
-        m.dead = true;
-      }
-    }
+// ================================================================
+// CONTROLS
+// ================================================================
+function toggleSim() {
+  simRunning = !simRunning;
+  $('btnPlay').textContent = simRunning ? '❚❚ PAUSE' : '▶ START';
+  $('btnPlay').classList.toggle('active', simRunning);
+  logEvent(simRunning ? 'Simulation started' : 'Simulation paused', 'log-sys');
+}
 
-    // leaks / protected ground line
-    for(const t of world.targets){
-      if(!t.alive) continue;
-      for(const b of world.batteries){
-        if(dist(t.x,t.y,b.x,b.y) < 34){
-          t.alive = false;
-          world.leaks++;
-          b.health = Math.max(0, b.health - 20);
-          addExplosion(b.x, b.y-10, "leak", 42);
-          logEvent("leak",`Прорыв у ${b.id}, цель T${t.id}`);
-          break;
-        }
-      }
-    }
+function resetSim() {
+  simRunning = false;
+  simTime = 0;
+  frameCount = 0;
+  lastWaveTime = 0;
+  enemies = [];
+  interceptors = [];
+  explosions = [];
+  particles = [];
+  debris = [];
+  aiDecisions = [];
+  stats.launched = 0;
+  stats.kills = 0;
+  stats.leakers = 0;
+  stats.fired = 0;
+  historyAccuracy = [];
+  historyLoss = [];
+  starField = null;
+  rebuildLaunchers(+$('cfgLaunchers').value);
+  $('btnPlay').textContent = '▶ START';
+  $('btnPlay').classList.remove('active');
+  $('logContainer').innerHTML = '';
+  logEvent('System reset complete.', 'log-sys');
+}
+
+function resetAI() {
+  ai = new TransformerAI();
+  O('dispParams', ai.countParameters().toLocaleString());
+  logEvent('AI Transformer reinitialized', 'log-ai');
+}
+
+function trainBurst(n) {
+  const t0 = performance.now();
+  ai.train(n);
+  const elapsed = (performance.now() - t0) | 0;
+  logEvent(`Training ×${n}: epoch=${ai.epoch} pLoss=${ai.policyLoss.toFixed(5)} vLoss=${ai.valueLoss.toFixed(5)} grad=${ai.gradientNorm.toFixed(3)} [${elapsed}ms]`, 'log-ai');
+}
+
+// ================================================================
+// MAIN LOOP
+// ================================================================
+let lastTimestamp = 0;
+let fpsCounter = 0;
+let fpsTimer = 0;
+
+function mainLoop(timestamp) {
+  const rawDt = (timestamp - lastTimestamp) / 1000;
+  lastTimestamp = timestamp;
+  const dt = min(rawDt, 0.05) * CONFIG.simSpeed;
+
+  fpsCounter++;
+  fpsTimer += rawDt;
+  if (fpsTimer >= 1) {
+    fps = fpsCounter;
+    fpsCounter = 0;
+    fpsTimer = 0;
+    O('badgeFPS', fps + ' FPS');
   }
 
-  function updateEffects(dt){
-    for(const p of world.particles){
-      p.life += dt;
-      p.x += p.vx*dt;
-      p.y += p.vy*dt;
-      p.vx *= 1 - dt*1.15;
-      p.vy *= 1 - dt*1.15;
-    }
-    for(const s of world.smoke){
-      s.life += dt;
-      s.y += -8*dt;
-      s.r += 8*dt;
-    }
-    for(const sw of world.shockwaves){
-      sw.life += dt;
-      sw.r = lerp(sw.r, sw.maxR, dt*9);
-    }
-    world.particles = world.particles.filter(p => p.life < p.ttl);
-    world.smoke = world.smoke.filter(s => s.life < s.ttl);
-    world.shockwaves = world.shockwaves.filter(sw => sw.life < sw.ttl);
+  if (simRunning) {
+    simTime += dt;
+    frameCount++;
+    updateSimulation(dt);
   }
 
-  function update(dt){
-    world.time += dt;
-    world.spawnAccum += dt * settings.spawnRate;
+  render();
 
-    while(world.spawnAccum >= 1){
-      world.spawnAccum -= 1;
-      spawnTarget();
-    }
+  if (frameCount % 4 === 0) updateUI();
 
-    for(const b of world.batteries) updateBattery(b, dt);
+  requestAnimationFrame(mainLoop);
+}
 
-    for(const t of world.targets) if(t.alive) updateTarget(t, dt);
-    for(const m of world.interceptors) if(!m.dead) updateInterceptor(m, dt);
-
-    processAutoDefense();
-    processCollisions();
-    updateEffects(dt);
-
-    world.targets = world.targets.filter(t => t.alive && t.x>-120 && t.x<W+120 && t.y>-120 && t.y<H+120);
-    world.interceptors = world.interceptors.filter(m => !m.dead);
-  }
-
-  // =========================
-  // Rendering
-  // =========================
-  function drawSky(){
-    const g = ctx.createLinearGradient(0,0,0,H);
-    g.addColorStop(0,"#7ab8ff");
-    g.addColorStop(0.45,"#c7e5ff");
-    g.addColorStop(1,"#eef7ff");
-    ctx.fillStyle = g;
-    ctx.fillRect(0,0,W,H);
-
-    // high haze
-    const rg = ctx.createRadialGradient(W*0.5, H*0.1, 0, W*0.5, H*0.1, W*0.9);
-    rg.addColorStop(0, "rgba(255,255,255,.18)");
-    rg.addColorStop(1, "rgba(255,255,255,0)");
-    ctx.fillStyle = rg;
-    ctx.fillRect(0,0,W,H);
-
-    drawSunGlow();
-    drawClouds();
-  }
-
-  function drawSunGlow(){
-    const x = W*0.82, y = H*0.16;
-    const rg = ctx.createRadialGradient(x,y,0,x,y,110);
-    rg.addColorStop(0, "rgba(255,245,200,.55)");
-    rg.addColorStop(1, "rgba(255,245,200,0)");
-    ctx.fillStyle = rg;
-    ctx.beginPath();
-    ctx.arc(x,y,110,0,Math.PI*2);
-    ctx.fill();
-  }
-
-  function drawCloudShape(x,y,s){
-    ctx.beginPath();
-    [
-      [0,0,26],[24,-6,22],[-22,-3,20],[45,2,18],[-42,3,16],[12,8,20]
-    ].forEach(c=>{
-      ctx.moveTo(x + c[0]*s + c[2]*s, y + c[1]*s);
-      ctx.arc(x+c[0]*s, y+c[1]*s, c[2]*s, 0, Math.PI*2);
-    });
-    ctx.fill();
-  }
-
-  function drawClouds(){
-    for(const c of world.cloudsSeed){
-      const drift = ((world.time * 8 * c.s) + c.phase*20) % (W + 240);
-      const x = drift - 120;
-      const y = c.y + Math.sin(world.time*0.3 + c.phase)*4;
-
-      ctx.save();
-      ctx.globalAlpha = 0.18;
-      ctx.fillStyle = "#ffffff";
-      drawCloudShape(x,y,c.s);
-      ctx.restore();
-
-      ctx.save();
-      ctx.globalAlpha = 0.08;
-      ctx.fillStyle = "#dbeafe";
-      drawCloudShape(x+16,y+6,c.s*1.12);
-      ctx.restore();
-    }
-  }
-
-  function drawGround(){
-    ctx.fillStyle = "#61788d";
-    ctx.fillRect(0,H-96,W,96);
-
-    ctx.fillStyle = "#4a6072";
-    ctx.beginPath();
-    ctx.moveTo(0,H-96);
-    for(let x=0;x<=W;x+=36){
-      const y = H-102 + Math.sin(x*0.018)*6 + Math.cos(x*0.009)*3;
-      ctx.lineTo(x,y);
-    }
-    ctx.lineTo(W,H);
-    ctx.lineTo(0,H);
-    ctx.closePath();
-    ctx.fill();
-
-    // road/platform line
-    ctx.fillStyle = "#475569";
-    ctx.fillRect(0,H-52,W,10);
-    ctx.fillStyle = "rgba(255,255,255,.15)";
-    for(let x=10;x<W;x+=40){
-      ctx.fillRect(x,H-47,22,2);
-    }
-  }
-
-  function drawRadarArcs(b){
-    ctx.save();
-    ctx.strokeStyle = "rgba(56,189,248,.18)";
-    ctx.lineWidth = 1.4;
-    [b.innerRange, b.radarRange].forEach(r=>{
-      ctx.beginPath();
-      ctx.arc(b.x,b.y-8,r,Math.PI,Math.PI*2);
-      ctx.stroke();
-    });
-    for(let a=Math.PI; a<=Math.PI*2; a+=Math.PI/12){
-      ctx.beginPath();
-      ctx.moveTo(b.x,b.y-8);
-      ctx.lineTo(b.x + Math.cos(a)*b.radarRange, b.y-8 + Math.sin(a)*b.radarRange);
-      ctx.stroke();
-    }
-
-    // sweep
-    const sa = Math.PI + ((Math.sin(b.radarSweep)+1)/2)*Math.PI;
-    const rg = ctx.createRadialGradient(b.x,b.y-8,0,b.x,b.y-8,b.radarRange);
-    rg.addColorStop(0,"rgba(56,189,248,.16)");
-    rg.addColorStop(1,"rgba(56,189,248,0)");
-    ctx.fillStyle = rg;
-    ctx.beginPath();
-    ctx.moveTo(b.x,b.y-8);
-    ctx.arc(b.x,b.y-8,b.radarRange, sa-0.08, sa+0.08);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-  }
-
-  function drawBattery(b){
-    drawRadarArcs(b);
-
-    ctx.save();
-    // shadow
-    ctx.fillStyle = "rgba(0,0,0,.18)";
-    ctx.beginPath();
-    ctx.ellipse(b.x, b.y+10, 70, 17, 0, 0, Math.PI*2);
-    ctx.fill();
-
-    // base
-    ctx.fillStyle = "#dbe7f5";
-    ctx.fillRect(b.x-b.bodyW/2, b.y-10, b.bodyW, b.bodyH);
-    ctx.strokeStyle = "#475569";
-    ctx.lineWidth = 2;
-    ctx.strokeRect(b.x-b.bodyW/2, b.y-10, b.bodyW, b.bodyH);
-
-    // tower
-    ctx.fillStyle = "#bccbdd";
-    ctx.fillRect(b.x-16, b.y-b.towerH, 32, 20);
-    ctx.strokeRect(b.x-16, b.y-b.towerH, 32, 20);
-
-    // angled canisters
-    ctx.save();
-    ctx.translate(b.x+4, b.y-b.towerH+2);
-    ctx.rotate(b.launcherAngle);
-    for(let i=0;i<4;i++){
-      ctx.fillStyle = i < b.stock/3 ? "#d7e1ee" : "#8a99aa";
-      ctx.fillRect(0, i*10-18, 42, 8);
-      ctx.strokeRect(0, i*10-18, 42, 8);
-    }
-    ctx.restore();
-
-    // radar mast
-    ctx.save();
-    ctx.translate(b.x-30, b.y-22);
-    ctx.rotate(Math.sin(b.radarSweep)*0.11 - 0.18);
-    ctx.fillStyle = "#f8fafc";
-    ctx.fillRect(-3,-18,6,36);
-    ctx.beginPath();
-    ctx.moveTo(0,-22);
-    ctx.lineTo(18,0);
-    ctx.lineTo(0,22);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-    ctx.restore();
-
-    // label
-    ctx.fillStyle = "#0f172a";
-    ctx.font = "12px Inter";
-    ctx.fillText(b.id, b.x-16, b.y+28);
-
-    // selected target line
-    if(settings.showGuides && b.selectedTarget){
-      const t = b.selectedTarget;
-      const pred = predictIntercept(b.x,b.y-b.towerH,t.x,t.y,t.vx,t.vy,settings.interceptorSpeed);
-      ctx.strokeStyle = "rgba(34,197,94,.65)";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(b.x, b.y-b.towerH);
-      ctx.lineTo(pred.x, pred.y);
-      ctx.stroke();
-      ctx.setLineDash([6,5]);
-      ctx.strokeStyle = "rgba(34,197,94,.4)";
-      ctx.beginPath();
-      ctx.moveTo(t.x, t.y);
-      ctx.lineTo(pred.x, pred.y);
-      ctx.stroke();
-      ctx.setLineDash([]);
-    }
-
-    // health bar
-    ctx.fillStyle = "rgba(15,23,42,.75)";
-    ctx.fillRect(b.x-28,b.y+33,56,6);
-    ctx.fillStyle = b.health > 50 ? "#22c55e" : b.health > 25 ? "#f59e0b" : "#ef4444";
-    ctx.fillRect(b.x-28,b.y+33,56*(b.health/100),6);
-
-    ctx.restore();
-  }
-
-  function drawTarget(t){
-    ctx.save();
-
-    if(settings.showTracks && t.trail.length > 1){
-      ctx.strokeStyle = "rgba(239,68,68,.22)";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(t.trail[0].x, t.trail[0].y);
-      for(let i=1;i<t.trail.length;i++) ctx.lineTo(t.trail[i].x, t.trail[i].y);
-      ctx.stroke();
-    }
-
-    // halo
-    ctx.fillStyle = "rgba(239,68,68,.14)";
-    ctx.beginPath();
-    ctx.arc(t.x,t.y,t.radius+10,0,Math.PI*2);
-    ctx.fill();
-
-    // tail
-    ctx.strokeStyle = "rgba(239,68,68,.35)";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(t.x,t.y);
-    ctx.lineTo(t.x - t.vx*0.11, t.y - t.vy*0.11);
-    ctx.stroke();
-
-    const bodyColor = t.type==="fast" ? "#ef4444" : t.type==="curve" ? "#fb7185" : "#f97316";
-    ctx.fillStyle = bodyColor;
-    ctx.beginPath();
-    ctx.arc(t.x,t.y,t.radius,0,Math.PI*2);
-    ctx.fill();
-    ctx.strokeStyle = "rgba(255,255,255,.72)";
-    ctx.lineWidth = 1;
-    ctx.stroke();
-
-    const d = norm(t.vx,t.vy);
-    ctx.strokeStyle = "rgba(255,255,255,.88)";
-    ctx.beginPath();
-    ctx.moveTo(t.x,t.y);
-    ctx.lineTo(t.x + d.x*(t.radius+8), t.y + d.y*(t.radius+8));
-    ctx.stroke();
-
-    ctx.fillStyle = "#7f1d1d";
-    ctx.font = "11px Inter";
-    ctx.fillText("T"+t.id, t.x+8, t.y-8);
-
-    if(world.guide && world.guide.target === t){
-      ctx.strokeStyle = "rgba(34,197,94,.95)";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(t.x,t.y,t.radius+7,0,Math.PI*2);
-      ctx.stroke();
-
-      const p = world.guide.pred;
-      ctx.strokeStyle = "rgba(245,158,11,.55)";
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,settings.killRadius,0,Math.PI*2);
-      ctx.stroke();
-    }
-
-    ctx.restore();
-  }
-
-  function drawSmoke(){
-    for(const s of world.smoke){
-      const a = (1 - s.life/s.ttl) * s.alpha;
-      ctx.save();
-      ctx.globalAlpha = a;
-      ctx.fillStyle = "#94a3b8";
-      ctx.beginPath();
-      ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
-      ctx.fill();
-      ctx.restore();
-    }
-  }
-
-  function drawInterceptor(m){
-    ctx.save();
-
-    if(settings.showTracks && m.trail.length > 1){
-      ctx.strokeStyle = "rgba(56,189,248,.22)";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(m.trail[0].x, m.trail[0].y);
-      for(let i=1;i<m.trail.length;i++) ctx.lineTo(m.trail[i].x, m.trail[i].y);
-      ctx.stroke();
-    }
-
-    if(settings.showGuides){
-      ctx.setLineDash([4,4]);
-      ctx.strokeStyle = "rgba(56,189,248,.22)";
-      ctx.beginPath();
-      ctx.moveTo(m.x,m.y);
-      ctx.lineTo(m.predX,m.predY);
-      ctx.stroke();
-      ctx.setLineDash([]);
-    }
-
-    ctx.strokeStyle = "rgba(56,189,248,.55)";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(m.x,m.y);
-    ctx.lineTo(m.x - m.vx*0.08, m.y - m.vy*0.08);
-    ctx.stroke();
-
-    const d = norm(m.vx,m.vy);
-    const nx = -d.y, ny = d.x;
-
-    ctx.fillStyle = "#38bdf8";
-    ctx.beginPath();
-    ctx.moveTo(m.x + d.x*9, m.y + d.y*9);
-    ctx.lineTo(m.x - d.x*8 + nx*3, m.y - d.y*8 + ny*3);
-    ctx.lineTo(m.x - d.x*8 - nx*3, m.y - d.y*8 - ny*3);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.strokeStyle = "rgba(255,255,255,.76)";
-    ctx.stroke();
-
-    ctx.strokeStyle = "rgba(255,220,120,.96)";
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(m.x - d.x*8, m.y - d.y*8);
-    ctx.lineTo(m.x - d.x*18 + rand(-2,2), m.y - d.y*18 + rand(-2,2));
-    ctx.stroke();
-
-    ctx.restore();
-  }
-
-  function drawParticles(){
-    for(const p of world.particles){
-      const a = 1 - p.life/p.ttl;
-      ctx.save();
-      ctx.globalAlpha = a;
-      ctx.fillStyle = p.color;
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,p.size||2.5,0,Math.PI*2);
-      ctx.fill();
-      ctx.restore();
-    }
-  }
-
-  function drawShockwaves(){
-    for(const sw of world.shockwaves){
-      const a = 1 - sw.life/sw.ttl;
-      ctx.save();
-      ctx.globalAlpha = a * 0.6;
-      ctx.strokeStyle = "rgba(255,255,255,.95)";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(sw.x,sw.y,sw.r,0,Math.PI*2);
-      ctx.stroke();
-      ctx.restore();
-    }
-  }
-
-  function drawCentralGuide(){
-    if(!settings.showGuides || !world.guide) return;
-    const g = world.guide;
-    ctx.save();
-    ctx.strokeStyle = "rgba(34,197,94,.95)";
-    ctx.lineWidth = 2.4;
-    ctx.beginPath();
-    ctx.moveTo(g.battery.x, g.battery.y-g.battery.towerH);
-    ctx.lineTo(g.pred.x, g.pred.y);
-    ctx.stroke();
-    ctx.fillStyle = "#22c55e";
-    ctx.beginPath();
-    ctx.arc(g.pred.x,g.pred.y,4,0,Math.PI*2);
-    ctx.fill();
-    ctx.restore();
-  }
-
-  function drawScene(){
-    drawSky();
-    drawGround();
-    for(const b of world.batteries) drawBattery(b);
-    drawCentralGuide();
-    drawSmoke();
-    for(const t of world.targets) drawTarget(t);
-    for(const m of world.interceptors) drawInterceptor(m);
-    drawParticles();
-    drawShockwaves();
-  }
-
-  function drawMiniMap(){
-    if(!settings.showMini) return;
-    const c = miniCtx;
-    const w = miniCanvas.clientWidth || 204;
-    const h = miniCanvas.clientHeight || 204;
-    c.clearRect(0,0,w,h);
-
-    c.fillStyle = "rgba(2,6,23,.85)";
-    c.fillRect(0,0,w,h);
-
-    // frame
-    c.strokeStyle = "rgba(255,255,255,.12)";
-    c.strokeRect(0.5,0.5,w-1,h-1);
-
-    // protected ground
-    c.fillStyle = "rgba(71,85,105,.9)";
-    c.fillRect(0,h*0.78,w,h*0.22);
-
-    function tx(x){ return (x / W) * w; }
-    function ty(y){ return (y / H) * h; }
-
-    // radar circles
-    for(const b of world.batteries){
-      c.strokeStyle = "rgba(56,189,248,.18)";
-      c.beginPath();
-      c.arc(tx(b.x), ty(b.y), (b.radarRange/W)*w, Math.PI, Math.PI*2);
-      c.stroke();
-    }
-
-    for(const b of world.batteries){
-      c.fillStyle = "#dbeafe";
-      c.beginPath();
-      c.arc(tx(b.x),ty(b.y),4,0,Math.PI*2);
-      c.fill();
-    }
-
-    for(const t of world.targets){
-      c.fillStyle = t.type==="fast" ? "#ef4444" : t.type==="curve" ? "#fb7185" : "#f97316";
-      c.beginPath();
-      c.arc(tx(t.x),ty(t.y),3,0,Math.PI*2);
-      c.fill();
-    }
-
-    for(const m of world.interceptors){
-      c.fillStyle = "#38bdf8";
-      c.beginPath();
-      c.arc(tx(m.x),ty(m.y),2.4,0,Math.PI*2);
-      c.fill();
-    }
-  }
-
-  // =========================
-  // HUD & side panels
-  // =========================
-  function updateStats(){
-    ui.hitsNum.textContent = world.hits;
-    ui.leaksNum.textContent = world.leaks;
-    ui.targetsNum.textContent = world.targets.length;
-    ui.intsNum.textContent = world.interceptors.length;
-    ui.shotsNum.textContent = world.shots;
-    const total = world.hits + world.leaks;
-    ui.accNum.textContent = total ? Math.round((world.hits/total)*100) + "%" : "0%";
-  }
-
-  function updateHud(){
-    const g = world.guide;
-    ui.hud.innerHTML = `
-t=${world.time.toFixed(1)}s<br>
-targets=${world.targets.length}<br>
-interceptors=${world.interceptors.length}<br>
-batteries=${world.batteries.length}<br>
-${g ? `focus=${g.battery.id}->T${g.target.id} eta=${g.pred.t.toFixed(2)}s` : "focus=none"}
-    `;
-  }
-
-  function renderBatteryPanel(){
-    ui.batteryPanel.innerHTML = world.batteries.map(b=>{
-      const reloadText = b.stock > 0 ? "готова" : `перезарядка ${Math.max(0,b.reloadDuration-b.reloadTimer).toFixed(1)}с`;
-      return `
-        <div style="padding:8px 0;border-bottom:1px dashed rgba(255,255,255,.07)">
-          <div><b>${b.id}</b></div>
-          <div>Боезапас: <span class="mono">${b.stock}/${b.maxStock}</span></div>
-          <div>Состояние: <span class="mono">${reloadText}</span></div>
-          <div>Здоровье: <span class="mono">${b.health}%</span></div>
-          <div>Цель: <span class="mono">${b.selectedTarget ? "T"+b.selectedTarget.id : "—"}</span></div>
-        </div>
-      `;
-    }).join("");
-  }
-
-  // =========================
-  // Main loop
-  // =========================
-  let last = performance.now();
-  function frame(ts){
-    const dt = Math.min(0.033, (ts - last)/1000);
-    last = ts;
-
-    if(settings.running){
-      update(dt);
-    }
-    drawScene();
-    drawMiniMap();
-    updateStats();
-    updateHud();
-    renderBatteryPanel();
-
-    requestAnimationFrame(frame);
-  }
-
-  // =========================
-  // UI actions
-  // =========================
-  ui.startBtn.onclick = () => settings.running = true;
-  ui.pauseBtn.onclick = () => settings.running = false;
-  ui.resetBtn.onclick = () => resetWorld();
-  ui.burstBtn.onclick = () => spawnBurst(12);
-  ui.waveBtn.onclick = () => spawnScenarioWave();
-
-  // =========================
-  // Boot
-  // =========================
-  resetWorld();
-  requestAnimationFrame(frame);
-})();
+// ================================================================
+// STARTUP
+// ================================================================
+window.addEventListener('load', init);
 </script>
 </body>
-  </html>
+                                                                      </html>
