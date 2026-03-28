@@ -1,1263 +1,379 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spiral Lattice Cipher</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-
-  :root {
-    --bg-primary: #0a0e17;
-    --bg-secondary: #111827;
-    --bg-card: #1a2235;
-    --bg-card-hover: #1f2a40;
-    --bg-input: #0d1321;
-    --border-primary: #2a3a5c;
-    --border-glow: #3b82f6;
-    --text-primary: #e2e8f0;
-    --text-secondary: #94a3b8;
-    --text-dim: #64748b;
-    --accent-blue: #3b82f6;
-    --accent-cyan: #06b6d4;
-    --accent-green: #10b981;
-    --accent-emerald: #34d399;
-    --accent-purple: #8b5cf6;
-    --accent-pink: #ec4899;
-    --accent-amber: #f59e0b;
-    --accent-red: #ef4444;
-    --glow-blue: rgba(59, 130, 246, 0.15);
-    --glow-cyan: rgba(6, 182, 212, 0.15);
-    --glow-green: rgba(16, 185, 129, 0.15);
-    --glow-purple: rgba(139, 92, 246, 0.15);
-  }
-
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
-  body {
-    font-family: 'Inter', sans-serif;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  .bg-animation {
-    position: fixed;
-    top: 0;left: 0;right: 0;bottom: 0;
-    z-index: 0;
-    overflow: hidden;
-    pointer-events: none;
-  }
-
-  .bg-animation .orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.3;
-    animation: float 20s infinite ease-in-out;
-  }
-
-  .orb:nth-child(1) {
-    width: 500px;height: 500px;
-    background: radial-gradient(circle, var(--accent-blue), transparent 70%);
-    top: -10%;left: -5%;
-    animation-duration: 25s;
-  }
-
-  .orb:nth-child(2) {
-    width: 400px;height: 400px;
-    background: radial-gradient(circle, var(--accent-purple), transparent 70%);
-    top: 50%;right: -5%;
-    animation-duration: 30s;
-    animation-delay: -5s;
-  }
-
-  .orb:nth-child(3) {
-    width: 350px;height: 350px;
-    background: radial-gradient(circle, var(--accent-cyan), transparent 70%);
-    bottom: -5%;left: 30%;
-    animation-duration: 22s;
-    animation-delay: -10s;
-  }
-
-  @keyframes float {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    25% { transform: translate(50px, -30px) scale(1.1); }
-    50% { transform: translate(-20px, 40px) scale(0.95); }
-    75% { transform: translate(30px, 20px) scale(1.05); }
-  }
-
-  .app-container {
-    position: relative;
-    z-index: 1;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    min-height: 100vh;
-  }
-
-  /* Header */
-  .header {
-    text-align: center;
-    padding: 40px 20px 30px;
-    margin-bottom: 30px;
-  }
-
-  .header-icon {
-    width: 80px;height: 80px;
-    margin: 0 auto 20px;
-    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-    border-radius: 20px;
-    display: flex;align-items: center;justify-content: center;
-    font-size: 36px;
-    box-shadow: 0 0 40px rgba(59,130,246,0.3);
-    animation: pulse-glow 3s infinite ease-in-out;
-  }
-
-  @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 40px rgba(59,130,246,0.3); }
-    50% { box-shadow: 0 0 60px rgba(59,130,246,0.5), 0 0 100px rgba(139,92,246,0.2); }
-  }
-
-  .header h1 {
-    font-size: 2.2rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, #e2e8f0, #3b82f6, #8b5cf6);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -0.5px;
-    margin-bottom: 8px;
-  }
-
-  .header p {
-    color: var(--text-dim);
-    font-size: 0.95rem;
-    font-weight: 400;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
-
-  /* Key Setup Section */
-  .key-section {
-    background: var(--bg-card);
-    border: 1px solid var(--border-primary);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 24px;
-    transition: all 0.3s ease;
-  }
-
-  .key-section:hover {
-    border-color: var(--accent-blue);
-    box-shadow: 0 0 30px var(--glow-blue);
-  }
-
-  .section-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: 16px;
-    color: var(--text-primary);
-  }
-
-  .section-title .icon {
-    width: 32px;height: 32px;
-    border-radius: 8px;
-    display: flex;align-items: center;justify-content: center;
-    font-size: 16px;
-  }
-
-  .key-row {
-    display: flex;
-    gap: 12px;
-    align-items: stretch;
-  }
-
-  .input-wrapper {
-    flex: 1;
-    position: relative;
-  }
-
-  .input-wrapper input, .input-wrapper textarea {
-    width: 100%;
-    background: var(--bg-input);
-    border: 1px solid var(--border-primary);
-    border-radius: 10px;
-    padding: 14px 16px;
-    color: var(--text-primary);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-    outline: none;
-  }
-
-  .input-wrapper input:focus, .input-wrapper textarea:focus {
-    border-color: var(--accent-blue);
-    box-shadow: 0 0 0 3px var(--glow-blue);
-  }
-
-  .input-wrapper input::placeholder, .input-wrapper textarea::placeholder {
-    color: var(--text-dim);
-    font-family: 'Inter', sans-serif;
-  }
-
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 14px 24px;
-    border: none;
-    border-radius: 10px;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .btn-primary {
-    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-    color: white;
-    box-shadow: 0 4px 15px rgba(59,130,246,0.3);
-  }
-
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(59,130,246,0.4);
-  }
-
-  .btn-primary:active { transform: translateY(0); }
-
-  .btn-encrypt {
-    background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
-    color: white;
-    box-shadow: 0 4px 15px rgba(16,185,129,0.3);
-  }
-
-  .btn-encrypt:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(16,185,129,0.4);
-  }
-
-  .btn-decrypt {
-    background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
-    color: white;
-    box-shadow: 0 4px 15px rgba(139,92,246,0.3);
-  }
-
-  .btn-decrypt:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(139,92,246,0.4);
-  }
-
-  .btn-secondary {
-    background: var(--bg-card);
-    color: var(--text-secondary);
-    border: 1px solid var(--border-primary);
-  }
-
-  .btn-secondary:hover {
-    background: var(--bg-card-hover);
-    color: var(--text-primary);
-    border-color: var(--accent-blue);
-  }
-
-  .btn:active { transform: translateY(0) scale(0.98); }
-
-  .key-status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 12px;
-    padding: 10px 14px;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  .key-status.active {
-    background: rgba(16,185,129,0.1);
-    border: 1px solid rgba(16,185,129,0.3);
-    color: var(--accent-emerald);
-  }
-
-  .key-status.inactive {
-    background: rgba(239,68,68,0.1);
-    border: 1px solid rgba(239,68,68,0.3);
-    color: var(--accent-red);
-  }
-
-  .status-dot {
-    width: 8px;height: 8px;
-    border-radius: 50%;
-    animation: blink 2s infinite;
-  }
-
-  .active .status-dot { background: var(--accent-green); }
-  .inactive .status-dot { background: var(--accent-red); }
-
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-
-  /* Main Workspace */
-  .workspace {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-    margin-bottom: 24px;
-  }
-
-  .panel {
-    background: var(--bg-card);
-    border: 1px solid var(--border-primary);
-    border-radius: 16px;
-    padding: 24px;
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .panel:hover {
-    border-color: var(--border-glow);
-    box-shadow: 0 0 30px var(--glow-blue);
-  }
-
-  .panel.encrypt-panel:hover { border-color: var(--accent-green); box-shadow: 0 0 30px var(--glow-green); }
-  .panel.decrypt-panel:hover { border-color: var(--accent-purple); box-shadow: 0 0 30px var(--glow-purple); }
-
-  .panel textarea {
-    width: 100%;
-    min-height: 160px;
-    background: var(--bg-input);
-    border: 1px solid var(--border-primary);
-    border-radius: 10px;
-    padding: 14px 16px;
-    color: var(--text-primary);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.9rem;
-    line-height: 1.6;
-    resize: vertical;
-    outline: none;
-    transition: all 0.3s ease;
-    flex: 1;
-  }
-
-  .panel textarea:focus {
-    border-color: var(--accent-blue);
-    box-shadow: 0 0 0 3px var(--glow-blue);
-  }
-
-  .panel-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 14px;
-  }
-
-  .panel-actions .btn { flex: 1; padding: 12px 16px; }
-
-  /* Result Area */
-  .result-section {
-    background: var(--bg-card);
-    border: 1px solid var(--border-primary);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 24px;
-    transition: all 0.3s ease;
-    display: none;
-  }
-
-  .result-section.visible { display: block; }
-
-  .result-section:hover {
-    border-color: var(--accent-amber);
-    box-shadow: 0 0 30px rgba(245,158,11,0.1);
-  }
-
-  .result-box {
-    background: var(--bg-input);
-    border: 1px solid var(--border-primary);
-    border-radius: 10px;
-    padding: 16px;
-    margin-top: 12px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.95rem;
-    line-height: 1.8;
-    word-break: break-all;
-    letter-spacing: 1px;
-    color: var(--accent-emerald);
-    position: relative;
-    min-height: 50px;
-  }
-
-  .result-box .copy-btn {
-    position: absolute;
-    top: 10px;right: 10px;
-    background: var(--bg-card);
-    border: 1px solid var(--border-primary);
-    border-radius: 6px;
-    padding: 6px 10px;
-    color: var(--text-dim);
-    cursor: pointer;
-    font-size: 0.75rem;
-    transition: all 0.2s ease;
-  }
-
-  .result-box .copy-btn:hover {
-    color: var(--text-primary);
-    border-color: var(--accent-blue);
-  }
-
-  .result-meta {
-    display: flex;
-    gap: 20px;
-    margin-top: 12px;
-    flex-wrap: wrap;
-  }
-
-  .meta-tag {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.8rem;
-    color: var(--text-dim);
-    background: rgba(255,255,255,0.03);
-    padding: 4px 10px;
-    border-radius: 6px;
-    border: 1px solid rgba(255,255,255,0.05);
-  }
-
-  .meta-tag span { color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; }
-
-  /* Lattice Section */
-  .extras-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-    margin-bottom: 24px;
-  }
-
-  .lattice-section, .history-section {
-    background: var(--bg-card);
-    border: 1px solid var(--border-primary);
-    border-radius: 16px;
-    padding: 24px;
-    transition: all 0.3s ease;
-  }
-
-  .lattice-section:hover { border-color: var(--accent-cyan); box-shadow: 0 0 30px var(--glow-cyan); }
-  .history-section:hover { border-color: var(--accent-amber); box-shadow: 0 0 30px rgba(245,158,11,0.1); }
-
-  .lattice-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 6px;
-    margin-top: 16px;
-    max-width: 320px;
-  }
-
-  .lattice-cell {
-    aspect-ratio: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg-input);
-    border: 1px solid var(--border-primary);
-    border-radius: 8px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--accent-cyan);
-    transition: all 0.3s ease;
-    cursor: default;
-    position: relative;
-  }
-
-  .lattice-cell:hover {
-    background: var(--bg-card-hover);
-    border-color: var(--accent-cyan);
-    transform: scale(1.1);
-    z-index: 2;
-    box-shadow: 0 0 15px var(--glow-cyan);
-  }
-
-  .lattice-cell .coord {
-    position: absolute;
-    bottom: 2px;right: 4px;
-    font-size: 0.5rem;
-    color: var(--text-dim);
-    font-weight: 400;
-  }
-
-  .pivot-cell {
-    margin-top: 10px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    background: rgba(236,72,153,0.1);
-    border: 1px solid rgba(236,72,153,0.3);
-    border-radius: 8px;
-    color: var(--accent-pink);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.85rem;
-  }
-
-  /* History */
-  .history-list {
-    margin-top: 12px;
-    max-height: 300px;
-    overflow-y: auto;
-  }
-
-  .history-list::-webkit-scrollbar { width: 4px; }
-  .history-list::-webkit-scrollbar-track { background: transparent; }
-  .history-list::-webkit-scrollbar-thumb { background: var(--border-primary); border-radius: 4px; }
-
-  .history-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
-    font-size: 0.82rem;
-    transition: background 0.2s ease;
-  }
-
-  .history-item:hover { background: rgba(255,255,255,0.02); }
-
-  .history-badge {
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-  }
-
-  .badge-encrypt { background: rgba(16,185,129,0.15); color: var(--accent-green); }
-  .badge-decrypt { background: rgba(139,92,246,0.15); color: var(--accent-purple); }
-  .badge-key { background: rgba(245,158,11,0.15); color: var(--accent-amber); }
-
-  .history-text {
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--text-secondary);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    flex: 1;
-  }
-
-  .history-arrow { color: var(--text-dim); }
-
-  .history-empty {
-    text-align: center;
-    padding: 30px;
-    color: var(--text-dim);
-    font-size: 0.85rem;
-  }
-
-  /* Verification */
-  .verify-section {
-    background: var(--bg-card);
-    border: 1px solid var(--border-primary);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 24px;
-    transition: all 0.3s ease;
-  }
-
-  .verify-section:hover { border-color: var(--accent-green); box-shadow: 0 0 30px var(--glow-green); }
-
-  .verify-results {
-    margin-top: 16px;
-    display: none;
-  }
-
-  .verify-results.visible { display: block; }
-
-  .verify-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 12px;
-    border-radius: 6px;
-    margin-bottom: 4px;
-    font-size: 0.82rem;
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  .verify-item.pass { background: rgba(16,185,129,0.05); }
-  .verify-item.fail { background: rgba(239,68,68,0.05); }
-
-  .verify-icon { font-size: 1rem; }
-  .verify-plain { color: var(--text-secondary); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .verify-cipher { color: var(--text-dim); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .verify-status { font-weight: 600; font-size: 0.75rem; }
-  .verify-status.pass-text { color: var(--accent-green); }
-  .verify-status.fail-text { color: var(--accent-red); }
-
-  .verify-summary {
-    margin-top: 16px;
-    padding: 12px 16px;
-    border-radius: 8px;
-    font-weight: 600;
-    text-align: center;
-  }
-
-  .verify-summary.all-pass {
-    background: rgba(16,185,129,0.1);
-    border: 1px solid rgba(16,185,129,0.3);
-    color: var(--accent-green);
-  }
-
-  .verify-summary.has-fail {
-    background: rgba(239,68,68,0.1);
-    border: 1px solid rgba(239,68,68,0.3);
-    color: var(--accent-red);
-  }
-
-  /* Notification */
-  .notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 14px 20px;
-    border-radius: 10px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    z-index: 1000;
-    transform: translateX(120%);
-    transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);
-    backdrop-filter: blur(10px);
-    max-width: 350px;
-  }
-
-  .notification.show { transform: translateX(0); }
-
-  .notification.success {
-    background: rgba(16,185,129,0.15);
-    border: 1px solid rgba(16,185,129,0.4);
-    color: var(--accent-emerald);
-  }
-
-  .notification.error {
-    background: rgba(239,68,68,0.15);
-    border: 1px solid rgba(239,68,68,0.4);
-    color: #fca5a5;
-  }
-
-  .notification.info {
-    background: rgba(59,130,246,0.15);
-    border: 1px solid rgba(59,130,246,0.4);
-    color: #93c5fd;
-  }
-
-  /* Footer */
-  .footer {
-    text-align: center;
-    padding: 30px;
-    color: var(--text-dim);
-    font-size: 0.8rem;
-    border-top: 1px solid rgba(255,255,255,0.03);
-  }
-
-  .footer a {
-    color: var(--accent-blue);
-    text-decoration: none;
-  }
-
-  /* Responsive */
-  @media (max-width: 768px) {
-    .workspace, .extras-row { grid-template-columns: 1fr; }
-    .header h1 { font-size: 1.6rem; }
-    .key-row { flex-direction: column; }
-    .app-container { padding: 12px; }
-    .panel, .key-section, .lattice-section, .history-section, .verify-section { padding: 16px; }
-  }
-
-  /* Animations */
-  .fade-in {
-    animation: fadeIn 0.5s ease forwards;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .processing {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .processing::after {
-    content: '';
-    position: absolute;
-    top: 0;left: -100%;
-    width: 100%;height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-    animation: shimmer 1.5s infinite;
-  }
-
-  @keyframes shimmer {
-    to { left: 100%; }
-  }
-
-  .swap-btn {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 5;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: var(--bg-card);
-    border: 2px solid var(--border-primary);
-    color: var(--text-secondary);
-    cursor: pointer;
-    font-size: 1.2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-  }
-
-  .swap-btn:hover {
-    background: var(--accent-blue);
-    border-color: var(--accent-blue);
-    color: white;
-    transform: translate(-50%, -50%) rotate(180deg);
-  }
-
-  .workspace-wrapper {
-    position: relative;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phantom Mirror Cipher</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-bg: #1e293b;
+            --accent: #06b6d4;
+            --accent-hover: #0891b2;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--accent);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+        }
+
+        .header p {
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .app-container {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 1000px;
+            padding: 2rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .keyword-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .keyword-section label {
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: var(--accent);
+        }
+
+        .keyword-section input {
+            background: var(--bg-color);
+            border: 2px solid var(--border);
+            color: var(--text-main);
+            padding: 0.75rem 1rem;
+            font-size: 1.2rem;
+            border-radius: 6px;
+            outline: none;
+            text-transform: uppercase;
+            transition: 0.3s;
+            width: 250px;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        .keyword-section input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+        }
+
+        .workspace {
+            display: flex;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .workspace {
+                flex-direction: column;
+            }
+        }
+
+        .panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h2 {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        textarea {
+            width: 100%;
+            height: 250px;
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-family: 'Courier New', Courier, monospace;
+            border-radius: 6px;
+            resize: none;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        textarea:focus {
+            border-color: var(--accent);
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        button {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+            transform: scale(1.02);
+        }
+
+        button.copy-btn {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+        }
+
+        button.copy-btn:hover {
+            background-color: var(--border);
+            color: var(--text-main);
+            transform: none;
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 1.5rem;
+            min-height: 24px;
+            color: var(--success);
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+    </style>
 </head>
 <body>
 
-<div class="bg-animation">
-  <div class="orb"></div>
-  <div class="orb"></div>
-  <div class="orb"></div>
-</div>
-
-<div id="notification" class="notification"></div>
-
-<div class="app-container">
-
-  <!-- Header -->
-  <header class="header fade-in">
-    <div class="header-icon">🌀</div>
-    <h1>Spiral Lattice Cipher</h1>
-    <p>Non-Linear • Fully Reversible • Alphabetical</p>
-  </header>
-
-  <!-- Key Section -->
-  <section class="key-section fade-in" style="animation-delay:0.1s">
-    <div class="section-title">
-      <div class="icon" style="background: linear-gradient(135deg, var(--accent-amber), #f97316);">🔑</div>
-      Encryption Key
+    <div class="header">
+        <h1>Phantom Mirror Cipher</h1>
+        <p>Dynamic Axial Reflection & Bipolar Extraction</p>
     </div>
-    <div class="key-row">
-      <div class="input-wrapper">
-        <input type="text" id="keyInput" placeholder="Enter your secret key (letters only)..." autocomplete="off" spellcheck="false" />
-      </div>
-      <button class="btn btn-primary" onclick="setKey()">Set Key</button>
-      <button class="btn btn-secondary" onclick="generateRandomKey()">Random</button>
-    </div>
-    <div id="keyStatus" class="key-status inactive">
-      <div class="status-dot"></div>
-      <span>No key configured</span>
-    </div>
-  </section>
 
-  <!-- Workspace -->
-  <div class="workspace-wrapper">
-    <div class="workspace fade-in" style="animation-delay:0.2s">
-      <!-- Encrypt Panel -->
-      <div class="panel encrypt-panel">
-        <div class="section-title">
-          <div class="icon" style="background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));">🔒</div>
-          Encrypt
+    <div class="app-container">
+        
+        <div class="keyword-section">
+            <label for="keyword">SECRET KEYWORD:</label>
+            <input type="text" id="keyword" value="LUNA" placeholder="ENTER KEYWORD">
         </div>
-        <textarea id="encryptInput" placeholder="Enter plaintext message to encrypt..."></textarea>
-        <div class="panel-actions">
-          <button class="btn btn-encrypt" onclick="encryptMessage()">Encrypt</button>
-          <button class="btn btn-secondary" onclick="clearField('encryptInput')">Clear</button>
+
+        <div class="workspace">
+            
+            <!-- Plaintext Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Plaintext</h2>
+                    <button class="copy-btn" onclick="copyText('plaintext')">Copy</button>
+                </div>
+                <textarea id="plaintext" placeholder="Enter your secret message here..."></textarea>
+            </div>
+
+            <!-- Controls -->
+            <div class="btn-group">
+                <button onclick="handleEncrypt()">Encrypt ➔</button>
+                <button onclick="handleDecrypt()">⬅ Decrypt</button>
+            </div>
+
+            <!-- Ciphertext Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Ciphertext</h2>
+                    <button class="copy-btn" onclick="copyText('ciphertext')">Copy</button>
+                </div>
+                <textarea id="ciphertext" placeholder="Encrypted output will appear here..."></textarea>
+            </div>
+            
         </div>
-      </div>
 
-      <!-- Decrypt Panel -->
-      <div class="panel decrypt-panel">
-        <div class="section-title">
-          <div class="icon" style="background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));">🔓</div>
-          Decrypt
-        </div>
-        <textarea id="decryptInput" placeholder="Enter ciphertext message to decrypt..."></textarea>
-        <div class="panel-actions">
-          <button class="btn btn-decrypt" onclick="decryptMessage()">Decrypt</button>
-          <button class="btn btn-secondary" onclick="clearField('decryptInput')">Clear</button>
-        </div>
-      </div>
-    </div>
-    <button class="swap-btn" onclick="swapFields()" title="Swap encrypt/decrypt text">⇄</button>
-  </div>
+        <div id="status" class="status"></div>
 
-  <!-- Result Section -->
-  <section id="resultSection" class="result-section fade-in">
-    <div class="section-title">
-      <div class="icon" style="background: linear-gradient(135deg, var(--accent-amber), #f97316);">✨</div>
-      <span id="resultLabel">Result</span>
-    </div>
-    <div class="result-box" id="resultBox">
-      <button class="copy-btn" onclick="copyResult()">📋 Copy</button>
-      <span id="resultText"></span>
-    </div>
-    <div class="result-meta" id="resultMeta"></div>
-  </section>
-
-  <!-- Extras Row -->
-  <div class="extras-row fade-in" style="animation-delay:0.3s">
-    <!-- Lattice -->
-    <div class="lattice-section">
-      <div class="section-title">
-        <div class="icon" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));">📊</div>
-        Lattice Grid
-      </div>
-      <div id="latticeContainer">
-        <p style="color: var(--text-dim); font-size: 0.85rem;">Set a key to view the lattice configuration.</p>
-      </div>
     </div>
 
-    <!-- History -->
-    <div class="history-section">
-      <div class="section-title">
-        <div class="icon" style="background: linear-gradient(135deg, var(--accent-amber), #f97316);">📜</div>
-        Session History
-      </div>
-      <div class="history-list" id="historyList">
-        <div class="history-empty">No operations yet</div>
-      </div>
-    </div>
-  </div>
+    <script>
+        // --- CRYPTOGRAPHIC ENGINE ---
+        
+        const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-  <!-- Verify Section -->
-  <section class="verify-section fade-in" style="animation-delay:0.4s">
-    <div class="section-title">
-      <div class="icon" style="background: linear-gradient(135deg, var(--accent-green), var(--accent-emerald));">🧪</div>
-      Verification Test
-    </div>
-    <p style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 14px;">
-      Verify that encryption and decryption are perfectly reversible.
-    </p>
-    <button class="btn btn-encrypt" onclick="runVerification()">Run Verification</button>
-    <div class="verify-results" id="verifyResults"></div>
-  </section>
+        class PhantomMirror {
+            constructor(keyword) {
+                this.originalKeyword = keyword;
+                this.resetState();
+            }
 
-  <!-- Footer -->
-  <footer class="footer">
-    <p>Spiral Lattice Cipher &mdash; A non-linear cryptographic system using 26 letters</p>
-    <p style="margin-top: 4px;">2D coordinate encryption • Polynomial shifts • Ciphertext feedback</p>
-  </footer>
+            resetState() {
+                // Sanitize keyword (Uppercase, letters only)
+                let clean = this.originalKeyword.toUpperCase().replace(/[^A-Z]/g, "");
+                if (!clean) clean = "PHANTOM"; // Default fallback
 
-</div>
+                this.array = [];
+                // 1. Add unique letters from keyword
+                for (let char of clean) {
+                    if (!this.array.includes(char)) this.array.push(char);
+                }
+                
+                // 2. Add remaining alphabet letters
+                for (let char of ALPHABET) {
+                    if (!this.array.includes(char)) this.array.push(char);
+                }
 
-<script>
-class SpiralLatticeCipher {
-  constructor(key) {
-    this.ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    if (!key || !/^[A-Za-z]+$/.test(key)) throw new Error("Key must contain only letters.");
-    this.key = key.toUpperCase();
-    this.grid = Array.from({length:5}, ()=> Array(5).fill(''));
-    this.pivotLetter = '';
-    this.letterToCoord = {};
-    this.coordToLetter = {};
-    this.initialFeedback = 0;
-    this._buildLattice();
-  }
+                // 3. Initialize Mirror
+                this.mirrorIndex = 0;
+            }
 
-  _buildLattice() {
-    const seen = new Set();
-    const ordered = [];
-    for (const ch of this.key) {
-      if (!seen.has(ch)) { seen.add(ch); ordered.push(ch); }
-    }
-    for (const ch of this.ALPHABET) {
-      if (!seen.has(ch)) { seen.add(ch); ordered.push(ch); }
-    }
-    let idx = 0;
-    for (let r = 0; r < 5; r++) {
-      for (let c = 0; c < 5; c++) {
-        const letter = ordered[idx];
-        this.grid[r][c] = letter;
-        this.letterToCoord[letter] = [r, c];
-        this.coordToLetter[r + ',' + c] = letter;
-        idx++;
-      }
-    }
-    this.pivotLetter = ordered[25];
-    this.pivotShadow = [2, 2];
-    let keySum = 0;
-    for (const ch of this.key) keySum += this.ALPHABET.indexOf(ch);
-    this.initialFeedback = keySum % 26;
-  }
+            getReflectedIndex(targetIndex) {
+                let oppositeMirror = (this.mirrorIndex + 13) % 26;
+                
+                // Rule 1: Target is on mirror -> swap to opposite
+                if (targetIndex === this.mirrorIndex) return oppositeMirror;
+                // Rule 2: Target is opposite mirror -> swap to mirror
+                if (targetIndex === oppositeMirror) return this.mirrorIndex;
+                
+                // Standard reflection: (2 * Mirror - Plain) mod 26
+                // In JS, % handles negative numbers poorly, so we add 26 and modulo again
+                let calc = (2 * this.mirrorIndex - targetIndex) % 26;
+                return (calc + 26) % 26; 
+            }
 
-  _mod(a, m) { return ((a % m) + m) % m; }
+            processChar(char, isEncrypt) {
+                let upperChar = char.toUpperCase();
+                // Pass spacing and punctuation through untouched
+                if (!ALPHABET.includes(upperChar)) return char; 
 
-  _computeShifts(n, feedback) {
-    const dr = this._mod(n * n + feedback, 5);
-    const dc = this._mod(n * n * n + 2 * feedback + n, 5);
-    return [dr, dc];
-  }
+                let targetIndex = this.array.indexOf(upperChar);
+                let resultIndex = this.getReflectedIndex(targetIndex);
+                let resultChar = this.array[resultIndex];
 
-  _forwardTransformWithTag(r, c) {
-    const s = this._mod(r + c, 3);
-    if (s === 0) {
-      return [this._mod(r + c, 5), this._mod(r * 2 + 1, 5), 0];
-    } else if (s === 1) {
-      return [r, c, 1];
-    } else {
-      return [this._mod(r + 2, 5), this._mod(c + 3, 5), 2];
-    }
-  }
+                // Identify Plaintext & Ciphertext
+                let pChar = isEncrypt ? upperChar : resultChar;
+                let cChar = isEncrypt ? resultChar : upperChar;
 
-  _inverseTransform(r, c, tag) {
-    if (tag === 0) {
-      const inv3 = 3;
-      const recR = this._mod((r - 1) * inv3, 5);
-      const recC = this._mod(r - recR, 5);
-      return [recR, recC];
-    } else if (tag === 1) {
-      return [r, c];
-    } else {
-      return [this._mod(r - 2, 5), this._mod(c - 3, 5)];
-    }
-  }
+                // BIPOLAR EXTRACTION (The Non-Linear Shift)
+                this.array = this.array.filter(c => c !== pChar && c !== cChar);
+                this.array.unshift(cChar); // Jam cipher to front
+                this.array.push(pChar);    // Jam plain to back
 
-  encrypt(plaintext) {
-    plaintext = plaintext.toUpperCase().replace(/[^A-Z]/g, '');
-    if (!plaintext) return "";
-    let ciphertext = [];
-    let feedback = this.initialFeedback;
+                // AUTO-KINETIC MOVEMENT (Move the mirror based on cipher letter)
+                let cVal = cChar.charCodeAt(0) - 64; // A=1, B=2, etc.
+                this.mirrorIndex = (this.mirrorIndex + cVal) % 26;
 
-    for (let i = 0; i < plaintext.length; i++) {
-      const ch = plaintext[i];
-      const n = i + 1;
-      let r, c, pivotFlag = false;
+                // Preserve original case (optional, but nice for UI)
+                return char === char.toLowerCase() ? resultChar.toLowerCase() : resultChar;
+            }
 
-      if (ch === this.pivotLetter) {
-        [r, c] = this.pivotShadow;
-        pivotFlag = true;
-      } else {
-        [r, c] = this.letterToCoord[ch];
-      }
-
-      const [dr, dc] = this._computeShifts(n, feedback);
-      let rShifted = this._mod(r + dr, 5);
-      let cShifted = this._mod(c + dc, 5);
-
-      let [rFinal, cFinal, tag] = this._forwardTransformWithTag(rShifted, cShifted);
-
-      if (pivotFlag) {
-        rFinal = this._mod(rFinal + 1, 5);
-        cFinal = this._mod(cFinal + 1, 5);
-      }
-
-      let resultLetter = this.coordToLetter[rFinal + ',' + cFinal];
-      if (pivotFlag && resultLetter === this.coordToLetter[this.pivotShadow[0]+','+this.pivotShadow[1]]) {
-        resultLetter = this.pivotLetter;
-      }
-
-      ciphertext.push(resultLetter);
-      feedback = this.ALPHABET.indexOf(resultLetter);
-    }
-    return ciphertext.join('');
-  }
-
-  decrypt(ciphertext) {
-    ciphertext = ciphertext.toUpperCase().replace(/[^A-Z]/g, '');
-    if (!ciphertext) return "";
-    let plaintext = [];
-    let feedback = this.initialFeedback;
-
-    for (let i = 0; i < ciphertext.length; i++) {
-      const ch = ciphertext[i];
-      const n = i + 1;
-      const [dr, dc] = this._computeShifts(n, feedback);
-      let found = false, resultLetter = '';
-
-      for (const pivotFlag of [false, true]) {
-        if (found) break;
-        let crAdj, ccAdj;
-        if (pivotFlag) {
-          let cr, cc;
-          if (ch === this.pivotLetter) { [cr, cc] = this.pivotShadow; }
-          else { [cr, cc] = this.letterToCoord[ch]; }
-          crAdj = this._mod(cr - 1, 5);
-          ccAdj = this._mod(cc - 1, 5);
-        } else {
-          let cr, cc;
-          if (ch === this.pivotLetter) { [cr, cc] = this.pivotShadow; }
-          else { [cr, cc] = this.letterToCoord[ch]; }
-          crAdj = cr; ccAdj = cc;
+            processText(text, isEncrypt) {
+                this.resetState();
+                let result = "";
+                for (let i = 0; i < text.length; i++) {
+                    result += this.processChar(text[i], isEncrypt);
+                }
+                return result;
+            }
         }
 
-        for (const tag of [0, 1, 2]) {
-          const [rPre, cPre] = this._inverseTransform(crAdj, ccAdj, tag);
-          const [verR, verC, verTag] = this._forwardTransformWithTag(rPre, cPre);
-          if (verTag !== tag || verR !== crAdj || verC !== ccAdj) continue;
+        // --- UI INTERACTION LOGIC ---
 
-          const rOrig = this._mod(rPre - dr, 5);
-          const cOrig = this._mod(cPre - dc, 5);
-          let candidate;
-
-          if (pivotFlag) {
-            candidate = this.pivotLetter;
-          } else {
-            candidate = this.coordToLetter[rOrig+','+cOrig];
-          }
-
-          let testR, testC;
-          if (candidate === this.pivotLetter) { [testR, testC] = this.pivotShadow; }
-          else { [testR, testC] = this.letterToCoord[candidate]; }
-
-          const tRS = this._mod(testR + dr, 5);
-          const tCS = this._mod(testC + dc, 5);
-          let [tRF, tCF] = this._forwardTransformWithTag(tRS, tCS);
-          const isPivot = (candidate === this.pivotLetter);
-
-          if (isPivot) {
-            tRF = this._mod(tRF + 1, 5);
-            tCF = this._mod(tCF + 1, 5);
-          }
-
-          let expected = this.coordToLetter[tRF+','+tCF];
-          if (isPivot && expected === this.coordToLetter[this.pivotShadow[0]+','+this.pivotShadow[1]]) {
-            expected = this.pivotLetter;
-          }
-
-          if (expected === ch) {
-            resultLetter = candidate;
-            found = true;
-            break;
-          }
+        function showStatus(message) {
+            const statusEl = document.getElementById('status');
+            statusEl.innerText = message;
+            setTimeout(() => { statusEl.innerText = ""; }, 3000);
         }
-      }
 
-      if (!found) resultLetter = ch;
-      plaintext.push(resultLetter);
-      feedback = this.ALPHABET.indexOf(ch);
-    }
-    return plaintext.join('');
-  }
-}
+        function handleEncrypt() {
+            const keyword = document.getElementById('keyword').value;
+            const plaintext = document.getElementById('plaintext').value;
+            
+            if (!plaintext.trim()) {
+                showStatus("⚠️ Please enter plaintext to encrypt.");
+                return;
+            }
 
-// App State
-let cipher = null;
-let history = [];
+            const cipher = new PhantomMirror(keyword);
+            const result = cipher.processText(plaintext, true);
+            
+            document.getElementById('ciphertext').value = result;
+            showStatus("✓ Encryption Complete");
+        }
 
-function notify(msg, type = 'info') {
-  const el = document.getElementById('notification');
-  el.textContent = msg;
-  el.className = 'notification ' + type;
-  setTimeout(() => el.classList.add('show'), 10);
-  setTimeout(() => el.classList.remove('show'), 3000);
-}
+        function handleDecrypt() {
+            const keyword = document.getElementById('keyword').value;
+            const ciphertext = document.getElementById('ciphertext').value;
+            
+            if (!ciphertext.trim()) {
+                showStatus("⚠️ Please enter ciphertext to decrypt.");
+                return;
+            }
 
-function setKey() {
-  const input = document.getElementById('keyInput').value.trim();
-  const clean = input.toUpperCase().replace(/[^A-Z]/g, '');
-  if (!clean) {
-    notify('Please enter a valid key with at least one letter.', 'error');
-    return;
-  }
-  try {
-    cipher = new SpiralLatticeCipher(clean);
-    const status = document.getElementById('keyStatus');
-    const unique = new Set(clean).size;
-    status.className = 'key-status active';
-    status.innerHTML = `<div class="status-dot"></div><span>Key active: "${clean}" • Length: ${clean.length} • Unique: ${unique} • Feedback: ${cipher.initialFeedback}</span>`;
-    renderLattice();
-    addHistory('key', clean, '');
-    notify('Encryption key set successfully!', 'success');
-  } catch (e) {
-    notify(e.message, 'error');
-  }
-}
+            const cipher = new PhantomMirror(keyword);
+            const result = cipher.processText(ciphertext, false);
+            
+            document.getElementById('plaintext').value = result;
+            showStatus("✓ Decryption Complete");
+        }
 
-function generateRandomKey() {
-  const words = ['QUANTUM','NEBULA','PHOENIX','CRYSTAL','VORTEX','CIPHER','MATRIX','SHADOW','PRISM','ENIGMA','HORIZON','ZENITH','AURORA','COSMOS','NEXUS','ORCHID','SPHINX','TEMPEST','MYSTIC','ALCHEMY'];
-  const word = words[Math.floor(Math.random() * words.length)];
-  document.getElementById('keyInput').value = word;
-  setKey();
-}
-
-function encryptMessage() {
-  if (!cipher) { notify('Please set a key first!', 'error'); return; }
-  const input = document.getElementById('encryptInput').value;
-  const clean = input.toUpperCase().replace(/[^A-Z]/g, '');
-  if (!clean) { notify('Enter a message to encrypt.', 'error'); return; }
-
-  const start = performance.now();
-  const result = cipher.encrypt(clean);
-  const elapsed = (performance.now() - start).toFixed(2);
-
-  showResult('Encrypted Result', result, clean.length, elapsed, 'encrypt');
-  addHistory('encrypt', clean, result);
-  notify('Message encrypted!', 'success');
-}
-
-function decryptMessage() {
-  if (!cipher) { notify('Please set a key first!', 'error'); return; }
-  const input = document.getElementById('decryptInput').value;
-  const clean = input.toUpperCase().replace(/[^A-Z]/g, '');
-  if (!clean) { notify('Enter a message to decrypt.', 'error'); return; }
-
-  const start = performance.now();
-  const result = cipher.decrypt(clean);
-  const elapsed = (performance.now() - start).toFixed(2);
-
-  showResult('Decrypted Result', result, clean.length, elapsed, 'decrypt');
-  addHistory('decrypt', clean, result);
-  notify('Message decrypted!', 'success');
-}
-
-function showResult(label, text, charCount, time, type) {
-  const section = document.getElementById('resultSection');
-  section.classList.add('visible');
-  document.getElementById('resultLabel').textContent = label;
-  const formatted = text.match(/.{1,5}/g)?.join(' ') || text;
-  document.getElementById('resultText').textContent = formatted;
-
-  const meta = document.getElementById('resultMeta');
-  meta.innerHTML = `
-    <div class="meta-tag">Type: <span>${type}</span></div>
-    <div class="meta-tag">Characters: <span>${charCount}</span></div>
-    <div class="meta-tag">Time: <span>${time}ms</span></div>
-    <div class="meta-tag">Key: <span>${cipher.key}</span></div>
-  `;
-  section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-
-function copyResult() {
-  const text = document.getElementById('resultText').textContent.replace(/\s/g, '');
-  navigator.clipboard.writeText(text).then(() => notify('Copied to clipboard!', 'success'));
-}
-
-function clearField(id) {
-  document.getElementById(id).value = '';
-}
-
-function swapFields() {
-  const enc = document.getElementById('encryptInput');
-  const dec = document.getElementById('decryptInput');
-  const temp = enc.value;
-  enc.value = dec.value;
-  dec.value = temp;
-}
-
-function renderLattice() {
-  if (!cipher) return;
-  const container = document.getElementById('latticeContainer');
-  let html = '<div class="lattice-grid">';
-  for (let r = 0; r < 5; r++) {
-    for (let c = 0; c < 5; c++) {
-      html += `<div class="lattice-cell">${cipher.grid[r][c]}<span class="coord">${r},${c}</span></div>`;
-    }
-  }
-  html += '</div>';
-  html += `<div class="pivot-cell">⚡ Pivot: <strong>${cipher.pivotLetter}</strong> → shadow (${cipher.pivotShadow})</div>`;
-  container.innerHTML = html;
-}
-
-function addHistory(type, input, output) {
-  history.unshift({ type, input, output, time: new Date().toLocaleTimeString() });
-  if (history.length > 50) history.pop();
-  renderHistory();
-}
-
-function renderHistory() {
-  const el = document.getElementById('historyList');
-  if (history.length === 0) {
-    el.innerHTML = '<div class="history-empty">No operations yet</div>';
-    return;
-  }
-  el.innerHTML = history.map(h => {
-    const badgeClass = h.type === 'encrypt' ? 'badge-encrypt' : h.type === 'decrypt' ? 'badge-decrypt' : 'badge-key';
-    const label = h.type.toUpperCase();
-    if (h.type === 'key') {
-      return `<div class="history-item"><span class="history-badge ${badgeClass}">${label}</span><span class="history-text">${h.input}</span><span style="color:var(--text-dim);font-size:0.7rem">${h.time}</span></div>`;
-    }
-    return `<div class="history-item"><span class="history-badge ${badgeClass}">${label}</span><span class="history-text">${h.input.substring(0,20)}</span><span class="history-arrow">→</span><span class="history-text">${h.output.substring(0,20)}</span><span style="color:var(--text-dim);font-size:0.7rem">${h.time}</span></div>`;
-  }).join('');
-}
-
-function runVerification() {
-  if (!cipher) { notify('Please set a key first!', 'error'); return; }
-
-  const tests = [
-    "HELLO",
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-    "THEQUICKBROWNFOXJUMPSOVERTHELAZYDOG",
-    "AAAAAAAAAA",
-    "ZZZZZ",
-    "ATTACKATDAWN",
-    "SPIRALLATTICECIPHERTEST",
-    "XYLOPHONE",
-  ];
-
-  const resultsEl = document.getElementById('verifyResults');
-  let html = '';
-  let passed = 0, failed = 0;
-
-  for (const test of tests) {
-    const encrypted = cipher.encrypt(test);
-    const decrypted = cipher.decrypt(encrypted);
-    const ok = decrypted === test;
-    if (ok) passed++; else failed++;
-    const cls = ok ? 'pass' : 'fail';
-    html += `<div class="verify-item ${cls}">
-      <span class="verify-icon">${ok ? '✅' : '❌'}</span>
-      <span class="verify-plain">${test}</span>
-      <span style="color:var(--text-dim)">→</span>
-      <span class="verify-cipher">${encrypted.substring(0,30)}${encrypted.length>30?'...':''}</span>
-      <span class="verify-status ${ok?'pass-text':'fail-text'}">${ok?'PASS':'FAIL'}</span>
-    </div>`;
-  }
-
-  const total = passed + failed;
-  const summaryClass = failed === 0 ? 'all-pass' : 'has-fail';
-  html += `<div class="verify-summary ${summaryClass}">${failed === 0 ? '✅ All '+total+' tests passed — cipher is fully reversible!' : '⚠️ '+passed+'/'+total+' tests passed, '+failed+' failed'}</div>`;
-
-  resultsEl.innerHTML = html;
-  resultsEl.classList.add('visible');
-  notify(`Verification complete: ${passed}/${total} passed`, failed === 0 ? 'success' : 'error');
-}
-
-// Init
-document.addEventListener('DOMContentLoaded', () => {
-  renderHistory();
-  document.getElementById('keyInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') setKey();
-  });
-});
-</script>
+        function copyText(elementId) {
+            const el = document.getElementById(elementId);
+            el.select();
+            document.execCommand('copy');
+            showStatus("✓ Copied to clipboard");
+        }
+    </script>
 </body>
-  </html>
+</html>
