@@ -1,902 +1,2131 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spiral Lattice Cipher</title>
+<title>Система ПРО с AI Transformer</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
---bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--bg4:#0d1117;
---border:#30363d;--border2:#484f58;
---text:#c9d1d9;--text2:#8b949e;--text3:#484f58;
---blue:#58a6ff;--green:#3fb950;--red:#f85149;--orange:#d29922;
---purple:#bc8cff;--cyan:#39d2c0;--pink:#f778ba;--yellow:#e3b341;
-}
-body{font-family:'Consolas','Monaco','Courier New',monospace;background:var(--bg);color:var(--text);font-size:13px;line-height:1.5}
-.wrap{max-width:1500px;margin:0 auto;padding:15px}
-.hdr{display:flex;align-items:center;gap:15px;padding:15px 0;border-bottom:1px solid var(--border);margin-bottom:20px;flex-wrap:wrap}
-.hdr h1{font-size:1.4em;color:var(--blue);white-space:nowrap}
-.badge{padding:3px 8px;border-radius:3px;font-size:.75em;font-weight:700;display:inline-block}
-.badge-g{background:#1f3a1f;color:var(--green);border:1px solid #2a5a2a}
-.badge-b{background:#1a2a3a;color:var(--cyan);border:1px solid #2a4a5a}
-.hdr-right{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-
-.layout{display:grid;grid-template-columns:340px 1fr 320px;gap:15px}
-@media(max-width:1200px){.layout{grid-template-columns:1fr}}
-.col{display:flex;flex-direction:column;gap:15px}
-
-.pnl{background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden}
-.pnl-hd{padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border);font-weight:700;font-size:.9em;color:var(--blue);display:flex;align-items:center;gap:8px}
-.pnl-bd{padding:14px}
-.pnl-ft{padding:10px 14px;background:var(--bg3);border-top:1px solid var(--border);font-size:.8em;color:var(--text2)}
-
-.fg{margin-bottom:12px}.fg:last-child{margin-bottom:0}
-.fg label{display:block;color:var(--text2);margin-bottom:5px;font-size:.85em}
-.fg .help{font-size:.75em;color:var(--text3);margin-top:3px}
-input,select,textarea{width:100%;padding:8px 10px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:inherit;font-size:.9em}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 2px rgba(88,166,255,.15)}
-textarea{min-height:60px;resize:vertical}
-.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:0}
-select{cursor:pointer}
-
-.btn{padding:9px 16px;border:1px solid var(--border);border-radius:4px;cursor:pointer;font-family:inherit;font-size:.85em;font-weight:700;transition:.15s;display:inline-flex;align-items:center;gap:6px;justify-content:center;white-space:nowrap;background:var(--bg3);color:var(--text)}
-.btn:hover{border-color:var(--blue);color:#fff}
-.btn:active{transform:scale(.97)}
-.btn-g{background:#1a3a1a;border-color:#2a5a2a;color:var(--green)}.btn-g:hover{background:#2a5a2a}
-.btn-r{background:#3a1a1a;border-color:#5a2a2a;color:var(--red)}.btn-r:hover{background:#5a2a2a}
-.btn-b{background:#1a2a3a;border-color:#2a4a6a;color:var(--blue)}.btn-b:hover{background:#2a4a6a}
-.btn-y{background:#2a2a1a;border-color:#4a4a2a;color:var(--orange)}.btn-y:hover{background:#4a4a2a}
-.btn-p{background:#2a1a3a;border-color:#4a2a6a;color:var(--purple)}.btn-p:hover{background:#4a2a6a}
-.btn-sm{padding:5px 10px;font-size:.8em}
-.btns{display:flex;gap:8px;flex-wrap:wrap}
-.btns-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-
-.alpha{display:flex;flex-wrap:wrap;gap:3px;padding:8px;background:var(--bg4);border:1px solid var(--border);border-radius:4px}
-.ac{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:var(--bg3);border:1px solid var(--border);border-radius:3px;font-size:.85em;color:var(--blue);position:relative;transition:.15s;cursor:default}
-.ac:hover{border-color:var(--blue);transform:scale(1.1);z-index:2}
-.ac .ix{font-size:.5em;color:var(--text3);position:absolute;top:1px;left:2px}
-
-.g5{display:grid;gap:3px}
-.gc{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg3);border:1px solid var(--border);border-radius:3px;position:relative;transition:.2s;cursor:default}
-.gc:hover{border-color:var(--blue);transform:scale(1.08);z-index:2;box-shadow:0 0 8px rgba(88,166,255,.2)}
-.gc .ix{font-size:.5em;color:var(--text3);position:absolute;top:1px;left:3px}
-.gc .cr{font-size:.5em;color:var(--text3);position:absolute;bottom:1px;right:3px}
-.gc .ch{font-size:1.1em;color:var(--blue);font-weight:700}
-.gc.empty{opacity:.3}.gc.empty .ch{color:var(--text3)}
-.gc.src{background:#1a2a1a;border-color:var(--green)}.gc.src .ch{color:var(--green)}
-.gc.dst{background:#2a1a1a;border-color:var(--red)}.gc.dst .ch{color:var(--red)}
-
-.out{background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:12px;min-height:50px;color:var(--green);word-break:break-all;font-size:1em;line-height:1.7;position:relative}
-.out .cbtn{position:absolute;top:6px;right:6px;padding:3px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:3px;color:var(--text2);cursor:pointer;font-size:.7em;font-family:inherit}
-.out .cbtn:hover{border-color:var(--blue);color:var(--text)}
-
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:6px}
-.st{background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:8px;text-align:center}
-.st .v{font-size:1.1em;color:var(--blue);font-weight:700}
-.st .l{font-size:.65em;color:var(--text2);margin-top:2px}
-
-.tabs{display:flex;gap:3px;margin-bottom:12px;flex-wrap:wrap}
-.tab{padding:6px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:4px 4px 0 0;cursor:pointer;font-size:.8em;color:var(--text2);transition:.15s}
-.tab:hover{color:var(--text)}
-.tab.on{background:var(--bg2);color:var(--blue);border-color:var(--blue);border-bottom-color:var(--bg2)}
-.tc{display:none}.tc.on{display:block}
-
-.tbl{width:100%;border-collapse:collapse;font-size:.8em}
-.tbl th,.tbl td{padding:5px 6px;border:1px solid var(--border);text-align:center}
-.tbl th{background:var(--bg3);color:var(--blue);font-weight:700;position:sticky;top:0;z-index:1}
-.tbl td{background:var(--bg4)}
-.hi-g{color:var(--green);font-weight:700}
-.hi-r{color:var(--red);font-weight:700}
-.hi-b{color:var(--blue)}
-.hi-o{color:var(--orange)}
-.hi-p{color:var(--purple)}
-.tscroll{max-height:400px;overflow:auto;border:1px solid var(--border);border-radius:4px}
-.tscroll::-webkit-scrollbar{width:6px;height:6px}
-.tscroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-
-.freq-bar{display:flex;align-items:end;gap:2px;height:100px;padding:8px;background:var(--bg4);border:1px solid var(--border);border-radius:4px;margin-top:8px}
-.fb{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px}
-.fb .bar{width:100%;background:var(--blue);border-radius:2px 2px 0 0;min-height:1px;transition:.3s}
-.fb .lbl{font-size:.5em;color:var(--text3);white-space:nowrap}
-
-.aval{display:flex;gap:3px;flex-wrap:wrap;margin-top:8px}
-.aval .bit{width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:3px;font-size:.75em;font-weight:700;border:1px solid var(--border)}
-.bit-same{background:var(--bg3);color:var(--text3)}
-.bit-diff{background:#2a1a1a;color:var(--red);border-color:var(--red)}
-
-.toast{position:fixed;top:15px;right:15px;padding:10px 16px;border-radius:4px;font-size:.85em;z-index:999;transform:translateX(120%);transition:.3s;font-family:inherit}
-.toast.show{transform:translateX(0)}
-.toast-ok{background:#1a3a1a;border:1px solid #2a5a2a;color:var(--green)}
-.toast-err{background:#3a1a1a;border:1px solid #5a2a2a;color:var(--red)}
-.toast-info{background:#1a2a3a;border:1px solid #2a4a6a;color:var(--blue)}
-
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
-.modal-bg.show{display:flex}
-.modal{background:var(--bg2);border:1px solid var(--border);border-radius:8px;max-width:700px;width:100%;max-height:85vh;overflow:auto;padding:20px}
-.modal h2{color:var(--blue);margin-bottom:15px;font-size:1.2em}
-.modal p,.modal li{color:var(--text2);font-size:.9em;line-height:1.7;margin-bottom:8px}
-.modal code{background:var(--bg4);padding:1px 5px;border-radius:3px;color:var(--cyan);font-size:.9em}
-.modal ul{padding-left:20px}
-
-.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
-.tag{display:inline-block;padding:2px 6px;border-radius:3px;font-size:.7em;font-weight:700}
-.tag-g{background:#1a3a1a;color:var(--green)}
-.tag-r{background:#3a1a1a;color:var(--red)}
-.tag-b{background:#1a2a3a;color:var(--blue)}
-.tag-y{background:#2a2a1a;color:var(--orange)}
-.tag-p{background:#2a1a3a;color:var(--purple)}
-.muted{color:var(--text3);font-size:.8em}
-.mt-sm{margin-top:8px}.mb-sm{margin-bottom:8px}
-.w100{width:100%}
-.flex-c{display:flex;align-items:center;gap:6px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a12;color:#00ff88;font-family:'Courier New',monospace;overflow:hidden;height:100vh;width:100vw}
+.main-container{display:grid;grid-template-columns:280px 1fr 320px;grid-template-rows:48px 1fr 200px;height:100vh;gap:2px;background:#111}
+.header{grid-column:1/-1;background:linear-gradient(90deg,#0a1628,#162040,#0a1628);display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid #1a3a5c}
+.header h1{font-size:16px;color:#00ccff;text-shadow:0 0 10px #00ccff55;letter-spacing:3px}
+.header .status{display:flex;gap:15px;font-size:11px}
+.header .status span{padding:3px 10px;border-radius:3px}
+.status-active{background:#00ff8822;border:1px solid #00ff88;color:#00ff88}
+.status-alert{background:#ff440022;border:1px solid #ff4400;color:#ff4400;animation:blink 1s infinite}
+.status-normal{background:#00ccff22;border:1px solid #00ccff;color:#00ccff}
+@keyframes blink{50%{opacity:.5}}
+.left-panel{background:#0d1117;border-right:1px solid #1a2a3c;overflow-y:auto;padding:8px;font-size:10px}
+.right-panel{background:#0d1117;border-left:1px solid #1a2a3c;overflow-y:auto;padding:8px;font-size:10px}
+.bottom-panel{grid-column:1/-1;background:#0d1117;border-top:1px solid #1a2a3c;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:2px;padding:4px}
+.main-view{position:relative;background:#080c14;overflow:hidden}
+canvas{position:absolute;top:0;left:0}
+.panel-title{color:#00ccff;font-size:11px;padding:4px 8px;background:#0a1a2a;margin-bottom:4px;border-left:3px solid #00ccff;letter-spacing:1px;text-transform:uppercase}
+.section{margin-bottom:8px;background:#0a0f18;border:1px solid #1a2a3c;border-radius:3px;overflow:hidden}
+.param-row{display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid #0d1a28}
+.param-row:last-child{border:none}
+.param-label{color:#668899}
+.param-value{color:#00ff88;font-weight:bold}
+.param-value.danger{color:#ff4444}
+.param-value.warning{color:#ffaa00}
+.slider-row{padding:4px 8px}
+.slider-row label{display:block;color:#668899;margin-bottom:2px;font-size:9px}
+.slider-row input[type=range]{width:100%;height:4px;-webkit-appearance:none;background:#1a2a3c;border-radius:2px;outline:none}
+.slider-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;background:#00ccff;border-radius:50%;cursor:pointer}
+button{background:#0a2a4a;color:#00ccff;border:1px solid #00ccff44;padding:5px 12px;cursor:pointer;font-family:inherit;font-size:10px;border-radius:3px;transition:all .2s}
+button:hover{background:#0a3a6a;border-color:#00ccff}
+button.danger{border-color:#ff4444;color:#ff4444}
+button.danger:hover{background:#3a0a0a}
+button.active{background:#00ccff33;border-color:#00ccff}
+.log-area{height:100%;overflow-y:auto;font-size:9px;padding:4px;background:#060a10}
+.log-entry{padding:2px 4px;border-bottom:1px solid #0a1018}
+.log-entry.intercept{color:#00ff88}
+.log-entry.launch{color:#00ccff}
+.log-entry.miss{color:#ff4444}
+.log-entry.warning{color:#ffaa00}
+.log-entry.ai{color:#cc88ff}
+.track-item{padding:4px 6px;margin:2px 0;background:#0a1420;border:1px solid #1a2a3c;border-radius:2px;cursor:pointer}
+.track-item:hover{border-color:#00ccff}
+.track-item.hostile{border-left:3px solid #ff4444}
+.track-item.friendly{border-left:3px solid #00ff88}
+.track-item.unknown{border-left:3px solid #ffaa00}
+.threat-bar{height:3px;background:#1a2a3c;border-radius:2px;margin-top:2px}
+.threat-fill{height:100%;border-radius:2px;transition:width .3s}
+.btn-row{display:flex;gap:4px;padding:4px 8px;flex-wrap:wrap}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;padding:4px}
+.stat-box{background:#0a1420;padding:6px;text-align:center;border:1px solid #1a2a3c;border-radius:3px}
+.stat-number{font-size:18px;font-weight:bold;color:#00ccff}
+.stat-label{font-size:8px;color:#668899;margin-top:2px}
+.ai-status{padding:4px 8px}
+.ai-meter{display:flex;align-items:center;gap:6px;margin:3px 0}
+.ai-meter-bar{flex:1;height:6px;background:#1a2a3c;border-radius:3px;overflow:hidden}
+.ai-meter-fill{height:100%;transition:width .5s;border-radius:3px}
+.ai-meter-label{width:60px;font-size:9px;color:#668899}
+.ai-meter-val{width:35px;font-size:9px;color:#00ff88;text-align:right}
+.controls-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:4px}
+.mini-chart{height:60px;background:#060a10;border:1px solid #1a2a3c;border-radius:3px;padding:2px}
+.tab-bar{display:flex;gap:1px;background:#0a1018;padding:2px}
+.tab{flex:1;text-align:center;padding:4px;cursor:pointer;font-size:9px;color:#668899;background:#0d1420;transition:all .2s}
+.tab.active{color:#00ccff;background:#0a2040;border-bottom:2px solid #00ccff}
+.network-viz{padding:4px;text-align:center;font-size:9px;color:#668899}
+select{background:#0a1a2a;color:#00ccff;border:1px solid #1a3a5c;padding:3px 6px;font-family:inherit;font-size:10px;border-radius:3px;outline:none}
+.checkbox-row{padding:3px 8px;display:flex;align-items:center;gap:6px}
+.checkbox-row input{accent-color:#00ccff}
+.tooltip{position:absolute;background:#0a1a2aee;border:1px solid #00ccff;padding:6px 10px;font-size:10px;border-radius:4px;pointer-events:none;z-index:100;max-width:220px}
 </style>
 </head>
 <body>
+<div class="main-container">
 
-<div id="toast" class="toast"></div>
-<div id="modalBg" class="modal-bg" onclick="if(event.target===this)closeModal()">
-  <div class="modal" id="modalContent"></div>
-</div>
-
-<div class="wrap">
-
-<div class="hdr">
-  <span style="font-size:1.5em">🌀</span>
-  <h1>Spiral Lattice Cipher</h1>
-  <span class="badge badge-g">v4.0</span>
-  <span class="badge badge-b">Reversible ✓</span>
-  <div class="hdr-right">
-    <button class="btn btn-sm btn-b" onclick="showHelp()">📖 Help</button>
-    <button class="btn btn-sm btn-p" onclick="runFullTest()">🧪 Test</button>
-    <button class="btn btn-sm btn-y" onclick="exportPuzzle()">📤 Export</button>
+<div class="header">
+  <h1>⬡ AEGIS-AI ПРОТИВОРАКЕТНАЯ ОБОРОНА v3.7</h1>
+  <div class="status">
+    <span id="sysStatus" class="status-active">● СИСТЕМА АКТИВНА</span>
+    <span id="aiStatus" class="status-normal">◆ AI ONLINE</span>
+    <span id="threatStatus" class="status-normal">▲ УГРОЗА: НЕТ</span>
+    <span id="timeDisplay" class="status-normal">T+0000.0s</span>
   </div>
 </div>
 
-<div class="layout">
-
-<!-- LEFT -->
-<div class="col">
-
-  <div class="pnl">
-    <div class="pnl-hd">🔑 Configuration</div>
-    <div class="pnl-bd">
-      <div class="fg">
-        <label>Secret Key</label>
-        <div class="row">
-          <input type="text" id="inKey" value="ENIGMA" maxlength="30" oninput="rebuild()" spellcheck="false">
-          <button class="btn btn-sm btn-b" onclick="randomKey()" style="flex:0 0 40px">🎲</button>
-        </div>
-      </div>
-      <div class="row">
-        <div class="fg">
-          <label>Alphabet</label>
-          <select id="selAlpha" onchange="rebuild()">
-            <option value="EN">English A-Z</option>
-            <option value="EN_NUM">English+Digits</option>
-            <option value="RU">Russian А-Я</option>
-            <option value="CUSTOM">Custom…</option>
-          </select>
-        </div>
-        <div class="fg">
-          <label>Rounds</label>
-          <select id="selRounds" onchange="rebuild()">
-            <option value="1">1</option>
-            <option value="2" selected>2</option>
-            <option value="3">3</option>
-          </select>
-        </div>
-      </div>
-      <div class="fg" id="customWrap" style="display:none">
-        <label>Custom Alphabet</label>
-        <input type="text" id="inCustom" placeholder="Unique chars…" oninput="rebuild()" spellcheck="false">
-      </div>
-      <div class="row">
-        <div class="fg">
-          <label>Feistel F(x)</label>
-          <select id="selF" onchange="rebuild()">
-            <option value="quad">x² + k</option>
-            <option value="cube">x³ + k</option>
-            <option value="mix">x²+xk+1</option>
-          </select>
-        </div>
-        <div class="fg">
-          <label>Feedback</label>
-          <select id="selFB" onchange="rebuild()">
-            <option value="cipher">Ciphertext</option>
-            <option value="plain">Plaintext</option>
-            <option value="both">Combined</option>
-          </select>
-        </div>
-      </div>
+<div class="left-panel">
+  <div class="section">
+    <div class="panel-title">⚙ Управление симуляцией</div>
+    <div class="btn-row">
+      <button id="btnStart" onclick="toggleSimulation()">▶ СТАРТ</button>
+      <button id="btnReset" onclick="resetSimulation()">⟳ СБРОС</button>
+      <button onclick="launchWave()">🚀 ВОЛНА</button>
+      <button onclick="launchSingle()">● ОДНА</button>
     </div>
-    <div class="pnl-ft"><div class="stats" id="statsRow"></div></div>
-  </div>
-
-  <div class="pnl">
-    <div class="pnl-hd">🔤 Cipher Alphabet</div>
-    <div class="pnl-bd"><div class="alpha" id="alphaDisp"></div></div>
-  </div>
-
-  <div class="pnl">
-    <div class="pnl-hd">📐 Grid <span class="muted" style="margin-left:auto" id="gridDims"></span></div>
-    <div class="pnl-bd">
-      <div id="gridDisp"></div>
-      <div class="help mt-sm">Green=source, Red=destination in step view.</div>
+    <div class="slider-row">
+      <label>Скорость симуляции: <span id="simSpeedVal">1.0</span>x</label>
+      <input type="range" min="0.1" max="5" step="0.1" value="1" oninput="simSpeed=+this.value;document.getElementById('simSpeedVal').textContent=this.value">
+    </div>
+    <div class="slider-row">
+      <label>Интервал атак: <span id="atkIntervalVal">5</span>с</label>
+      <input type="range" min="1" max="30" step="1" value="5" id="atkInterval" oninput="document.getElementById('atkIntervalVal').textContent=this.value">
+    </div>
+    <div class="slider-row">
+      <label>Ракет в волне: <span id="waveCountVal">5</span></label>
+      <input type="range" min="1" max="20" step="1" value="5" id="waveCount" oninput="document.getElementById('waveCountVal').textContent=this.value">
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="autoWaves" checked><label for="autoWaves">Авто-волны</label>
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="aiEnabled" checked><label for="aiEnabled">AI управление</label>
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="showTrails" checked><label for="showTrails">Следы траекторий</label>
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="showPredictions" checked><label for="showPredictions">Прогнозы AI</label>
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="showZones" checked><label for="showZones">Зоны поражения</label>
     </div>
   </div>
 
+  <div class="section">
+    <div class="panel-title">🎯 Параметры ракет противника</div>
+    <div class="slider-row">
+      <label>Мин. скорость: <span id="minSpdVal">200</span> м/с</label>
+      <input type="range" min="100" max="1000" step="50" value="200" id="minSpd" oninput="document.getElementById('minSpdVal').textContent=this.value">
+    </div>
+    <div class="slider-row">
+      <label>Макс. скорость: <span id="maxSpdVal">800</span> м/с</label>
+      <input type="range" min="200" max="3000" step="50" value="800" id="maxSpd" oninput="document.getElementById('maxSpdVal').textContent=this.value">
+    </div>
+    <div class="slider-row">
+      <label>Типы траекторий:</label>
+    </div>
+    <div class="checkbox-row"><input type="checkbox" id="trajBallistic" checked><label for="trajBallistic">Баллистические</label></div>
+    <div class="checkbox-row"><input type="checkbox" id="trajCruise" checked><label for="trajCruise">Крылатые</label></div>
+    <div class="checkbox-row"><input type="checkbox" id="trajManeuvering" checked><label for="trajManeuvering">Маневрирующие</label></div>
+    <div class="checkbox-row"><input type="checkbox" id="trajHypersonic"><label for="trajHypersonic">Гиперзвуковые</label></div>
+  </div>
+
+  <div class="section">
+    <div class="panel-title">🛡 Параметры ПРО</div>
+    <div class="slider-row">
+      <label>Кол-во ПУ: <span id="launcherCountVal">4</span></label>
+      <input type="range" min="1" max="8" step="1" value="4" id="launcherCount" oninput="updateLaunchers(+this.value);document.getElementById('launcherCountVal').textContent=this.value">
+    </div>
+    <div class="slider-row">
+      <label>Ракет на ПУ: <span id="missilesPerVal">8</span></label>
+      <input type="range" min="2" max="16" step="1" value="8" id="missilesPerLauncher" oninput="document.getElementById('missilesPerVal').textContent=this.value">
+    </div>
+    <div class="slider-row">
+      <label>Скорость перехватчика: <span id="intSpdVal">1200</span> м/с</label>
+      <input type="range" min="400" max="4000" step="100" value="1200" id="interceptorSpeed" oninput="document.getElementById('intSpdVal').textContent=this.value">
+    </div>
+    <div class="slider-row">
+      <label>Перезарядка: <span id="reloadVal">3</span>с</label>
+      <input type="range" min="1" max="15" step="0.5" value="3" id="reloadTime" oninput="document.getElementById('reloadVal').textContent=this.value">
+    </div>
+    <div class="slider-row">
+      <label>Радиус поражения: <span id="killRadVal">30</span>м</label>
+      <input type="range" min="5" max="100" step="5" value="30" id="killRadius" oninput="document.getElementById('killRadVal').textContent=this.value">
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="panel-title">🧠 Параметры AI</div>
+    <div class="slider-row">
+      <label>Скорость обучения: <span id="lrVal">0.001</span></label>
+      <input type="range" min="0.0001" max="0.01" step="0.0001" value="0.001" id="learningRate" oninput="document.getElementById('lrVal').textContent=(+this.value).toFixed(4)">
+    </div>
+    <div class="slider-row">
+      <label>Горизонт прогноза: <span id="horizonVal">3</span>с</label>
+      <input type="range" min="1" max="10" step="0.5" value="3" id="predHorizon" oninput="document.getElementById('horizonVal').textContent=this.value">
+    </div>
+    <div class="slider-row">
+      <label>Порог уверенности: <span id="confThreshVal">0.6</span></label>
+      <input type="range" min="0.1" max="0.95" step="0.05" value="0.6" id="confThreshold" oninput="document.getElementById('confThreshVal').textContent=this.value">
+    </div>
+    <div class="btn-row">
+      <button onclick="resetAI()">⟳ Сброс AI</button>
+      <button onclick="trainBatch()">⚡ Обучить</button>
+    </div>
+  </div>
 </div>
 
-<!-- CENTER -->
-<div class="col">
-
-  <div class="pnl">
-    <div class="pnl-hd">📝 Encrypt / Decrypt</div>
-    <div class="pnl-bd">
-      <div class="fg">
-        <label>Input</label>
-        <textarea id="inText" rows="3" placeholder="Enter text…">HELLO WORLD</textarea>
-      </div>
-      <div class="btns-grid">
-        <button class="btn btn-g" onclick="doProc(true)">🔒 Encrypt</button>
-        <button class="btn btn-r" onclick="doProc(false)">🔓 Decrypt</button>
-      </div>
-      <div class="fg mt-sm">
-        <label>Output</label>
-        <div class="out" id="outBox">
-          <span class="cbtn" onclick="copyOut()">📋</span>
-          <span id="outText">—</span>
-        </div>
-      </div>
-      <div class="btns mt-sm">
-        <button class="btn btn-sm" onclick="swapIO()">⇄ Swap</button>
-        <button class="btn btn-sm" onclick="clearIO()">✕ Clear</button>
-        <button class="btn btn-sm btn-b" onclick="doProc(true);doVerify()">⚡ Encrypt+Verify</button>
-      </div>
-      <div id="procInfo" class="muted mt-sm"></div>
-    </div>
-  </div>
-
-  <div class="pnl">
-    <div class="pnl-hd">🔍 Step-by-Step Trace</div>
-    <div class="pnl-bd">
-      <div class="tabs">
-        <div class="tab on" onclick="stab(this,'stTrace')">Table</div>
-        <div class="tab" onclick="stab(this,'stGrid')">Grid View</div>
-        <div class="tab" onclick="stab(this,'stForm')">Formulas</div>
-      </div>
-      <div class="tc on" id="stTrace">
-        <div class="tscroll"><table class="tbl" id="traceTbl"><thead id="traceHd"></thead><tbody id="traceTb"></tbody></table></div>
-      </div>
-      <div class="tc" id="stGrid">
-        <div class="fg">
-          <div class="row">
-            <button class="btn btn-sm" onclick="trStep(-1)">◀ Prev</button>
-            <span id="trInfo" class="flex-c" style="justify-content:center">—</span>
-            <button class="btn btn-sm" onclick="trStep(1)">Next ▶</button>
-          </div>
-        </div>
-        <div id="trGridVis"></div>
-        <div id="trDetail" class="muted mt-sm"></div>
-      </div>
-      <div class="tc" id="stForm"><div id="formDisp" style="background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:12px;font-size:.85em;line-height:2"></div></div>
-    </div>
-  </div>
-
+<div class="main-view" id="mainView">
+  <canvas id="bgCanvas"></canvas>
+  <canvas id="mainCanvas"></canvas>
+  <canvas id="uiCanvas"></canvas>
 </div>
 
-<!-- RIGHT -->
-<div class="col">
+<div class="right-panel">
+  <div class="section">
+    <div class="panel-title">📊 Статистика</div>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-number" id="statLaunched">0</div><div class="stat-label">АТАК.РАКЕТ</div></div>
+      <div class="stat-box"><div class="stat-number" id="statIntercepted">0</div><div class="stat-label">ПЕРЕХВАЧЕНО</div></div>
+      <div class="stat-box"><div class="stat-number" id="statMissed">0</div><div class="stat-label">ПРОПУЩЕНО</div></div>
+      <div class="stat-box"><div class="stat-number" id="statAccuracy">0%</div><div class="stat-label">ТОЧНОСТЬ</div></div>
+      <div class="stat-box"><div class="stat-number" id="statFired">0</div><div class="stat-label">ВЫПУЩЕНО ПРО</div></div>
+      <div class="stat-box"><div class="stat-number" id="statEfficiency">0%</div><div class="stat-label">ЭФФЕКТИВНОСТЬ</div></div>
+    </div>
+  </div>
 
-  <div class="pnl">
-    <div class="pnl-hd">📊 Frequency</div>
-    <div class="pnl-bd">
-      <div class="tabs">
-        <div class="tab on" onclick="stab(this,'fIn')">Input</div>
-        <div class="tab" onclick="stab(this,'fOut')">Output</div>
-        <div class="tab" onclick="stab(this,'fCmp')">Compare</div>
+  <div class="section">
+    <div class="panel-title">🎯 Активные цели</div>
+    <div id="trackList" style="max-height:180px;overflow-y:auto"></div>
+  </div>
+
+  <div class="section">
+    <div class="panel-title">🧠 AI Transformer</div>
+    <div class="ai-status">
+      <div class="ai-meter">
+        <span class="ai-meter-label">Уверенность</span>
+        <div class="ai-meter-bar"><div class="ai-meter-fill" id="aiConfBar" style="width:0%;background:#00ccff"></div></div>
+        <span class="ai-meter-val" id="aiConfVal">0%</span>
       </div>
-      <div class="tc on" id="fIn"><div id="freqIn" class="freq-bar"></div></div>
-      <div class="tc" id="fOut"><div id="freqOut" class="freq-bar"></div></div>
-      <div class="tc" id="fCmp"><div id="freqCmp"></div></div>
+      <div class="ai-meter">
+        <span class="ai-meter-label">Loss</span>
+        <div class="ai-meter-bar"><div class="ai-meter-fill" id="aiLossBar" style="width:50%;background:#ff8800"></div></div>
+        <span class="ai-meter-val" id="aiLossVal">1.00</span>
+      </div>
+      <div class="ai-meter">
+        <span class="ai-meter-label">Эпохи</span>
+        <div class="ai-meter-bar"><div class="ai-meter-fill" id="aiEpochBar" style="width:0%;background:#cc88ff"></div></div>
+        <span class="ai-meter-val" id="aiEpochVal">0</span>
+      </div>
+      <div class="ai-meter">
+        <span class="ai-meter-label">Нагрузка</span>
+        <div class="ai-meter-bar"><div class="ai-meter-fill" id="aiLoadBar" style="width:0%;background:#00ff88"></div></div>
+        <span class="ai-meter-val" id="aiLoadVal">0%</span>
+      </div>
     </div>
   </div>
 
-  <div class="pnl">
-    <div class="pnl-hd">💥 Avalanche</div>
-    <div class="pnl-bd">
-      <div class="help mb-sm">One letter change → cascade effect.</div>
-      <button class="btn btn-sm btn-y w100" onclick="showAval()">Run Test</button>
-      <div id="avalRes" class="mt-sm"></div>
-    </div>
+  <div class="section">
+    <div class="panel-title">🚀 Пусковые установки</div>
+    <div id="launcherStatus"></div>
   </div>
 
-  <div class="pnl">
-    <div class="pnl-hd">✅ Reversibility</div>
-    <div class="pnl-bd">
-      <button class="btn btn-sm btn-g w100 mb-sm" onclick="runFullTest()">Run Full Test</button>
-      <div id="testRes"></div>
-    </div>
+  <div class="section">
+    <div class="panel-title">📡 Радар</div>
+    <div class="param-row"><span class="param-label">Дальность</span><span class="param-value" id="radarRange">150 км</span></div>
+    <div class="param-row"><span class="param-label">Обновление</span><span class="param-value" id="radarUpdate">100 мс</span></div>
+    <div class="param-row"><span class="param-label">Целей</span><span class="param-value" id="radarTargets">0</span></div>
+    <div class="param-row"><span class="param-label">СНР</span><span class="param-value" id="radarSNR">--</span></div>
   </div>
-
-  <div class="pnl">
-    <div class="pnl-hd">📋 Reference</div>
-    <div class="pnl-bd" style="font-size:.8em;color:var(--text2);line-height:1.8">
-      <div><span class="tag tag-g">Feistel</span> Bijective grid permutation</div>
-      <div><span class="tag tag-b">Shift</span> Position-dependent offset</div>
-      <div><span class="tag tag-y">Feedback</span> Output chains to next step</div>
-      <div><span class="tag tag-p">Cycle-walk</span> Ensures domain [0,N)</div>
-      <hr class="sep">
-      <div>4-round unbalanced Feistel + cycle-walking = guaranteed bijection on any alphabet size.</div>
-    </div>
-  </div>
-
 </div>
+
+<div class="bottom-panel">
+  <div class="section" style="grid-row:span 1">
+    <div class="panel-title">📈 График перехватов</div>
+    <canvas id="chartIntercepts" class="mini-chart" style="width:100%;height:100%"></canvas>
+  </div>
+  <div class="section">
+    <div class="panel-title">📉 Loss AI</div>
+    <canvas id="chartLoss" class="mini-chart" style="width:100%;height:100%"></canvas>
+  </div>
+  <div class="section">
+    <div class="panel-title">🧠 Активность нейронов</div>
+    <canvas id="chartNeurons" class="mini-chart" style="width:100%;height:100%"></canvas>
+  </div>
+  <div class="section">
+    <div class="panel-title">📋 Журнал событий</div>
+    <div class="log-area" id="logArea"></div>
+  </div>
 </div>
+
 </div>
 
 <script>
-// ════════════════════════════════════════════════════
-//  SPIRAL LATTICE CIPHER ENGINE v4
-//  Fixed: proper 4-round unbalanced Feistel with
-//  mathematically verified inverse
-// ════════════════════════════════════════════════════
+// ============================================================
+// MATH UTILITIES
+// ============================================================
+const {sin,cos,sqrt,atan2,PI,abs,min,max,floor,random,exp,log,pow,hypot,round,sign,tanh}=Math;
+const TAU=PI*2;
+const rand=(a=0,b=1)=>a+(b-a)*random();
+const randInt=(a,b)=>floor(rand(a,b+1));
+const clamp=(v,lo,hi)=>max(lo,min(hi,v));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const dist=(a,b)=>hypot(a.x-b.x,a.y-b.y);
+const normalize=(v)=>{const m=hypot(v.x,v.y)||1;return{x:v.x/m,y:v.y/m}};
+const vec2=(x,y)=>({x,y});
 
-const ALPHAS = {
-  EN:     "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-  EN_NUM: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-  RU:     "АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ",
+// ============================================================
+// TENSOR OPERATIONS (minimal neural net framework)
+// ============================================================
+class Tensor {
+  constructor(rows, cols, data=null) {
+    this.rows=rows; this.cols=cols;
+    this.data=data||new Float32Array(rows*cols);
+  }
+  static zeros(r,c){return new Tensor(r,c)}
+  static rand(r,c,scale=0.1){
+    const t=new Tensor(r,c);
+    const s=scale/sqrt(c);
+    for(let i=0;i<t.data.length;i++)t.data[i]=(random()-0.5)*2*s;
+    return t;
+  }
+  static fromArray(arr){
+    if(Array.isArray(arr[0])){
+      const r=arr.length,c=arr[0].length,t=new Tensor(r,c);
+      for(let i=0;i<r;i++)for(let j=0;j<c;j++)t.data[i*c+j]=arr[i][j];
+      return t;
+    }
+    const t=new Tensor(1,arr.length);
+    for(let i=0;i<arr.length;i++)t.data[i]=arr[i];
+    return t;
+  }
+  get(i,j){return this.data[i*this.cols+j]}
+  set(i,j,v){this.data[i*this.cols+j]=v}
+  clone(){return new Tensor(this.rows,this.cols,new Float32Array(this.data))}
+  add(other){
+    const r=new Tensor(this.rows,this.cols);
+    if(other.rows===1&&this.rows>1){
+      for(let i=0;i<this.rows;i++)for(let j=0;j<this.cols;j++)r.data[i*this.cols+j]=this.data[i*this.cols+j]+other.data[j];
+    } else {
+      for(let i=0;i<this.data.length;i++)r.data[i]=this.data[i]+other.data[i];
+    }
+    return r;
+  }
+  sub(other){
+    const r=new Tensor(this.rows,this.cols);
+    for(let i=0;i<this.data.length;i++)r.data[i]=this.data[i]-other.data[i];
+    return r;
+  }
+  mul(s){const r=new Tensor(this.rows,this.cols);for(let i=0;i<this.data.length;i++)r.data[i]=this.data[i]*s;return r}
+  elementMul(other){const r=new Tensor(this.rows,this.cols);for(let i=0;i<this.data.length;i++)r.data[i]=this.data[i]*other.data[i];return r}
+  matmul(other){
+    const r=new Tensor(this.rows,other.cols);
+    for(let i=0;i<this.rows;i++)for(let j=0;j<other.cols;j++){
+      let s=0;for(let k=0;k<this.cols;k++)s+=this.data[i*this.cols+k]*other.data[k*other.cols+j];
+      r.data[i*other.cols+j]=s;
+    }
+    return r;
+  }
+  transpose(){
+    const r=new Tensor(this.cols,this.rows);
+    for(let i=0;i<this.rows;i++)for(let j=0;j<this.cols;j++)r.data[j*this.rows+i]=this.data[i*this.cols+j];
+    return r;
+  }
+  relu(){const r=new Tensor(this.rows,this.cols);for(let i=0;i<this.data.length;i++)r.data[i]=max(0,this.data[i]);return r}
+  gelu(){
+    const r=new Tensor(this.rows,this.cols);
+    for(let i=0;i<this.data.length;i++){
+      const x=this.data[i];
+      r.data[i]=0.5*x*(1+tanh(sqrt(2/PI)*(x+0.044715*x*x*x)));
+    }
+    return r;
+  }
+  sigmoid(){const r=new Tensor(this.rows,this.cols);for(let i=0;i<this.data.length;i++)r.data[i]=1/(1+exp(-this.data[i]));return r}
+  tanhAct(){const r=new Tensor(this.rows,this.cols);for(let i=0;i<this.data.length;i++)r.data[i]=tanh(this.data[i]);return r}
+  softmax(){
+    const r=new Tensor(this.rows,this.cols);
+    for(let i=0;i<this.rows;i++){
+      let mx=-1e9;
+      for(let j=0;j<this.cols;j++)mx=max(mx,this.get(i,j));
+      let s=0;
+      for(let j=0;j<this.cols;j++){const e=exp(this.get(i,j)-mx);r.set(i,j,e);s+=e;}
+      for(let j=0;j<this.cols;j++)r.set(i,j,r.get(i,j)/s);
+    }
+    return r;
+  }
+  layerNorm(gamma,beta){
+    const r=new Tensor(this.rows,this.cols);
+    for(let i=0;i<this.rows;i++){
+      let mean=0;for(let j=0;j<this.cols;j++)mean+=this.get(i,j);mean/=this.cols;
+      let variance=0;for(let j=0;j<this.cols;j++){const d=this.get(i,j)-mean;variance+=d*d;}variance/=this.cols;
+      const std=sqrt(variance+1e-5);
+      for(let j=0;j<this.cols;j++)r.set(i,j,(this.get(i,j)-mean)/std*(gamma?gamma.data[j]:1)+(beta?beta.data[j]:0));
+    }
+    return r;
+  }
+  meanAll(){let s=0;for(let i=0;i<this.data.length;i++)s+=this.data[i];return s/this.data.length}
+  row(i){const r=new Tensor(1,this.cols);for(let j=0;j<this.cols;j++)r.data[j]=this.data[i*this.cols+j];return r}
+  sumRows(){const r=new Tensor(1,this.cols);for(let i=0;i<this.rows;i++)for(let j=0;j<this.cols;j++)r.data[j]+=this.data[i*this.cols+j];return r}
+}
+
+// ============================================================
+// WORLD MODEL TRANSFORMER
+// ============================================================
+class TransformerLayer {
+  constructor(dim, heads) {
+    this.dim=dim; this.heads=heads; this.headDim=dim/heads;
+    this.Wq=Tensor.rand(dim,dim,0.02);
+    this.Wk=Tensor.rand(dim,dim,0.02);
+    this.Wv=Tensor.rand(dim,dim,0.02);
+    this.Wo=Tensor.rand(dim,dim,0.02);
+    this.bq=Tensor.zeros(1,dim);
+    this.bk=Tensor.zeros(1,dim);
+    this.bv=Tensor.zeros(1,dim);
+    this.bo=Tensor.zeros(1,dim);
+    this.ln1g=new Tensor(1,dim);this.ln1g.data.fill(1);
+    this.ln1b=Tensor.zeros(1,dim);
+    this.ff1=Tensor.rand(dim,dim*4,0.02);
+    this.ff1b=Tensor.zeros(1,dim*4);
+    this.ff2=Tensor.rand(dim*4,dim,0.02);
+    this.ff2b=Tensor.zeros(1,dim);
+    this.ln2g=new Tensor(1,dim);this.ln2g.data.fill(1);
+    this.ln2b=Tensor.zeros(1,dim);
+    this.attentionWeights=null;
+  }
+  forward(x) {
+    const n=x.rows, d=this.dim, h=this.heads, hd=this.headDim;
+    // LN1
+    const normed=x.layerNorm(this.ln1g,this.ln1b);
+    // QKV
+    const Q=normed.matmul(this.Wq).add(this.bq);
+    const K=normed.matmul(this.Wk).add(this.bk);
+    const V=normed.matmul(this.Wv).add(this.bv);
+    // Multi-head attention (simplified single-head for perf)
+    const scale=1/sqrt(d);
+    const scores=Q.matmul(K.transpose()).mul(scale);
+    const attn=scores.softmax();
+    this.attentionWeights=attn;
+    const attended=attn.matmul(V);
+    const projected=attended.matmul(this.Wo).add(this.bo);
+    const residual1=x.add(projected);
+    // LN2 + FFN
+    const normed2=residual1.layerNorm(this.ln2g,this.ln2b);
+    const ff=normed2.matmul(this.ff1).add(this.ff1b).gelu();
+    const ffOut=ff.matmul(this.ff2).add(this.ff2b);
+    return residual1.add(ffOut);
+  }
+  getParams(){return[this.Wq,this.Wk,this.Wv,this.Wo,this.bq,this.bk,this.bv,this.bo,this.ff1,this.ff1b,this.ff2,this.ff2b,this.ln1g,this.ln1b,this.ln2g,this.ln2b]}
+}
+
+class WorldModelTransformer {
+  constructor() {
+    this.inputDim=16;   // [x,y,vx,vy,ax,ay,speed,heading,dist,threat,type,age,covX,covY,isManeuv,timeNorm]
+    this.embedDim=32;
+    this.nHeads=4;
+    this.nLayers=2;
+    this.outputDim=6; // [priority, nMissiles, launchTimeOffset, interceptX, interceptY, confidence]
+
+    // Input embedding
+    this.inputProj=Tensor.rand(this.inputDim,this.embedDim,0.1);
+    this.inputBias=Tensor.zeros(1,this.embedDim);
+
+    // Context embedding (system state)
+    this.contextDim=8; // [readyMissiles, totalLaunchers, activeTracks, threatLevel, avgDist, time, interceptorSpeed, reloadPct]
+    this.contextProj=Tensor.rand(this.contextDim,this.embedDim,0.1);
+    this.contextBias=Tensor.zeros(1,this.embedDim);
+
+    // Transformer layers
+    this.layers=[];
+    for(let i=0;i<this.nLayers;i++)this.layers.push(new TransformerLayer(this.embedDim,this.nHeads));
+
+    // World Model Head - trajectory prediction
+    this.worldHead1=Tensor.rand(this.embedDim,this.embedDim,0.1);
+    this.worldHead1b=Tensor.zeros(1,this.embedDim);
+    this.worldHead2=Tensor.rand(this.embedDim,4,0.1); // predX, predY, predVX, predVY
+    this.worldHead2b=Tensor.zeros(1,4);
+
+    // Policy Head - action decisions
+    this.policyHead1=Tensor.rand(this.embedDim,this.embedDim,0.1);
+    this.policyHead1b=Tensor.zeros(1,this.embedDim);
+    this.policyHead2=Tensor.rand(this.embedDim,this.outputDim,0.1);
+    this.policyHead2b=Tensor.zeros(1,this.outputDim);
+
+    // Final LayerNorm
+    this.finalLNg=new Tensor(1,this.embedDim);this.finalLNg.data.fill(1);
+    this.finalLNb=Tensor.zeros(1,this.embedDim);
+
+    // Training state
+    this.trainEpoch=0;
+    this.totalLoss=1.0;
+    this.replayBuffer=[];
+    this.maxReplay=2000;
+    this.confidence=0;
+    this.lastInferenceTime=0;
+  }
+
+  encodeTargets(targets, systemState, time) {
+    if(targets.length===0) return null;
+    // Build target features
+    const features=[];
+    for(const t of targets) {
+      const d=hypot(t.x-BASE.x,t.y-BASE.y);
+      const spd=hypot(t.vx,t.vy);
+      const heading=atan2(t.vy,t.vx);
+      features.push([
+        t.x/WORLD_SIZE, t.y/WORLD_SIZE,
+        t.vx/1000, t.vy/1000,
+        (t.ax||0)/100, (t.ay||0)/100,
+        spd/1000, heading/PI,
+        d/WORLD_SIZE, t.threat||0.5,
+        t.type/3, (time-t.spawnTime)/60,
+        (t.covX||1)/100, (t.covY||1)/100,
+        t.maneuvering?1:0, time/300
+      ]);
+    }
+    return Tensor.fromArray(features);
+  }
+
+  encodeContext(systemState) {
+    return Tensor.fromArray([[
+      systemState.readyMissiles/32,
+      systemState.totalLaunchers/8,
+      systemState.activeTracks/20,
+      systemState.threatLevel,
+      systemState.avgDistance/WORLD_SIZE,
+      systemState.time/300,
+      systemState.interceptorSpeed/3000,
+      systemState.reloadPct
+    ]]);
+  }
+
+  forward(targetFeatures, contextFeatures) {
+    const t0=performance.now();
+    const n=targetFeatures.rows;
+
+    // Embed targets
+    let embedded=targetFeatures.matmul(this.inputProj).add(this.inputBias);
+
+    // Embed context and add to all target embeddings
+    const ctxEmb=contextFeatures.matmul(this.contextProj).add(this.contextBias);
+    for(let i=0;i<n;i++){
+      for(let j=0;j<this.embedDim;j++){
+        embedded.data[i*this.embedDim+j]+=ctxEmb.data[j];
+      }
+    }
+
+    // Positional encoding (simple sinusoidal)
+    for(let i=0;i<n;i++){
+      for(let j=0;j<this.embedDim;j++){
+        const pe=j%2===0?sin(i/pow(10000,j/this.embedDim)):cos(i/pow(10000,(j-1)/this.embedDim));
+        embedded.data[i*this.embedDim+j]+=pe*0.1;
+      }
+    }
+
+    // Transformer layers
+    let h=embedded;
+    for(const layer of this.layers) h=layer.forward(h);
+
+    // Final norm
+    h=h.layerNorm(this.finalLNg,this.finalLNb);
+
+    // World Model Head (trajectory prediction)
+    const worldH=h.matmul(this.worldHead1).add(this.worldHead1b).gelu();
+    const worldPred=worldH.matmul(this.worldHead2).add(this.worldHead2b);
+
+    // Policy Head (decisions)
+    const policyH=h.matmul(this.policyHead1).add(this.policyHead1b).gelu();
+    const policyRaw=policyH.matmul(this.policyHead2).add(this.policyHead2b);
+
+    // Apply activations to policy output
+    const policy=new Tensor(n,this.outputDim);
+    for(let i=0;i<n;i++){
+      policy.set(i,0,1/(1+exp(-policyRaw.get(i,0)))); // priority [0,1]
+      policy.set(i,1,clamp(round(1+2/(1+exp(-policyRaw.get(i,1)))),1,3)); // nMissiles [1..3]
+      policy.set(i,2,policyRaw.get(i,2)*2); // launchTimeOffset
+      policy.set(i,3,policyRaw.get(i,3)*WORLD_SIZE); // interceptX
+      policy.set(i,4,policyRaw.get(i,4)*WORLD_SIZE); // interceptY
+      policy.set(i,5,1/(1+exp(-policyRaw.get(i,5)))); // confidence
+    }
+
+    this.lastInferenceTime=performance.now()-t0;
+    return {worldPred, policy, hiddenStates:h};
+  }
+
+  computeDecisions(targets, systemState, time) {
+    if(targets.length===0) return [];
+    const tf=this.encodeTargets(targets,systemState,time);
+    const cf=this.encodeContext(systemState);
+    if(!tf) return [];
+
+    const {worldPred,policy,hiddenStates}=this.forward(tf,cf);
+
+    const decisions=[];
+    let totalConf=0;
+    for(let i=0;i<targets.length;i++){
+      const priority=policy.get(i,0);
+      const conf=policy.get(i,5);
+      totalConf+=conf;
+
+      // Compute intercept point using world prediction
+      const predDx=worldPred.get(i,0)*1000;
+      const predDy=worldPred.get(i,1)*1000;
+      const t_=targets[i];
+
+      decisions.push({
+        targetId:t_.id,
+        target:t_,
+        priority,
+        nMissiles:policy.get(i,1),
+        launchTimeOffset:policy.get(i,2),
+        interceptX:t_.x+predDx*+document.getElementById('predHorizon').value,
+        interceptY:t_.y+predDy*+document.getElementById('predHorizon').value,
+        confidence:conf,
+        predVx:predDx,
+        predVy:predDy
+      });
+    }
+    this.confidence=targets.length>0?totalConf/targets.length:0;
+    return decisions.sort((a,b)=>b.priority-a.priority);
+  }
+
+  addExperience(exp) {
+    this.replayBuffer.push(exp);
+    if(this.replayBuffer.length>this.maxReplay)this.replayBuffer.shift();
+  }
+
+  train(batchSize=16) {
+    if(this.replayBuffer.length<batchSize) return;
+    const lr=+document.getElementById('learningRate').value;
+    let totalLoss=0;
+    const batch=[];
+    for(let i=0;i<batchSize;i++){
+      batch.push(this.replayBuffer[randInt(0,this.replayBuffer.length-1)]);
+    }
+
+    for(const exp of batch) {
+      // exp = {targetFeatures, actualOutcome, predictedIntercept, wasHit}
+      // Simple gradient-free optimization: perturb weights toward better outcomes
+      const reward = exp.wasHit ? 1.0 : -0.5;
+      const error = exp.interceptError || 0;
+
+      // Nudge policy weights based on outcome
+      const nudgeScale = lr * reward * 0.01;
+      this.perturbWeights(nudgeScale);
+      totalLoss += abs(error) + (exp.wasHit ? 0 : 1);
+    }
+
+    this.totalLoss = totalLoss / batchSize;
+    this.trainEpoch++;
+  }
+
+  perturbWeights(scale) {
+    const allParams = [
+      this.inputProj, this.inputBias,
+      this.contextProj, this.contextBias,
+      this.worldHead1, this.worldHead1b, this.worldHead2, this.worldHead2b,
+      this.policyHead1, this.policyHead1b, this.policyHead2, this.policyHead2b
+    ];
+    for(const layer of this.layers) allParams.push(...layer.getParams());
+
+    for(const p of allParams) {
+      for(let i=0;i<p.data.length;i++) {
+        p.data[i] += (random()-0.5)*scale;
+        // Weight clipping
+        p.data[i] = clamp(p.data[i], -2, 2);
+      }
+    }
+  }
+
+  // Evolution strategy training - more effective
+  trainES(batchSize=8) {
+    if(this.replayBuffer.length < 10) return;
+    const lr = +document.getElementById('learningRate').value;
+    const sigma = 0.02;
+
+    // Save current weights
+    const saved = this.saveWeights();
+
+    // Evaluate current performance
+    let baseReward = this.evaluateOnBuffer(min(batchSize, this.replayBuffer.length));
+
+    // Try perturbations
+    const noise = this.generateNoise(sigma);
+    this.applyNoise(noise, 1);
+    let plusReward = this.evaluateOnBuffer(min(batchSize, this.replayBuffer.length));
+
+    this.loadWeights(saved);
+    this.applyNoise(noise, -1);
+    let minusReward = this.evaluateOnBuffer(min(batchSize, this.replayBuffer.length));
+
+    // Update in direction of improvement
+    this.loadWeights(saved);
+    const advantage = (plusReward - minusReward) / (2 * sigma);
+    this.applyNoise(noise, lr * advantage);
+
+    this.totalLoss = max(0, 1 - (plusReward + minusReward) / 2);
+    this.trainEpoch++;
+  }
+
+  evaluateOnBuffer(n) {
+    let reward = 0;
+    const samples = [];
+    for(let i=0;i<n;i++) samples.push(this.replayBuffer[randInt(0,this.replayBuffer.length-1)]);
+
+    for(const exp of samples) {
+      if(exp.targetFeatures && exp.contextFeatures) {
+        try {
+          const tf = Tensor.fromArray([exp.targetFeatures]);
+          const cf = Tensor.fromArray([exp.contextFeatures]);
+          const {policy} = this.forward(tf, cf);
+
+          // Reward for correct predictions
+          const predPriority = policy.get(0, 0);
+          const actualThreat = exp.actualThreat || 0.5;
+          reward += 1 - abs(predPriority - actualThreat);
+
+          if(exp.wasHit) reward += 1;
+          else reward -= 0.3;
+
+          // Reward for intercept accuracy
+          if(exp.interceptError !== undefined) {
+            reward += max(0, 1 - exp.interceptError / 200);
+          }
+        } catch(e) {
+          // Skip bad samples
+        }
+      }
+    }
+    return reward / n;
+  }
+
+  generateNoise(sigma) {
+    const allParams = this.getAllParams();
+    const noise = [];
+    for(const p of allParams) {
+      const n = new Float32Array(p.data.length);
+      for(let i=0;i<n.length;i++) n[i] = (random()-0.5)*2*sigma;
+      noise.push(n);
+    }
+    return noise;
+  }
+
+  applyNoise(noise, scale) {
+    const allParams = this.getAllParams();
+    for(let p=0;p<allParams.length;p++) {
+      for(let i=0;i<allParams[p].data.length;i++) {
+        allParams[p].data[i] += noise[p][i] * scale;
+      }
+    }
+  }
+
+  getAllParams() {
+    const params = [
+      this.inputProj, this.inputBias,
+      this.contextProj, this.contextBias,
+      this.worldHead1, this.worldHead1b, this.worldHead2, this.worldHead2b,
+      this.policyHead1, this.policyHead1b, this.policyHead2, this.policyHead2b,
+      this.finalLNg, this.finalLNb
+    ];
+    for(const layer of this.layers) params.push(...layer.getParams());
+    return params;
+  }
+
+  saveWeights() {
+    return this.getAllParams().map(p=>new Float32Array(p.data));
+  }
+
+  loadWeights(saved) {
+    const params = this.getAllParams();
+    for(let i=0;i<params.length;i++) params[i].data = new Float32Array(saved[i]);
+  }
+}
+
+// ============================================================
+// IMM FILTER (Interacting Multiple Model)
+// ============================================================
+class IMMTracker {
+  constructor() {
+    this.tracks = new Map();
+    this.nextId = 1;
+  }
+
+  update(detections, dt) {
+    // Associate detections with existing tracks (nearest neighbor)
+    const unmatched = [...detections];
+    const matchedTracks = new Set();
+
+    for(const [id, track] of this.tracks) {
+      // Predict
+      track.predX = track.x + track.vx * dt;
+      track.predY = track.y + track.vy * dt;
+
+      // Find nearest detection
+      let bestDist = Infinity, bestIdx = -1;
+      for(let i=0;i<unmatched.length;i++) {
+        const d = hypot(unmatched[i].x - track.predX, unmatched[i].y - track.predY);
+        if(d < bestDist && d < 50) { bestDist = d; bestIdx = i; }
+      }
+
+      if(bestIdx >= 0) {
+        const det = unmatched.splice(bestIdx, 1)[0];
+        // Kalman-like update
+        const alpha = 0.7; // smoothing
+        track.vx = lerp(track.vx, (det.x - track.x)/dt, alpha);
+        track.vy = lerp(track.vy, (det.y - track.y)/dt, alpha);
+        track.ax = lerp(track.ax||0, (track.vx - (track.prevVx||track.vx))/dt, 0.3);
+        track.ay = lerp(track.ay||0, (track.vy - (track.prevVy||track.vy))/dt, 0.3);
+        track.prevVx = track.vx;
+        track.prevVy = track.vy;
+        track.x = det.x;
+        track.y = det.y;
+        track.age += dt;
+        track.lastSeen = 0;
+        // Innovation for covariance estimate
+        track.covX = lerp(track.covX, abs(det.x - track.predX), 0.2);
+        track.covY = lerp(track.covY, abs(det.y - track.predY), 0.2);
+        track.maneuvering = (abs(track.ax) > 5 || abs(track.ay) > 5);
+        matchedTracks.add(id);
+      } else {
+        track.x = track.predX;
+        track.y = track.predY;
+        track.lastSeen += dt;
+      }
+    }
+
+    // Remove lost tracks
+    for(const [id, track] of this.tracks) {
+      if(track.lastSeen > 3) this.tracks.delete(id);
+    }
+
+    // Create new tracks from unmatched detections
+    for(const det of unmatched) {
+      const id = this.nextId++;
+      this.tracks.set(id, {
+        id, x:det.x, y:det.y,
+        vx:det.vx||0, vy:det.vy||0,
+        ax:0, ay:0, prevVx:0, prevVy:0,
+        covX:10, covY:10,
+        age:0, lastSeen:0,
+        type:det.type||0,
+        threat:0.5,
+        maneuvering:false,
+        spawnTime:det.spawnTime||simTime,
+        assignedInterceptors:0,
+        engaged:false
+      });
+    }
+
+    // Update threat levels
+    for(const [id, track] of this.tracks) {
+      const d = hypot(track.x - BASE.x, track.y - BASE.y);
+      const speed = hypot(track.vx, track.vy);
+      const closing = -((track.x-BASE.x)*track.vx+(track.y-BASE.y)*track.vy)/(d*speed+1);
+      track.threat = clamp(
+        0.3 * (1 - d / WORLD_SIZE) +
+        0.3 * (speed / 1000) +
+        0.2 * max(0, closing) +
+        0.2 * (track.maneuvering ? 1 : 0),
+        0, 1
+      );
+    }
+
+    return this.tracks;
+  }
+}
+
+// ============================================================
+// BALLISTIC SOLVER
+// ============================================================
+class BallisticSolver {
+  static computeIntercept(target, launchPos, interceptorSpeed, dt=0.05) {
+    // Iterative intercept point calculation with lead
+    let bestT = Infinity;
+    let bestPt = null;
+
+    // Predict target trajectory
+    const maxTime = 30; // max prediction time
+    const steps = 100;
+    const gravity = 2; // reduced gravity for simulation scale
+
+    for(let step=1;step<=steps;step++) {
+      const t = (step/steps) * maxTime;
+      // Target predicted position (with acceleration and type-dependent behavior)
+      let tx = target.x + target.vx * t + 0.5 * (target.ax||0) * t * t;
+      let ty = target.y + target.vy * t + 0.5 * (target.ay||0) * t * t;
+
+      // Add gravity for ballistic targets
+      if(target.type === 0) ty += 0.5 * gravity * t * t;
+
+      // Interceptor flight time to this point
+      const dist = hypot(tx - launchPos.x, ty - launchPos.y);
+      const interceptTime = dist / interceptorSpeed;
+
+      if(abs(interceptTime - t) < abs(bestT - t) && interceptTime <= t * 1.2) {
+        bestT = t;
+        bestPt = {x: tx, y: ty, time: t, dist};
+      }
+    }
+
+    return bestPt;
+  }
+
+  static computeLeadAngle(target, launchPos, interceptorSpeed) {
+    const intercept = this.computeIntercept(target, launchPos, interceptorSpeed);
+    if(!intercept) return null;
+    const angle = atan2(intercept.y - launchPos.y, intercept.x - launchPos.x);
+    return {angle, point: intercept};
+  }
+}
+
+// ============================================================
+// GAME/SIMULATION STATE
+// ============================================================
+const WORLD_SIZE = 1500;
+const BASE = {x: WORLD_SIZE/2, y: WORLD_SIZE * 0.85};
+const DEFENSE_RADIUS = WORLD_SIZE * 0.6;
+
+let simRunning = false;
+let simTime = 0;
+let simSpeed = 1;
+let frameCount = 0;
+let lastAutoWave = 0;
+
+// Stats
+let stats = {launched:0, intercepted:0, missed:0, fired:0, totalShots:0};
+
+// Entities
+let enemies = [];
+let interceptors = [];
+let explosions = [];
+let trails = [];
+let launchers = [];
+let particles = [];
+
+// AI
+let transformer = new WorldModelTransformer();
+let tracker = new IMMTracker();
+let aiDecisions = [];
+let lossHistory = [];
+let interceptHistory = [];
+let neuronActivity = [];
+
+// Canvas
+let bgCanvas, mainCanvas, uiCanvas;
+let bgCtx, mainCtx, uiCtx;
+let viewW, viewH;
+let radarAngle = 0;
+
+// Enemy types
+const ENEMY_TYPES = {
+  0: {name:'Баллистическая', color:'#ff4444', speed:[200,600], trail:'#ff444466'},
+  1: {name:'Крылатая', color:'#ffaa00', speed:[150,400], trail:'#ffaa0066'},
+  2: {name:'Маневрирующая', color:'#ff00ff', speed:[250,700], trail:'#ff00ff66'},
+  3: {name:'Гиперзвуковая', color:'#ff0066', speed:[800,2500], trail:'#ff006666'}
 };
 
-class SLC {
-  constructor() {
-    this.alpha = "";
-    this.N = 0;
-    this.s = 0;          // left half size
-    this.t = 0;          // right half size
-    this.ordered = [];
-    this.fb0 = 0;
-    this.rounds = 2;     // outer rounds (each applies the full Feistel)
-    this.fType = "quad";
-    this.fbMode = "cipher";
-    this.trace = [];
-  }
+// ============================================================
+// INITIALIZATION
+// ============================================================
+function init() {
+  bgCanvas = document.getElementById('bgCanvas');
+  mainCanvas = document.getElementById('mainCanvas');
+  uiCanvas = document.getElementById('uiCanvas');
+  bgCtx = bgCanvas.getContext('2d');
+  mainCtx = mainCanvas.getContext('2d');
+  uiCtx = uiCanvas.getContext('2d');
 
-  init(key, alpha, rounds, fType, fbMode) {
-    this.alpha = alpha;
-    this.N = alpha.length;
-    if (this.N < 2) throw new Error("Alphabet must have ≥2 chars");
+  resize();
+  window.addEventListener('resize', resize);
 
-    this.rounds = rounds;
-    this.fType = fType;
-    this.fbMode = fbMode;
-
-    // Split dimensions for unbalanced Feistel
-    this.s = Math.ceil(Math.sqrt(this.N));
-    this.t = Math.ceil(this.N / this.s);
-    // Domain = s * t ≥ N
-
-    // Build keyed alphabet
-    const seen = new Set();
-    this.ordered = [];
-    const cleanKey = key.toUpperCase();
-    for (const ch of cleanKey) {
-      if (this.alpha.indexOf(ch) >= 0 && !seen.has(ch)) {
-        seen.add(ch);
-        this.ordered.push(ch);
-      }
-    }
-    for (const ch of this.alpha) {
-      if (!seen.has(ch)) {
-        seen.add(ch);
-        this.ordered.push(ch);
-      }
-    }
-
-    // Initial feedback value
-    this.fb0 = 0;
-    for (const ch of cleanKey) {
-      const idx = this.alpha.indexOf(ch);
-      if (idx >= 0) this.fb0 = (this.fb0 + idx) % this.N;
-    }
-
-    // Self-test: verify Feistel bijectivity for a sample of keys
-    this._selfTest();
-  }
-
-  _mod(a, m) { return ((a % m) + m) % m; }
-
-  // Round function F: maps x → result, with modulus m
-  _F(x, k, m) {
-    switch (this.fType) {
-      case "quad": return this._mod(x * x + k, m);
-      case "cube": return this._mod(x * x * x + k, m);
-      case "mix":  return this._mod(x * x + x * (k + 1) + 1, m);
-      default:     return this._mod(x * x + k, m);
-    }
-  }
-
-  // ── 4-ROUND UNBALANCED FEISTEL ──────────────────
-  //
-  // Input:  v in [0, s*t)
-  //         L = v % s   (in [0, s))
-  //         R = floor(v / s)  (in [0, t))
-  //
-  // Round 1: L1 = (R + F(L, k0)) mod t     R1 = L
-  //          — now L1 in [0,t), R1 in [0,s)
-  // Round 2: L2 = (R1 + F(L1, k1)) mod s   R2 = L1
-  //          — now L2 in [0,s), R2 in [0,t)
-  // Round 3: L3 = (R2 + F(L2, k2)) mod t   R3 = L2
-  //          — now L3 in [0,t), R3 in [0,s)
-  // Round 4: L4 = (R3 + F(L3, k3)) mod s   R4 = L3
-  //          — now L4 in [0,s), R4 in [0,t)  ← same shape as input!
-  //
-  // Output: R4 * s + L4
-  //
-  // In each round:
-  //   odd rounds:  F maps [0,s) → [0,t) with mod t, new L in [0,t)
-  //   even rounds: F maps [0,t) → [0,s) with mod s, new L in [0,s)
-
-  _feistelEnc(L, R, keys) {
-    // Round 1: L in [0,s), R in [0,t) → L' in [0,t), R' in [0,s)
-    let nL = this._mod(R + this._F(L, keys[0], this.t), this.t);
-    let nR = L;
-    L = nL; R = nR;
-
-    // Round 2: L in [0,t), R in [0,s) → L' in [0,s), R' in [0,t)
-    nL = this._mod(R + this._F(L, keys[1], this.s), this.s);
-    nR = L;
-    L = nL; R = nR;
-
-    // Round 3: L in [0,s), R in [0,t) → L' in [0,t), R' in [0,s)
-    nL = this._mod(R + this._F(L, keys[2], this.t), this.t);
-    nR = L;
-    L = nL; R = nR;
-
-    // Round 4: L in [0,t), R in [0,s) → L' in [0,s), R' in [0,t)
-    nL = this._mod(R + this._F(L, keys[3], this.s), this.s);
-    nR = L;
-    L = nL; R = nR;
-
-    return [L, R]; // L in [0,s), R in [0,t)
-  }
-
-  _feistelDec(L, R, keys) {
-    // Undo Round 4: we have L4 in [0,s), R4 in [0,t)
-    // Round 4 was: L4 = (R3 + F(L3, k3)) mod s,  R4 = L3
-    // So: L3 = R4, R3 = (L4 - F(L3, k3)) mod s = (L4 - F(R4, k3)) mod s
-    let L3 = R;
-    let R3 = this._mod(L - this._F(R, keys[3], this.s), this.s);
-
-    // Undo Round 3: L3 in [0,t), R3 in [0,s)
-    // Round 3 was: L3 = (R2 + F(L2, k2)) mod t,  R3 = L2
-    // So: L2 = R3, R2 = (L3 - F(L2, k2)) mod t = (L3 - F(R3, k2)) mod t
-    let L2 = R3;
-    let R2 = this._mod(L3 - this._F(R3, keys[2], this.t), this.t);
-
-    // Undo Round 2: L2 in [0,s), R2 in [0,t)
-    // Round 2 was: L2 = (R1 + F(L1, k1)) mod s,  R2 = L1
-    // So: L1 = R2, R1 = (L2 - F(L1, k1)) mod s = (L2 - F(R2, k1)) mod s
-    let L1 = R2;
-    let R1 = this._mod(L2 - this._F(R2, keys[1], this.s), this.s);
-
-    // Undo Round 1: L1 in [0,t), R1 in [0,s)
-    // Round 1 was: L1 = (R0 + F(L0, k0)) mod t,  R1 = L0
-    // So: L0 = R1, R0 = (L1 - F(L0, k0)) mod t = (L1 - F(R1, k0)) mod t
-    let L0 = R1;
-    let R0 = this._mod(L1 - this._F(R1, keys[0], this.t), this.t);
-
-    return [L0, R0]; // L0 in [0,s), R0 in [0,t)
-  }
-
-  // Cycle-walking: apply Feistel, if result ≥ N, repeat until < N
-  _cycleEnc(v, keys) {
-    let L = v % this.s;
-    let R = Math.floor(v / this.s);
-    let safety = 0;
-    do {
-      [L, R] = this._feistelEnc(L, R, keys);
-      if (++safety > 200) throw new Error("Cycle-walk stuck (enc)");
-    } while (R * this.s + L >= this.N);
-    return R * this.s + L;
-  }
-
-  _cycleDec(v, keys) {
-    let L = v % this.s;
-    let R = Math.floor(v / this.s);
-    let safety = 0;
-    do {
-      [L, R] = this._feistelDec(L, R, keys);
-      if (++safety > 200) throw new Error("Cycle-walk stuck (dec)");
-    } while (R * this.s + L >= this.N);
-    return R * this.s + L;
-  }
-
-  // Generate round keys for a given outer round + position + feedback
-  _roundKeys(outerRound, pos, fb) {
-    const N = this.N;
-    return [
-      this._mod(pos + outerRound * 7 + fb, N),
-      this._mod(fb * 3 + outerRound * 11 + pos * pos, N),
-      this._mod(pos * 5 + fb + outerRound * 13, N),
-      this._mod(fb * fb + pos + outerRound * 17 + 1, N),
-    ];
-  }
-
-  // ── Self-test: exhaustive bijectivity check ─────
-  _selfTest() {
-    // Test with a few key combinations
-    const testKeys = this._roundKeys(0, 1, this.fb0);
-    const seen = new Set();
-    for (let v = 0; v < this.N; v++) {
-      const enc = this._cycleEnc(v, testKeys);
-      if (enc < 0 || enc >= this.N) throw new Error(`Enc out of range: ${v}→${enc}`);
-      if (seen.has(enc)) throw new Error(`Collision: two values map to ${enc}`);
-      seen.add(enc);
-      const dec = this._cycleDec(enc, testKeys);
-      if (dec !== v) throw new Error(`Inverse failed: ${v}→${enc}→${dec}`);
-    }
-  }
-
-  // ── Encrypt / Decrypt single char ───────────────
-  _procChar(v, pos, fb, encrypt) {
-    const N = this.N;
-    const shift = this._mod(pos * pos + 3 * fb + pos, N);
-
-    if (encrypt) {
-      // Apply outer rounds of Feistel
-      for (let rd = 0; rd < this.rounds; rd++) {
-        const keys = this._roundKeys(rd, pos, fb);
-        v = this._cycleEnc(v, keys);
-      }
-      // Global shift
-      v = this._mod(v + shift, N);
-    } else {
-      // Inverse global shift
-      v = this._mod(v - shift, N);
-      // Inverse outer rounds in reverse order
-      for (let rd = this.rounds - 1; rd >= 0; rd--) {
-        const keys = this._roundKeys(rd, pos, fb);
-        v = this._cycleDec(v, keys);
-      }
-    }
-    return v;
-  }
-
-  _getFB(prevFB, cipherIdx, plainIdx) {
-    switch (this.fbMode) {
-      case "cipher": return cipherIdx;
-      case "plain":  return plainIdx;
-      case "both":   return this._mod(cipherIdx + plainIdx, this.N);
-      default:       return cipherIdx;
-    }
-  }
-
-  _clean(text) {
-    let out = "";
-    const upper = text.toUpperCase();
-    for (let i = 0; i < upper.length; i++) {
-      if (this.alpha.indexOf(upper[i]) >= 0) out += upper[i];
-    }
-    return out;
-  }
-
-  encrypt(text) {
-    const clean = this._clean(text);
-    let out = "", fb = this.fb0;
-    this.trace = [];
-
-    for (let i = 0; i < clean.length; i++) {
-      const ch = clean[i];
-      const v = this.ordered.indexOf(ch);
-      const nv = this._procChar(v, i + 1, fb, true);
-      const outCh = this.ordered[nv];
-      this.trace.push({ pos: i+1, inCh: ch, inIdx: v, fb, outIdx: nv, outCh });
-      out += outCh;
-      fb = this._getFB(fb, nv, v);
-    }
-    return out;
-  }
-
-  decrypt(text) {
-    const clean = this._clean(text);
-    let out = "", fb = this.fb0;
-    this.trace = [];
-
-    for (let i = 0; i < clean.length; i++) {
-      const ch = clean[i];
-      const v = this.ordered.indexOf(ch);
-      const nv = this._procChar(v, i + 1, fb, false);
-      const outCh = this.ordered[nv];
-      this.trace.push({ pos: i+1, inCh: ch, inIdx: v, fb, outIdx: nv, outCh });
-      out += outCh;
-      // CRITICAL: feedback uses CIPHERTEXT index.
-      // In decrypt: input IS ciphertext, output IS plaintext.
-      // cipher index = v (the input to decrypt), plain index = nv (the output)
-      fb = this._getFB(fb, v, nv);
-    }
-    return out;
-  }
+  initLaunchers(4);
+  drawBackground();
+  requestAnimationFrame(gameLoop);
 }
 
-// ════════════════════════════════════════════════════
-//  UI
-// ════════════════════════════════════════════════════
-
-const cipher = new SLC();
-let lastIn = "", lastOut = "", lastEnc = true, trIdx = 0;
-
-function getConf() {
-  const ak = document.getElementById("selAlpha").value;
-  let alpha;
-  if (ak === "CUSTOM") {
-    const raw = document.getElementById("inCustom").value;
-    const seen = new Set(); let c = "";
-    for (const ch of raw) { const u = ch.toUpperCase(); if (!seen.has(u) && u.trim()) { seen.add(u); c += u; } }
-    alpha = c.length >= 2 ? c : ALPHAS.EN;
-  } else {
-    alpha = ALPHAS[ak] || ALPHAS.EN;
-  }
-  return {
-    key: document.getElementById("inKey").value || "KEY",
-    alpha,
-    rounds: parseInt(document.getElementById("selRounds").value) || 2,
-    fType: document.getElementById("selF").value,
-    fbMode: document.getElementById("selFB").value,
-  };
-}
-
-function rebuild() {
-  document.getElementById("customWrap").style.display =
-    document.getElementById("selAlpha").value === "CUSTOM" ? "block" : "none";
-  const c = getConf();
-  try { cipher.init(c.key, c.alpha, c.rounds, c.fType, c.fbMode); }
-  catch(e) { toast(e.message, "err"); return; }
-  renderStats(); renderAlpha(); renderGrid(); renderFormulas();
-}
-
-function renderStats() {
-  const N = cipher.N, kl = (document.getElementById("inKey").value||"").length;
-  const bits = Math.floor(Math.log2(Math.pow(N, Math.min(kl, N))));
-  const items = [[N,"Alpha"],[cipher.s+"×"+cipher.t,"Grid"],[cipher.rounds,"Rounds"],[cipher.fb0,"FB₀"],["~"+bits,"Bits"]];
-  document.getElementById("statsRow").innerHTML = items.map(([v,l])=>`<div class="st"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
-}
-
-function renderAlpha() {
-  document.getElementById("alphaDisp").innerHTML = cipher.ordered.map((ch,i)=>`<span class="ac"><span class="ix">${i}</span>${ch}</span>`).join("");
-}
-
-function renderGrid(hiSrc, hiDst) {
-  const el = document.getElementById("gridDisp");
-  const W = cipher.s, N = cipher.N, total = cipher.s * cipher.t;
-  let html = `<div class="g5" style="grid-template-columns:repeat(${W},1fr)">`;
-  for (let i = 0; i < total; i++) {
-    const r = Math.floor(i / W), c = i % W;
-    const cls = i === hiSrc ? " src" : i === hiDst ? " dst" : i >= N ? " empty" : "";
-    const ch = i < N ? cipher.ordered[i] : "∅";
-    html += `<div class="gc${cls}"><span class="ix">${i}</span><span class="ch">${ch}</span><span class="cr">${r},${c}</span></div>`;
-  }
-  html += "</div>";
-  el.innerHTML = html;
-  document.getElementById("gridDims").textContent = `${W}×${cipher.t}` + (total > N ? ` (${total-N} empty)` : "");
-}
-
-function renderFormulas() {
-  const fn = {quad:"x² + k", cube:"x³ + k", mix:"x² + x·(k+1) + 1"}[cipher.fType];
-  const fm = {cipher:"ciphertext idx", plain:"plaintext idx", both:"cipher+plain mod N"}[cipher.fbMode];
-  document.getElementById("formDisp").innerHTML = `
-    <div><span class="tag tag-g">N</span> = ${cipher.N}, <span class="tag tag-b">s</span> = ${cipher.s}, <span class="tag tag-b">t</span> = ${cipher.t} (s·t=${cipher.s*cipher.t}≥N)</div>
-    <div><span class="tag tag-p">F(x,k,m)</span> = (${fn}) mod m</div>
-    <div><span class="tag tag-y">Shift</span> = (n² + 3·fb + n) mod N</div>
-    <div><span class="tag tag-r">Feedback</span> = ${fm}</div>
-    <hr class="sep">
-    <div style="color:var(--text2)"><b>Feistel (4 internal rounds):</b><br>
-    R1: L'=(R + F(L,k₀)) mod t, R'=L<br>
-    R2: L'=(R'+ F(L',k₁)) mod s, R'=L'<br>
-    R3: L'=(R'+ F(L',k₂)) mod t, R'=L'<br>
-    R4: L'=(R'+ F(L',k₃)) mod s, R'=L'<br>
-    + cycle-walking if result ≥ N</div>`;
-}
-
-function doProc(enc) {
-  rebuild();
-  const raw = document.getElementById("inText").value;
-  if (!raw.trim()) { toast("Enter text", "err"); return; }
-  const t0 = performance.now();
-  let out;
-  try { out = enc ? cipher.encrypt(raw) : cipher.decrypt(raw); }
-  catch(e) { toast("Error: "+e.message, "err"); return; }
-  const ms = (performance.now()-t0).toFixed(2);
-  lastEnc = enc; lastIn = raw; lastOut = out;
-  document.getElementById("outText").textContent = out || "(empty)";
-  document.getElementById("procInfo").innerHTML =
-    `<span class="tag ${enc?"tag-g":"tag-r"}">${enc?"ENC":"DEC"}</span> ` +
-    `${cipher._clean(raw).length}→${out.length} chars | ${ms}ms | Rounds:${cipher.rounds}`;
-  renderTrace(); renderFreq(raw,"freqIn"); renderFreq(out,"freqOut"); renderFreqCmp();
-}
-
-function doVerify() {
-  if (!lastOut) return;
-  const dec = cipher.decrypt(lastOut);
-  const orig = cipher._clean(lastIn);
-  toast(dec===orig ? "✓ Verified: decrypt(encrypt(x)) = x" : "✗ FAILED: "+dec.substring(0,30)+"…", dec===orig?"ok":"err");
-}
-
-function swapIO() { const o = document.getElementById("outText").textContent; if (o && o!=="—") document.getElementById("inText").value = o; }
-function clearIO() { document.getElementById("inText").value=""; document.getElementById("outText").textContent="—"; document.getElementById("procInfo").innerHTML=""; document.getElementById("traceTb").innerHTML=""; }
-function copyOut() { const t = document.getElementById("outText").textContent; if(t&&t!=="—") navigator.clipboard.writeText(t).then(()=>toast("Copied!","ok")); }
-
-function randomKey() {
-  const w=["PHOENIX","QUANTUM","NEBULA","CRYSTAL","VORTEX","SHADOW","ENIGMA","CIPHER","MATRIX","PRISM","HORIZON","ZENITH","AURORA","COSMOS","TEMPEST","SPHINX","ORCHID","ALCHEMY","MYSTIC","NEXUS"];
-  const k=w[Math.floor(Math.random()*w.length)];
-  document.getElementById("inKey").value=k; rebuild(); toast("Key: "+k,"info");
-}
-
-// ── TRACE ─────────────────────────────────────────
-
-function renderTrace() {
-  const hd = document.getElementById("traceHd");
-  const tb = document.getElementById("traceTb");
-  const tr = cipher.trace;
-  if (!tr.length) { hd.innerHTML=""; tb.innerHTML="<tr><td class='muted'>No data</td></tr>"; return; }
-  hd.innerHTML = "<tr><th>#</th><th>In</th><th>Idx</th><th>FB</th><th>Out Idx</th><th>Out</th></tr>";
-  tb.innerHTML = tr.map(r =>
-    `<tr><td class="hi-b">${r.pos}</td><td class="hi-g">${r.inCh}</td><td>${r.inIdx}</td><td class="hi-o">${r.fb}</td><td class="hi-r">${r.outIdx}</td><td class="hi-r">${r.outCh}</td></tr>`
-  ).join("");
-  trIdx = 0; updateTrStep();
-}
-
-function updateTrStep() {
-  const tr = cipher.trace;
-  if (!tr.length) return;
-  trIdx = Math.max(0, Math.min(trIdx, tr.length-1));
-  const r = tr[trIdx];
-  document.getElementById("trInfo").textContent = `${trIdx+1}/${tr.length}`;
-  renderGrid(r.inIdx, r.outIdx);
-  document.getElementById("trDetail").innerHTML =
-    `<span class="tag tag-g">${r.inCh}</span> (${r.inIdx}) → <span class="tag tag-r">${r.outCh}</span> (${r.outIdx}) | FB: ${r.fb}`;
-}
-
-function trStep(d) { trIdx += d; updateTrStep(); }
-
-// ── FREQ ──────────────────────────────────────────
-
-function renderFreq(text, id) {
-  const el = document.getElementById(id);
-  const clean = cipher._clean(text);
-  if (!clean) { el.innerHTML='<div class="muted" style="padding:20px;text-align:center">—</div>'; return; }
-  const cnt = {}; let mx = 0;
-  for (const ch of clean) { cnt[ch]=(cnt[ch]||0)+1; if(cnt[ch]>mx)mx=cnt[ch]; }
-  el.innerHTML = [...cipher.alpha].map(ch => {
-    const n=cnt[ch]||0, p=mx>0?(n/mx*100):0;
-    return `<div class="fb"><div class="bar" style="height:${Math.max(p,1)}%;${n>0?"":"opacity:.2"}"></div><div class="lbl">${ch}</div></div>`;
-  }).join("");
-}
-
-function renderFreqCmp() {
-  const el = document.getElementById("freqCmp");
-  if (!lastIn||!lastOut) { el.innerHTML='<div class="muted">—</div>'; return; }
-  const ci={}, co={};
-  for (const ch of cipher._clean(lastIn)) ci[ch]=(ci[ch]||0)+1;
-  for (const ch of cipher._clean(lastOut)) co[ch]=(co[ch]||0)+1;
-  let html = '<table class="tbl"><tr><th>Ch</th><th>In</th><th>Out</th><th>Δ</th></tr>';
-  for (const ch of cipher.alpha) {
-    const a=ci[ch]||0, b=co[ch]||0, d=b-a;
-    if(!a&&!b) continue;
-    html+=`<tr><td class="hi-b">${ch}</td><td>${a}</td><td>${b}</td><td class="${d>0?"hi-r":d<0?"hi-g":""}">${d>0?"+":""}${d}</td></tr>`;
-  }
-  el.innerHTML = html+"</table>";
-}
-
-// ── AVALANCHE ─────────────────────────────────────
-
-function showAval() {
-  rebuild();
-  const base = cipher.alpha.substring(0, Math.min(20, cipher.N));
-  if (base.length<2) return;
-  const enc1 = cipher.encrypt(base);
-  const i0 = cipher.ordered.indexOf(base[0]);
-  const alt = cipher.ordered[(i0+1)%cipher.N] + base.substring(1);
-  const enc2 = cipher.encrypt(alt);
-  let diffs=0, bits="";
-  const len=Math.max(enc1.length,enc2.length);
-  for(let i=0;i<len;i++){
-    const a=enc1[i]||"?",b=enc2[i]||"?",same=a===b;
-    if(!same)diffs++;
-    bits+=`<div class="bit ${same?"bit-same":"bit-diff"}" title="${a}→${b}">${b}</div>`;
-  }
-  document.getElementById("avalRes").innerHTML=`
-    <div class="mb-sm muted">Original: <b>${base.substring(0,20)}</b></div>
-    <div class="mb-sm muted">Changed:  <b>${alt.substring(0,20)}</b></div>
-    <div class="aval">${bits}</div>
-    <div class="mt-sm muted">Diff: <b style="color:var(--red)">${diffs}/${len}</b> (${(diffs/len*100).toFixed(0)}%) ${diffs/len>.3?'<span style="color:var(--green)">✓ Good</span>':'<span style="color:var(--orange)">⚠ Weak</span>'}</div>`;
-}
-
-// ── FULL TEST ─────────────────────────────────────
-
-function runFullTest() {
-  rebuild();
-  const N = cipher.N, alpha = cipher.alpha;
-  const tests = [
-    alpha.substring(0, Math.min(N, 26)),
-    alpha[0].repeat(10),
-    alpha[N-1].repeat(5),
-    alpha[Math.floor(N/2)].repeat(8),
-  ];
-  for (let t=0; t<4; t++) {
-    let s="";
-    for(let i=0;i<15+t*10;i++) s+=alpha[Math.floor(Math.random()*N)];
-    tests.push(s);
-  }
-  // Single char tests
-  for (let i=0; i<Math.min(N,26); i++) tests.push(alpha[i]);
-
-  let pass=0,fail=0;
-  let html='<div class="tscroll"><table class="tbl"><tr><th>#</th><th>Input</th><th>Encrypted</th><th>Decrypted</th><th>✓</th></tr>';
-  tests.forEach((t,i) => {
-    const enc=cipher.encrypt(t);
-    const dec=cipher.decrypt(enc);
-    const clean=cipher._clean(t);
-    const ok=dec===clean;
-    ok?pass++:fail++;
-    const trn=s=>s.length>22?s.substring(0,20)+"…":s;
-    html+=`<tr><td>${i+1}</td><td style="text-align:left">${trn(clean)}</td><td style="text-align:left" class="hi-p">${trn(enc)}</td><td style="text-align:left">${trn(dec)}</td><td class="${ok?"hi-g":"hi-r"}">${ok?"✅":"❌"}</td></tr>`;
+function resize() {
+  const view = document.getElementById('mainView');
+  viewW = view.clientWidth;
+  viewH = view.clientHeight;
+  [bgCanvas, mainCanvas, uiCanvas].forEach(c => {
+    c.width = viewW;
+    c.height = viewH;
   });
-  html+="</table></div>";
-  html+=`<div class="mt-sm" style="text-align:center;font-weight:700;color:${fail===0?"var(--green)":"var(--red)"}">${fail===0?"✅ All "+pass+" passed!":"❌ "+fail+" failed"}</div>`;
-  document.getElementById("testRes").innerHTML=html;
-  toast(fail===0?`All ${pass} passed!`:`${fail} FAILED`,(fail===0?"ok":"err"));
+  drawBackground();
 }
 
-// ── EXPORT ────────────────────────────────────────
+function initLaunchers(count) {
+  launchers = [];
+  const spacing = WORLD_SIZE * 0.6 / (count + 1);
+  const startX = WORLD_SIZE * 0.2;
+  for(let i=0;i<count;i++) {
+    launchers.push({
+      id: i,
+      x: startX + spacing * (i + 1),
+      y: BASE.y + 20,
+      missiles: +document.getElementById('missilesPerLauncher').value,
+      maxMissiles: +document.getElementById('missilesPerLauncher').value,
+      reloadTimer: 0,
+      status: 'ready', // ready, firing, reloading
+      angle: -PI/2
+    });
+  }
+}
+function updateLaunchers(n) { initLaunchers(n); }
 
-function exportPuzzle() {
-  const raw=document.getElementById("inText").value;
-  if(!raw.trim()){toast("Enter text first","err");return;}
-  rebuild();
-  const enc=cipher.encrypt(raw);
-  const c=getConf();
-  const json=JSON.stringify({title:"Spiral Lattice Cipher Puzzle",ciphertext:enc,settings:{alphabet:c.alpha.length+" chars",rounds:c.rounds,feistel:c.fType,feedback:c.fbMode,grid:cipher.s+"×"+cipher.t},hint:"Key is a single English word"},null,2);
-  const reddit=`**🌀 Spiral Lattice Cipher Challenge**\n\n\`${enc}\`\n\n**Settings:** ${c.alpha.length} chars, ${c.rounds} rounds, ${c.fType}, ${c.fbMode}\n\n**Hint:** The key is a single word.`;
-  document.getElementById("modalContent").innerHTML=`
-    <h2>📤 Export Puzzle</h2>
-    <p style="color:var(--text2)">Share on r/codes or r/puzzles:</p>
-    <textarea style="width:100%;min-height:120px;margin:8px 0" readonly onclick="this.select()">${json}</textarea>
-    <div class="btns mt-sm">
-      <button class="btn btn-b" onclick="navigator.clipboard.writeText(document.querySelector('#modalContent textarea').value);toast('Copied!','ok')">📋 JSON</button>
-      <button class="btn btn-g" onclick="navigator.clipboard.writeText(\`${reddit.replace(/`/g,"\\`")}\`);toast('Reddit format copied!','ok')">📝 Reddit</button>
-      <button class="btn" onclick="closeModal()">Close</button>
+// ============================================================
+// BACKGROUND RENDERING
+// ============================================================
+function drawBackground() {
+  const ctx = bgCtx;
+  const sx = viewW / WORLD_SIZE;
+  const sy = viewH / WORLD_SIZE;
+
+  ctx.fillStyle = '#080c14';
+  ctx.fillRect(0, 0, viewW, viewH);
+
+  // Grid
+  ctx.strokeStyle = '#0a1a2a';
+  ctx.lineWidth = 0.5;
+  const gridSize = 100;
+  for(let x=0; x<=WORLD_SIZE; x+=gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(x*sx, 0);
+    ctx.lineTo(x*sx, viewH);
+    ctx.stroke();
+  }
+  for(let y=0; y<=WORLD_SIZE; y+=gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(0, y*sy);
+    ctx.lineTo(viewW, y*sy);
+    ctx.stroke();
+  }
+
+  // Range circles
+  const baseX = BASE.x * sx, baseY = BASE.y * sy;
+  [200, 400, 600, 800, 1000].forEach((r, i) => {
+    ctx.beginPath();
+    ctx.arc(baseX, baseY, r*sx, 0, TAU);
+    ctx.strokeStyle = `rgba(0,100,150,${0.15 - i*0.02})`;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.fillStyle = '#0a4a6a44';
+    ctx.font = '9px monospace';
+    ctx.fillText(`${r}m`, baseX + r*sx*0.7, baseY - r*sy*0.7);
+  });
+
+  // Compass lines
+  ctx.strokeStyle = '#0a2a4a33';
+  ctx.lineWidth = 0.5;
+  for(let a=0;a<360;a+=30) {
+    const rad = a*PI/180;
+    ctx.beginPath();
+    ctx.moveTo(baseX, baseY);
+    ctx.lineTo(baseX + cos(rad)*WORLD_SIZE*sx, baseY + sin(rad)*WORLD_SIZE*sy);
+    ctx.stroke();
+  }
+
+  // Ground
+  ctx.fillStyle = '#0a1a0a';
+  ctx.fillRect(0, BASE.y*sy+30, viewW, viewH-BASE.y*sy);
+
+  // Base
+  ctx.beginPath();
+  ctx.arc(baseX, baseY, 12, 0, TAU);
+  ctx.fillStyle = '#00ff8844';
+  ctx.fill();
+  ctx.strokeStyle = '#00ff88';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.fillStyle = '#00ff88';
+  ctx.font = '10px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('БАЗА ПРО', baseX, baseY+25);
+}
+
+// ============================================================
+// ENEMY SPAWNING
+// ============================================================
+function spawnEnemy(type=null) {
+  const types = [];
+  if(document.getElementById('trajBallistic').checked) types.push(0);
+  if(document.getElementById('trajCruise').checked) types.push(1);
+  if(document.getElementById('trajManeuvering').checked) types.push(2);
+  if(document.getElementById('trajHypersonic').checked) types.push(3);
+  if(types.length===0) types.push(0);
+
+  if(type===null) type = types[randInt(0, types.length-1)];
+
+  const minSpd = +document.getElementById('minSpd').value;
+  const maxSpd = +document.getElementById('maxSpd').value;
+  const typeInfo = ENEMY_TYPES[type];
+  const speed = clamp(rand(typeInfo.speed[0], typeInfo.speed[1]), minSpd, maxSpd);
+
+  // Spawn from edges, aim toward base area
+  const side = randInt(0, 2); // 0=top, 1=left, 2=right
+  let x, y;
+  if(side === 0) { x = rand(100, WORLD_SIZE-100); y = rand(-50, 50); }
+  else if(side === 1) { x = rand(-50, 50); y = rand(50, WORLD_SIZE*0.5); }
+  else { x = rand(WORLD_SIZE-50, WORLD_SIZE+50); y = rand(50, WORLD_SIZE*0.5); }
+
+  // Aim toward base with some randomness
+  const targetX = BASE.x + rand(-200, 200);
+  const targetY = BASE.y + rand(-100, 50);
+  const angle = atan2(targetY - y, targetX - x);
+
+  const enemy = {
+    id: 'E' + (++stats.launched),
+    x, y,
+    vx: cos(angle) * speed,
+    vy: sin(angle) * speed,
+    ax: 0, ay: 0,
+    speed,
+    type,
+    color: typeInfo.color,
+    trailColor: typeInfo.trail,
+    alive: true,
+    spawnTime: simTime,
+    trail: [],
+    threat: 0.5,
+    maneuvering: type === 2,
+    maneuverTimer: 0,
+    maneuverFreq: rand(0.5, 2),
+    maneuverAmp: rand(50, 200),
+    engaged: false,
+    assignedInterceptors: 0,
+    covX: 10, covY: 10
+  };
+
+  // Type-specific behaviors
+  if(type === 0) { // Ballistic - arc trajectory
+    enemy.vy = -speed * 0.3;
+    enemy.vx = (targetX - x) / (hypot(targetX-x, targetY-y) / speed);
+    enemy.ay = rand(5, 15); // gravity pull
+  }
+  if(type === 1) { // Cruise - low altitude, constant
+    enemy.y = rand(WORLD_SIZE*0.4, WORLD_SIZE*0.7);
+    enemy.vy = rand(-20, 20);
+  }
+  if(type === 3) { // Hypersonic
+    enemy.speed = rand(1200, 2500);
+    enemy.vx = cos(angle) * enemy.speed;
+    enemy.vy = sin(angle) * enemy.speed;
+  }
+
+  enemies.push(enemy);
+  addLog(`Обнаружена цель ${enemy.id}: ${typeInfo.name}, V=${round(speed)}м/с`, 'warning');
+}
+
+function launchWave() {
+  const count = +document.getElementById('waveCount').value;
+  for(let i=0;i<count;i++) setTimeout(()=>spawnEnemy(), i*200);
+  addLog(`АТАКА ВОЛНОЙ: ${count} ракет!`, 'warning');
+}
+
+function launchSingle() { spawnEnemy(); }
+
+// ============================================================
+// INTERCEPTOR LAUNCH
+// ============================================================
+function launchInterceptor(launcher, target, interceptPoint) {
+  if(launcher.missiles <= 0 || launcher.status !== 'ready') return false;
+
+  const intSpeed = +document.getElementById('interceptorSpeed').value;
+  const angle = atan2(interceptPoint.y - launcher.y, interceptPoint.x - launcher.x);
+
+  const interceptor = {
+    id: 'I' + (++stats.fired),
+    x: launcher.x,
+    y: launcher.y,
+    vx: cos(angle) * intSpeed,
+    vy: sin(angle) * intSpeed,
+    speed: intSpeed,
+    targetId: target.id,
+    target: target,
+    alive: true,
+    age: 0,
+    trail: [],
+    interceptPoint,
+    launchTime: simTime,
+    guidancePhase: 'midcourse', // midcourse, terminal
+    killRadius: +document.getElementById('killRadius').value,
+    // Proportional navigation constants
+    N: 3, // navigation constant
+    prevLOS: atan2(target.y - launcher.y, target.x - launcher.x)
+  };
+
+  interceptors.push(interceptor);
+  launcher.missiles--;
+  launcher.status = 'reloading';
+  launcher.reloadTimer = +document.getElementById('reloadTime').value;
+  stats.totalShots++;
+
+  target.engaged = true;
+  target.assignedInterceptors++;
+
+  addLog(`ПУСК ${interceptor.id} → ${target.id} из ПУ-${launcher.id}`, 'launch');
+  createExplosion(launcher.x, launcher.y, '#00ccff', 8, 0.3);
+
+  return true;
+}
+
+// ============================================================
+// PROPORTIONAL NAVIGATION GUIDANCE
+// ============================================================
+function guidInterceptor(int, dt) {
+  const t = int.target;
+  if(!t || !t.alive) {
+    int.alive = false;
+    return;
+  }
+
+  // Current line of sight
+  const dx = t.x - int.x;
+  const dy = t.y - int.y;
+  const range = hypot(dx, dy);
+  const LOS = atan2(dy, dx);
+
+  // LOS rate
+  const LOSrate = (LOS - int.prevLOS) / dt;
+  int.prevLOS = LOS;
+
+  // Closing velocity
+  const Vc = -((dx*(t.vx-int.vx) + dy*(t.vy-int.vy)) / range);
+
+  if(int.guidancePhase === 'midcourse' && range < 300) {
+    int.guidancePhase = 'terminal';
+  }
+
+  // Proportional navigation: a = N * Vc * LOSrate
+  const N = int.guidancePhase === 'terminal' ? 4 : 3;
+  const aCommand = N * Vc * LOSrate;
+
+  // Apply acceleration perpendicular to velocity
+  const velAngle = atan2(int.vy, int.vx);
+  const accelX = -sin(velAngle) * aCommand;
+  const accelY = cos(velAngle) * aCommand;
+
+  // Limit acceleration
+  const maxAccel = 300;
+  const accelMag = hypot(accelX, accelY);
+  const scale = accelMag > maxAccel ? maxAccel / accelMag : 1;
+
+  int.vx += accelX * scale * dt;
+  int.vy += accelY * scale * dt;
+
+  // Maintain speed
+  const currentSpeed = hypot(int.vx, int.vy);
+  if(currentSpeed > 0) {
+    int.vx = int.vx / currentSpeed * int.speed;
+    int.vy = int.vy / currentSpeed * int.speed;
+  }
+
+  // Check intercept
+  if(range < int.killRadius) {
+    // HIT!
+    t.alive = false;
+    int.alive = false;
+    stats.intercepted++;
+    createExplosion((t.x+int.x)/2, (t.y+int.y)/2, '#ff8800', 25, 1);
+    addLog(`ПЕРЕХВАТ! ${int.id} уничтожил ${t.id} (D=${round(range)}м)`, 'intercept');
+
+    // Store experience for AI training
+    transformer.addExperience({
+      targetFeatures: [
+        t.x/WORLD_SIZE, t.y/WORLD_SIZE,
+        t.vx/1000, t.vy/1000,
+        (t.ax||0)/100, (t.ay||0)/100,
+        t.speed/1000, atan2(t.vy,t.vx)/PI,
+        hypot(t.x-BASE.x,t.y-BASE.y)/WORLD_SIZE, t.threat,
+        t.type/3, (simTime-t.spawnTime)/60,
+        t.covX/100, t.covY/100,
+        t.maneuvering?1:0, simTime/300
+      ],
+      contextFeatures: getSystemState().arr,
+      actualThreat: t.threat,
+      wasHit: true,
+      interceptError: range,
+      interceptTime: simTime - int.launchTime
+    });
+  }
+
+  // Self-destruct if too old or out of bounds
+  if(int.age > 30 || int.x < -100 || int.x > WORLD_SIZE+100 || int.y < -100 || int.y > WORLD_SIZE+100) {
+    int.alive = false;
+    addLog(`${int.id} самоликвидация`, 'miss');
+  }
+}
+
+// ============================================================
+// SYSTEM STATE
+// ============================================================
+function getSystemState() {
+  let readyMissiles = 0, totalLaunchers = launchers.length;
+  let reloadPct = 0;
+  for(const l of launchers) {
+    readyMissiles += l.missiles;
+    reloadPct += l.status === 'ready' ? 1 : 0;
+  }
+  reloadPct /= totalLaunchers;
+
+  const activeTracks = tracker.tracks.size;
+  let avgDist = 0, maxThreat = 0;
+  for(const [, t] of tracker.tracks) {
+    avgDist += hypot(t.x-BASE.x, t.y-BASE.y);
+    maxThreat = max(maxThreat, t.threat);
+  }
+  avgDist = activeTracks > 0 ? avgDist / activeTracks : WORLD_SIZE;
+
+  const state = {
+    readyMissiles,
+    totalLaunchers,
+    activeTracks,
+    threatLevel: maxThreat,
+    avgDistance: avgDist,
+    time: simTime,
+    interceptorSpeed: +document.getElementById('interceptorSpeed').value,
+    reloadPct,
+    arr: [readyMissiles/32, totalLaunchers/8, activeTracks/20, maxThreat,
+          avgDist/WORLD_SIZE, simTime/300,
+          (+document.getElementById('interceptorSpeed').value)/3000, reloadPct]
+  };
+  return state;
+}
+
+// ============================================================
+// GUARDIAN - SAFETY VALIDATOR
+// ============================================================
+function validateDecision(decision, systemState) {
+  // Physical limits check
+  const t = decision.target;
+  if(!t || !t.alive) return false;
+
+  // Distance check - too close or too far
+  const d = hypot(t.x - BASE.x, t.y - BASE.y);
+  if(d > WORLD_SIZE * 1.2) return false;
+  if(d < 30) return false; // too close, can't intercept
+
+  // Already engaged enough
+  if(t.assignedInterceptors >= 2) return false;
+
+  // Resource check
+  if(systemState.readyMissiles <= 0) return false;
+
+  // Confidence threshold
+  const confThresh = +document.getElementById('confThreshold').value;
+  if(decision.confidence < confThresh * 0.5 && transformer.trainEpoch > 50) return false;
+
+  // Moving away from base?
+  const closing = -((t.x-BASE.x)*t.vx+(t.y-BASE.y)*t.vy)/(d*hypot(t.vx,t.vy)+1);
+  if(closing < -0.3 && d > WORLD_SIZE*0.5) return false;
+
+  return true;
+}
+
+// ============================================================
+// AI DECISION CYCLE
+// ============================================================
+function aiDecisionCycle() {
+  if(!document.getElementById('aiEnabled').checked) return;
+
+  const targets = [];
+  for(const [, track] of tracker.tracks) {
+    if(track.lastSeen < 1) targets.push(track);
+  }
+
+  if(targets.length === 0) return;
+
+  const systemState = getSystemState();
+  aiDecisions = transformer.computeDecisions(targets, systemState, simTime);
+
+  // Process decisions through guardian
+  for(const decision of aiDecisions) {
+    if(!validateDecision(decision, systemState)) continue;
+    if(decision.priority < 0.3) continue;
+
+    // Find best launcher
+    let bestLauncher = null, bestDist = Infinity;
+    for(const l of launchers) {
+      if(l.missiles > 0 && l.status === 'ready') {
+        const d = hypot(l.x - decision.interceptX, l.y - decision.interceptY);
+        if(d < bestDist) { bestDist = d; bestLauncher = l; }
+      }
+    }
+
+    if(bestLauncher) {
+      const target = decision.target;
+      const intSpeed = +document.getElementById('interceptorSpeed').value;
+
+      // Use AI's predicted intercept point, refined by ballistic solver
+      let interceptPt = BallisticSolver.computeIntercept(target, bestLauncher, intSpeed);
+      if(!interceptPt) {
+        interceptPt = {x: decision.interceptX, y: decision.interceptY, time: 5};
+      }
+
+      launchInterceptor(bestLauncher, target, interceptPt);
+      break; // One launch per cycle to avoid overwhelming
+    }
+  }
+}
+
+// ============================================================
+// SIMPLE AI FALLBACK (when AI is disabled or fresh)
+// ============================================================
+function simpleDefense() {
+  if(document.getElementById('aiEnabled').checked && transformer.trainEpoch > 10) return;
+
+  for(const enemy of enemies) {
+    if(!enemy.alive || enemy.engaged) continue;
+
+    const d = hypot(enemy.x - BASE.x, enemy.y - BASE.y);
+    if(d > WORLD_SIZE * 0.8) continue;
+
+    // Simple threat-based engagement
+    if(enemy.threat > 0.3 || d < WORLD_SIZE * 0.4) {
+      let bestLauncher = null;
+      for(const l of launchers) {
+        if(l.missiles > 0 && l.status === 'ready') {
+          if(!bestLauncher || l.missiles > bestLauncher.missiles) bestLauncher = l;
+        }
+      }
+
+      if(bestLauncher) {
+        const intSpeed = +document.getElementById('interceptorSpeed').value;
+        const interceptPt = BallisticSolver.computeIntercept(enemy, bestLauncher, intSpeed);
+        if(interceptPt) {
+          launchInterceptor(bestLauncher, enemy, interceptPt);
+        }
+      }
+    }
+  }
+}
+
+// ============================================================
+// EXPLOSIONS AND PARTICLES
+// ============================================================
+function createExplosion(x, y, color, size, duration) {
+  explosions.push({x, y, color, size, duration, maxDuration: duration, t:0});
+
+  for(let i=0;i<20;i++){
+    const angle=rand(0,TAU);
+    const speed=rand(50,200);
+    particles.push({
+      x, y,
+      vx:cos(angle)*speed, vy:sin(angle)*speed,
+      life:rand(0.3,1), maxLife:rand(0.3,1),
+      color, size:rand(1,3)
+    });
+  }
+}
+
+// ============================================================
+// SIMULATION UPDATE
+// ============================================================
+function updateSimulation(dt) {
+  // Update enemies
+  const detections = [];
+  for(const e of enemies) {
+    if(!e.alive) continue;
+
+    // Type-specific movement
+    if(e.type === 2) { // Maneuvering
+      e.maneuverTimer += dt;
+      const mAngle = sin(e.maneuverTimer * e.maneuverFreq * TAU) * e.maneuverAmp;
+      const heading = atan2(e.vy, e.vx);
+      e.ax = cos(heading + PI/2) * mAngle;
+      e.ay = sin(heading + PI/2) * mAngle;
+    }
+    if(e.type === 0) { // Ballistic
+      e.ay = (e.ay || 0) + 2 * dt; // gravity
+    }
+
+    e.vx += (e.ax || 0) * dt;
+    e.vy += (e.ay || 0) * dt;
+    e.x += e.vx * dt;
+    e.y += e.vy * dt;
+
+    // Trail
+    if(document.getElementById('showTrails').checked) {
+      e.trail.push({x:e.x, y:e.y});
+      if(e.trail.length > 100) e.trail.shift();
+    }
+
+    // Check if reached base
+    const dBase = hypot(e.x - BASE.x, e.y - BASE.y);
+    if(dBase < 25) {
+      e.alive = false;
+      stats.missed++;
+      createExplosion(e.x, e.y, '#ff0000', 30, 1.5);
+      addLog(`ПРОПУСК! ${e.id} достигла базы!`, 'miss');
+
+      // Negative experience
+      transformer.addExperience({
+        targetFeatures: [
+          e.x/WORLD_SIZE, e.y/WORLD_SIZE,
+          e.vx/1000, e.vy/1000,
+          (e.ax||0)/100, (e.ay||0)/100,
+          e.speed/1000, atan2(e.vy,e.vx)/PI,
+          dBase/WORLD_SIZE, e.threat,
+          e.type/3, (simTime-e.spawnTime)/60,
+          e.covX/100, e.covY/100,
+          e.maneuvering?1:0, simTime/300
+        ],
+        contextFeatures: getSystemState().arr,
+        actualThreat: 1.0,
+        wasHit: false,
+        interceptError: 999
+      });
+    }
+
+    // Out of bounds
+    if(e.x < -200 || e.x > WORLD_SIZE+200 || e.y < -200 || e.y > WORLD_SIZE+200) {
+      e.alive = false;
+    }
+
+    if(e.alive) {
+      detections.push({
+        x: e.x + rand(-5, 5), // radar noise
+        y: e.y + rand(-5, 5),
+        vx: e.vx, vy: e.vy,
+        type: e.type,
+        spawnTime: e.spawnTime
+      });
+    }
+  }
+
+  // Update tracker
+  tracker.update(detections, dt);
+
+  // Sync tracker threat back to enemies
+  for(const e of enemies) {
+    for(const [, track] of tracker.tracks) {
+      if(hypot(e.x-track.x, e.y-track.y) < 30) {
+        e.threat = track.threat;
+        track.engaged = e.engaged;
+        track.assignedInterceptors = e.assignedInterceptors;
+      }
+    }
+  }
+
+  // Update interceptors
+  for(const int of interceptors) {
+    if(!int.alive) continue;
+    int.age += dt;
+    guidInterceptor(int, dt);
+    int.x += int.vx * dt;
+    int.y += int.vy * dt;
+
+    if(document.getElementById('showTrails').checked) {
+      int.trail.push({x:int.x, y:int.y});
+      if(int.trail.length > 60) int.trail.shift();
+    }
+  }
+
+  // Update launchers
+  for(const l of launchers) {
+    if(l.status === 'reloading') {
+      l.reloadTimer -= dt;
+      if(l.reloadTimer <= 0) {
+        l.status = 'ready';
+        l.reloadTimer = 0;
+      }
+    }
+  }
+
+  // Update explosions
+  for(const ex of explosions) {
+    ex.t += dt;
+  }
+  explosions = explosions.filter(e => e.t < e.maxDuration);
+
+  // Update particles
+  for(const p of particles) {
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.vx *= 0.95;
+    p.vy *= 0.95;
+    p.life -= dt;
+  }
+  particles = particles.filter(p => p.life > 0);
+
+  // Cleanup dead
+  enemies = enemies.filter(e => e.alive);
+  interceptors = interceptors.filter(i => i.alive);
+
+  // AI cycle (every ~200ms sim time)
+  if(frameCount % 12 === 0) {
+    aiDecisionCycle();
+    simpleDefense();
+  }
+
+  // Training cycle (every ~1s)
+  if(frameCount % 60 === 0 && transformer.replayBuffer.length > 20) {
+    transformer.trainES(8);
+  }
+
+  // Auto waves
+  if(document.getElementById('autoWaves').checked) {
+    const interval = +document.getElementById('atkInterval').value;
+    if(simTime - lastAutoWave > interval) {
+      lastAutoWave = simTime;
+      const count = randInt(1, +document.getElementById('waveCount').value);
+      for(let i=0;i<count;i++) setTimeout(()=>spawnEnemy(), i*100);
+    }
+  }
+
+  // Radar sweep
+  radarAngle = (radarAngle + dt * 1.5) % TAU;
+}
+
+// ============================================================
+// RENDERING
+// ============================================================
+function render() {
+  const ctx = mainCtx;
+  const sx = viewW / WORLD_SIZE;
+  const sy = viewH / WORLD_SIZE;
+
+  ctx.clearRect(0, 0, viewW, viewH);
+
+  // Defense zones
+  if(document.getElementById('showZones').checked) {
+    const baseX = BASE.x*sx, baseY = BASE.y*sy;
+
+    // Engagement zone
+    ctx.beginPath();
+    ctx.arc(baseX, baseY, DEFENSE_RADIUS*0.7*sx, 0, TAU);
+    ctx.fillStyle = '#00ff8808';
+    ctx.fill();
+    ctx.strokeStyle = '#00ff8833';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([5,10]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Kill zone
+    ctx.beginPath();
+    ctx.arc(baseX, baseY, DEFENSE_RADIUS*0.4*sx, 0, TAU);
+    ctx.fillStyle = '#ff880808';
+    ctx.fill();
+    ctx.strokeStyle = '#ff880833';
+    ctx.stroke();
+  }
+
+  // Radar sweep
+  const baseX = BASE.x*sx, baseY = BASE.y*sy;
+  const grad = ctx.createConicalGradient ? null : null;
+  ctx.save();
+  ctx.globalAlpha = 0.15;
+  ctx.beginPath();
+  ctx.moveTo(baseX, baseY);
+  ctx.arc(baseX, baseY, WORLD_SIZE*sx, radarAngle - 0.3, radarAngle);
+  ctx.closePath();
+  ctx.fillStyle = '#00ff88';
+  ctx.fill();
+  ctx.restore();
+
+  // Trails
+  if(document.getElementById('showTrails').checked) {
+    for(const e of enemies) {
+      if(e.trail.length < 2) continue;
+      ctx.beginPath();
+      ctx.moveTo(e.trail[0].x*sx, e.trail[0].y*sy);
+      for(let i=1;i<e.trail.length;i++) {
+        ctx.lineTo(e.trail[i].x*sx, e.trail[i].y*sy);
+      }
+      ctx.strokeStyle = e.trailColor;
+      ctx.lineWidth = 1;
+      ctx.globalAlpha = 0.4;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    for(const int of interceptors) {
+      if(int.trail.length < 2) continue;
+      ctx.beginPath();
+      ctx.moveTo(int.trail[0].x*sx, int.trail[0].y*sy);
+      for(let i=1;i<int.trail.length;i++) {
+        ctx.lineTo(int.trail[i].x*sx, int.trail[i].y*sy);
+      }
+      ctx.strokeStyle = '#00ccff44';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+  }
+
+  // AI predictions
+  if(document.getElementById('showPredictions').checked) {
+    for(const dec of aiDecisions) {
+      if(!dec.target.alive) continue;
+      const tx = dec.target.x*sx, ty = dec.target.y*sy;
+      const ix = dec.interceptX*sx, iy = dec.interceptY*sy;
+
+      // Predicted trajectory
+      ctx.beginPath();
+      ctx.moveTo(tx, ty);
+      ctx.lineTo(ix, iy);
+      ctx.strokeStyle = `rgba(204,136,255,${dec.confidence})`;
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3,6]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Intercept point
+      ctx.beginPath();
+      ctx.arc(ix, iy, 6, 0, TAU);
+      ctx.strokeStyle = '#cc88ff';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Priority indicator
+      if(dec.priority > 0.5) {
+        ctx.fillStyle = `rgba(255,${round(255*(1-dec.priority))},0,0.7)`;
+        ctx.font = '9px monospace';
+        ctx.fillText(`P:${(dec.priority*100).toFixed(0)}%`, tx+12, ty-12);
+      }
+    }
+  }
+
+  // Enemies
+  for(const e of enemies) {
+    const ex = e.x*sx, ey = e.y*sy;
+
+    // Threat glow
+    ctx.beginPath();
+    ctx.arc(ex, ey, 8 + e.threat*8, 0, TAU);
+    ctx.fillStyle = e.color + '22';
+    ctx.fill();
+
+    // Enemy body
+    ctx.save();
+    ctx.translate(ex, ey);
+    ctx.rotate(atan2(e.vy, e.vx));
+
+    // Missile shape
+    ctx.beginPath();
+    ctx.moveTo(8, 0);
+    ctx.lineTo(-5, -4);
+    ctx.lineTo(-3, 0);
+    ctx.lineTo(-5, 4);
+    ctx.closePath();
+    ctx.fillStyle = e.color;
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff44';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+
+    // Engine flame
+    ctx.beginPath();
+    ctx.moveTo(-3, 0);
+    ctx.lineTo(-8-random()*4, -2);
+    ctx.lineTo(-8-random()*4, 2);
+    ctx.closePath();
+    ctx.fillStyle = '#ffaa00';
+    ctx.fill();
+
+    ctx.restore();
+
+    // ID label
+    ctx.fillStyle = e.color;
+    ctx.font = '8px monospace';
+    ctx.fillText(e.id, ex+10, ey-8);
+
+    // Velocity vector
+    ctx.beginPath();
+    ctx.moveTo(ex, ey);
+    ctx.lineTo(ex + e.vx*0.02*sx, ey + e.vy*0.02*sy);
+    ctx.strokeStyle = e.color + '88';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Interceptors
+  for(const int of interceptors) {
+    const ix = int.x*sx, iy = int.y*sy;
+
+    // Glow
+    ctx.beginPath();
+    ctx.arc(ix, iy, 6, 0, TAU);
+    ctx.fillStyle = '#00ccff22';
+    ctx.fill();
+
+    // Interceptor body
+    ctx.save();
+    ctx.translate(ix, iy);
+    ctx.rotate(atan2(int.vy, int.vx));
+
+    ctx.beginPath();
+    ctx.moveTo(7, 0);
+    ctx.lineTo(-4, -3);
+    ctx.lineTo(-2, 0);
+    ctx.lineTo(-4, 3);
+    ctx.closePath();
+    ctx.fillStyle = int.guidancePhase === 'terminal' ? '#00ff88' : '#00ccff';
+    ctx.fill();
+
+    // Engine
+    ctx.beginPath();
+    ctx.moveTo(-2, 0);
+    ctx.lineTo(-6-random()*3, -1.5);
+    ctx.lineTo(-6-random()*3, 1.5);
+    ctx.closePath();
+    ctx.fillStyle = '#00ffcc';
+    ctx.fill();
+
+    ctx.restore();
+
+    // Guidance line to target
+    if(int.target && int.target.alive) {
+      ctx.beginPath();
+      ctx.moveTo(ix, iy);
+      ctx.lineTo(int.target.x*sx, int.target.y*sy);
+      ctx.strokeStyle = '#00ccff22';
+      ctx.lineWidth = 0.5;
+      ctx.setLineDash([2,4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
+  // Launchers
+  for(const l of launchers) {
+    const lx = l.x*sx, ly = l.y*sy;
+
+    // Launcher base
+    ctx.fillStyle = '#1a3a2a';
+    ctx.fillRect(lx-8, ly-4, 16, 12);
+    ctx.strokeStyle = l.status==='ready' ? '#00ff88' : '#ffaa00';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(lx-8, ly-4, 16, 12);
+
+    // Barrel
+    ctx.save();
+    ctx.translate(lx, ly);
+    // Point at nearest threat
+    let angle = -PI/2;
+    let nearestEnemy = null, nearestDist = Infinity;
+    for(const e of enemies) {
+      const d = hypot(e.x-l.x, e.y-l.y);
+      if(d < nearestDist) { nearestDist = d; nearestEnemy = e; }
+    }
+    if(nearestEnemy) angle = atan2(nearestEnemy.y-l.y, nearestEnemy.x-l.x);
+    l.angle = lerp(l.angle, angle, 0.05);
+
+    ctx.rotate(l.angle);
+    ctx.fillStyle = '#446644';
+    ctx.fillRect(0, -2, 12, 4);
+    ctx.restore();
+
+    // Status text
+    ctx.fillStyle = l.status==='ready' ? '#00ff88' : '#ffaa00';
+    ctx.font = '8px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(`ПУ${l.id} [${l.missiles}]`, lx, ly+18);
+    if(l.status === 'reloading') {
+      ctx.fillStyle = '#ffaa00';
+      ctx.fillText(`${l.reloadTimer.toFixed(1)}s`, lx, ly+26);
+    }
+    ctx.textAlign = 'left';
+  }
+
+  // Explosions
+  for(const ex of explosions) {
+    const progress = ex.t / ex.maxDuration;
+    const r = ex.size * (1 + progress * 2);
+    ctx.beginPath();
+    ctx.arc(ex.x*sx, ex.y*sy, r, 0, TAU);
+
+    const alpha = 1 - progress;
+    ctx.fillStyle = ex.color + Math.round(alpha*255).toString(16).padStart(2,'0');
+    ctx.fill();
+
+    // Shockwave ring
+    ctx.beginPath();
+    ctx.arc(ex.x*sx, ex.y*sy, r*1.5, 0, TAU);
+    ctx.strokeStyle = ex.color + Math.round(alpha*128).toString(16).padStart(2,'0');
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  // Particles
+  for(const p of particles) {
+    const alpha = p.life / p.maxLife;
+    ctx.beginPath();
+    ctx.arc(p.x*sx, p.y*sy, p.size*alpha, 0, TAU);
+    ctx.fillStyle = p.color + Math.round(alpha*200).toString(16).padStart(2,'0');
+    ctx.fill();
+  }
+
+  // UI overlay
+  const uctx = uiCtx;
+  uctx.clearRect(0, 0, viewW, viewH);
+
+  // Compass
+  uctx.save();
+  uctx.translate(viewW - 50, 50);
+  uctx.beginPath();
+  uctx.arc(0, 0, 30, 0, TAU);
+  uctx.strokeStyle = '#1a3a5c';
+  uctx.lineWidth = 1;
+  uctx.stroke();
+  ['С','В','Ю','З'].forEach((l,i)=>{
+    const a = i*PI/2 - PI/2;
+    uctx.fillStyle = '#00ccff88';
+    uctx.font = '9px monospace';
+    uctx.textAlign = 'center';
+    uctx.fillText(l, cos(a)*35, sin(a)*35+3);
+  });
+  uctx.restore();
+
+  // Time and frame info
+  uctx.fillStyle = '#00ccff88';
+  uctx.font = '10px monospace';
+  uctx.fillText(`T+${simTime.toFixed(1)}s | FPS:${fps} | AI:${transformer.lastInferenceTime.toFixed(1)}ms`, 10, 20);
+  uctx.fillText(`Цели: ${enemies.length} | Перехватчики: ${interceptors.length} | Треки: ${tracker.tracks.size}`, 10, 35);
+}
+
+// ============================================================
+// UI UPDATES
+// ============================================================
+function updateUI() {
+  // Stats
+  document.getElementById('statLaunched').textContent = stats.launched;
+  document.getElementById('statIntercepted').textContent = stats.intercepted;
+  document.getElementById('statMissed').textContent = stats.missed;
+  const total = stats.intercepted + stats.missed;
+  const acc = total > 0 ? round(stats.intercepted/total*100) : 0;
+  document.getElementById('statAccuracy').textContent = acc + '%';
+  document.getElementById('statAccuracy').className = 'stat-number' + (acc<50?' danger':acc<80?' warning':'');
+  document.getElementById('statFired').textContent = stats.fired;
+  const eff = stats.fired > 0 ? round(stats.intercepted/stats.fired*100) : 0;
+  document.getElementById('statEfficiency').textContent = eff + '%';
+
+  // Threat status
+  let maxThreat = 0;
+  for(const e of enemies) maxThreat = max(maxThreat, e.threat||0);
+  const ts = document.getElementById('threatStatus');
+  if(maxThreat > 0.7) { ts.textContent = '▲ УГРОЗА: ВЫСОКАЯ'; ts.className = 'status-alert'; }
+  else if(maxThreat > 0.3) { ts.textContent = '▲ УГРОЗА: СРЕДНЯЯ'; ts.className = 'status-normal'; }
+  else if(enemies.length > 0) { ts.textContent = '▲ УГРОЗА: НИЗКАЯ'; ts.className = 'status-normal'; }
+  else { ts.textContent = '▲ УГРОЗА: НЕТ'; ts.className = 'status-normal'; }
+
+  document.getElementById('timeDisplay').textContent = `T+${simTime.toFixed(1)}s`;
+
+  // Track list
+  let trackHTML = '';
+  const sortedTracks = [...tracker.tracks.values()].sort((a,b) => b.threat - a.threat);
+  for(const t of sortedTracks.slice(0, 10)) {
+    const d = round(hypot(t.x-BASE.x, t.y-BASE.y));
+    const spd = round(hypot(t.vx, t.vy));
+    const threatPct = round(t.threat*100);
+    const threatColor = t.threat > 0.7 ? '#ff4444' : t.threat > 0.4 ? '#ffaa00' : '#00ff88';
+    trackHTML += `<div class="track-item hostile">
+      <div style="display:flex;justify-content:space-between">
+        <span style="color:${threatColor}">●T${t.id}</span>
+        <span style="color:#668899">${['BAL','CRU','MAN','HYP'][t.type||0]}</span>
+      </div>
+      <div style="color:#668899;font-size:9px">D:${d}m V:${spd}m/s ${t.engaged?'⚔':''}${t.maneuvering?'↻':''}</div>
+      <div class="threat-bar"><div class="threat-fill" style="width:${threatPct}%;background:${threatColor}"></div></div>
     </div>`;
-  document.getElementById("modalBg").classList.add("show");
+  }
+  document.getElementById('trackList').innerHTML = trackHTML;
+
+  // Launcher status
+  let launcherHTML = '';
+  for(const l of launchers) {
+    const pct = round(l.missiles/l.maxMissiles*100);
+    const color = l.status==='ready'?'#00ff88':'#ffaa00';
+    launcherHTML += `<div class="param-row">
+      <span class="param-label">ПУ-${l.id}</span>
+      <span class="param-value" style="color:${color}">${l.missiles}/${l.maxMissiles} ${l.status==='reloading'?'⟳':'✓'}</span>
+    </div>`;
+  }
+  document.getElementById('launcherStatus').innerHTML = launcherHTML;
+
+  // AI metrics
+  document.getElementById('aiConfBar').style.width = (transformer.confidence*100)+'%';
+  document.getElementById('aiConfVal').textContent = round(transformer.confidence*100)+'%';
+  document.getElementById('aiLossBar').style.width = min(100,transformer.totalLoss*50)+'%';
+  document.getElementById('aiLossVal').textContent = transformer.totalLoss.toFixed(3);
+  document.getElementById('aiEpochBar').style.width = min(100,transformer.trainEpoch/10)+'%';
+  document.getElementById('aiEpochVal').textContent = transformer.trainEpoch;
+  document.getElementById('aiLoadBar').style.width = min(100,transformer.lastInferenceTime/30*100)+'%';
+  document.getElementById('aiLoadVal').textContent = round(transformer.lastInferenceTime)+'ms';
+
+  // Radar info
+  document.getElementById('radarTargets').textContent = tracker.tracks.size;
+
+  // History tracking
+  if(frameCount % 30 === 0) {
+    interceptHistory.push(acc);
+    if(interceptHistory.length > 100) interceptHistory.shift();
+    lossHistory.push(transformer.totalLoss);
+    if(lossHistory.length > 100) lossHistory.shift();
+    neuronActivity.push(transformer.confidence);
+    if(neuronActivity.length > 100) neuronActivity.shift();
+  }
+
+  // Draw mini charts
+  if(frameCount % 15 === 0) {
+    drawMiniChart('chartIntercepts', interceptHistory, '#00ff88', '% перехват');
+    drawMiniChart('chartLoss', lossHistory, '#ff8800', 'Loss');
+    drawMiniChart('chartNeurons', neuronActivity, '#cc88ff', 'Уверенность');
+  }
 }
 
-// ── HELP ──────────────────────────────────────────
+function drawMiniChart(canvasId, data, color, label) {
+  const canvas = document.getElementById(canvasId);
+  if(!canvas) return;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width - 4;
+  canvas.height = rect.height - 24;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
 
-function showHelp() {
-  document.getElementById("modalContent").innerHTML=`
-    <h2>📖 How It Works</h2>
-    <p><b>Spiral Lattice Cipher</b> — a non-linear, position-dependent cipher using Feistel networks.</p>
-    <ul>
-      <li><b>Key</b> reorders the alphabet (like a keyed substitution)</li>
-      <li><b>Grid</b>: alphabet mapped to s×t grid (s=⌈√N⌉)</li>
-      <li><b>Feistel</b>: 4-round unbalanced Feistel network — mathematically guaranteed bijection</li>
-      <li><b>Cycle-walking</b>: if Feistel output ≥ N, re-apply until in range (preserves bijectivity)</li>
-      <li><b>Shift</b>: position-dependent modular addition: (n² + 3·fb + n) mod N</li>
-      <li><b>Feedback</b>: each character's output influences the next character's encryption</li>
-      <li><b>Rounds</b>: the entire Feistel+shift is applied multiple times for stronger diffusion</li>
-    </ul>
-    <p><b>Reversibility:</b> Feistel networks are inherently invertible. Cycle-walking preserves bijectivity. Modular shift is trivially reversed. This is mathematically proven — not heuristic.</p>
-    <p style="color:var(--orange)"><b>⚠️ Security:</b> Educational/puzzle cipher. NOT for real encryption. Key space ~28-40 bits.</p>
-    <button class="btn btn-b mt-sm" onclick="closeModal()">Close</button>`;
-  document.getElementById("modalBg").classList.add("show");
+  ctx.clearRect(0, 0, w, h);
+
+  if(data.length < 2) return;
+
+  const maxVal = max(...data, 0.01);
+  const minVal = min(...data, 0);
+  const range = maxVal - minVal || 1;
+
+  // Grid
+  ctx.strokeStyle = '#1a2a3c';
+  ctx.lineWidth = 0.5;
+  for(let i=0;i<5;i++){
+    const y = h * i / 4;
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
+  }
+
+  // Line
+  ctx.beginPath();
+  for(let i=0;i<data.length;i++){
+    const x = (i/(data.length-1)) * w;
+    const y = h - ((data[i]-minVal)/range) * h * 0.9 - h*0.05;
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Fill
+  ctx.lineTo(w, h);
+  ctx.lineTo(0, h);
+  ctx.closePath();
+  ctx.fillStyle = color + '15';
+  ctx.fill();
+
+  // Current value
+  ctx.fillStyle = color;
+  ctx.font = '9px monospace';
+  ctx.fillText(`${data[data.length-1].toFixed(2)}`, 3, 10);
 }
 
-function closeModal(){document.getElementById("modalBg").classList.remove("show")}
-function stab(el,id){const p=el.parentElement,c=p.parentElement;p.querySelectorAll(".tab").forEach(t=>t.classList.remove("on"));c.querySelectorAll(".tc").forEach(t=>t.classList.remove("on"));el.classList.add("on");document.getElementById(id).classList.add("on")}
-function toast(msg,type){const el=document.getElementById("toast");el.textContent=msg;el.className="toast toast-"+(type||"info");requestAnimationFrame(()=>el.classList.add("show"));clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),3000)}
+// ============================================================
+// LOG
+// ============================================================
+function addLog(msg, type='normal') {
+  const area = document.getElementById('logArea');
+  const time = simTime.toFixed(1);
+  const div = document.createElement('div');
+  div.className = 'log-entry ' + type;
+  div.textContent = `[${time}s] ${msg}`;
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
 
-document.addEventListener("DOMContentLoaded", rebuild);
+  // Limit entries
+  while(area.children.length > 200) area.removeChild(area.firstChild);
+}
+
+// ============================================================
+// CONTROLS
+// ============================================================
+function toggleSimulation() {
+  simRunning = !simRunning;
+  document.getElementById('btnStart').textContent = simRunning ? '❚❚ ПАУЗА' : '▶ СТАРТ';
+  document.getElementById('btnStart').classList.toggle('active', simRunning);
+  if(simRunning) addLog('Симуляция запущена', 'launch');
+  else addLog('Симуляция на паузе', 'warning');
+}
+
+function resetSimulation() {
+  simRunning = false;
+  simTime = 0;
+  frameCount = 0;
+  lastAutoWave = 0;
+  enemies = [];
+  interceptors = [];
+  explosions = [];
+  particles = [];
+  tracker = new IMMTracker();
+  aiDecisions = [];
+  stats = {launched:0, intercepted:0, missed:0, fired:0, totalShots:0};
+  interceptHistory = [];
+  lossHistory = [];
+  neuronActivity = [];
+  initLaunchers(+document.getElementById('launcherCount').value);
+  document.getElementById('btnStart').textContent = '▶ СТАРТ';
+  document.getElementById('logArea').innerHTML = '';
+  addLog('Система сброшена', 'ai');
+  drawBackground();
+}
+
+function resetAI() {
+  transformer = new WorldModelTransformer();
+  addLog('AI Transformer сброшен и реинициализирован', 'ai');
+}
+
+function trainBatch() {
+  for(let i=0;i<10;i++) transformer.trainES(16);
+  addLog(`Обучение: ${transformer.trainEpoch} эпох, Loss: ${transformer.totalLoss.toFixed(4)}`, 'ai');
+}
+
+// ============================================================
+// GAME LOOP
+// ============================================================
+let lastTime = 0;
+let fps = 0;
+let fpsCounter = 0;
+let fpsTimer = 0;
+
+function gameLoop(timestamp) {
+  const rawDt = (timestamp - lastTime) / 1000;
+  lastTime = timestamp;
+  const dt = min(rawDt, 0.05) * simSpeed;
+
+  fpsCounter++;
+  fpsTimer += rawDt;
+  if(fpsTimer >= 1) { fps = fpsCounter; fpsCounter = 0; fpsTimer = 0; }
+
+  if(simRunning) {
+    simTime += dt;
+    frameCount++;
+    updateSimulation(dt);
+  }
+
+  render();
+
+  if(frameCount % 5 === 0) updateUI();
+
+  requestAnimationFrame(gameLoop);
+}
+
+// Start
+window.addEventListener('load', init);
 </script>
 </body>
-</html>
+  </html>
