@@ -2,2130 +2,1149 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Система ПРО с AI Transformer</title>
+<title>AEGIS-AI ПРО v5.0</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0a0a12;color:#00ff88;font-family:'Courier New',monospace;overflow:hidden;height:100vh;width:100vw}
-.main-container{display:grid;grid-template-columns:280px 1fr 320px;grid-template-rows:48px 1fr 200px;height:100vh;gap:2px;background:#111}
-.header{grid-column:1/-1;background:linear-gradient(90deg,#0a1628,#162040,#0a1628);display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid #1a3a5c}
-.header h1{font-size:16px;color:#00ccff;text-shadow:0 0 10px #00ccff55;letter-spacing:3px}
-.header .status{display:flex;gap:15px;font-size:11px}
-.header .status span{padding:3px 10px;border-radius:3px}
-.status-active{background:#00ff8822;border:1px solid #00ff88;color:#00ff88}
-.status-alert{background:#ff440022;border:1px solid #ff4400;color:#ff4400;animation:blink 1s infinite}
-.status-normal{background:#00ccff22;border:1px solid #00ccff;color:#00ccff}
-@keyframes blink{50%{opacity:.5}}
-.left-panel{background:#0d1117;border-right:1px solid #1a2a3c;overflow-y:auto;padding:8px;font-size:10px}
-.right-panel{background:#0d1117;border-left:1px solid #1a2a3c;overflow-y:auto;padding:8px;font-size:10px}
-.bottom-panel{grid-column:1/-1;background:#0d1117;border-top:1px solid #1a2a3c;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:2px;padding:4px}
-.main-view{position:relative;background:#080c14;overflow:hidden}
-canvas{position:absolute;top:0;left:0}
-.panel-title{color:#00ccff;font-size:11px;padding:4px 8px;background:#0a1a2a;margin-bottom:4px;border-left:3px solid #00ccff;letter-spacing:1px;text-transform:uppercase}
-.section{margin-bottom:8px;background:#0a0f18;border:1px solid #1a2a3c;border-radius:3px;overflow:hidden}
-.param-row{display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid #0d1a28}
-.param-row:last-child{border:none}
-.param-label{color:#668899}
-.param-value{color:#00ff88;font-weight:bold}
-.param-value.danger{color:#ff4444}
-.param-value.warning{color:#ffaa00}
-.slider-row{padding:4px 8px}
-.slider-row label{display:block;color:#668899;margin-bottom:2px;font-size:9px}
-.slider-row input[type=range]{width:100%;height:4px;-webkit-appearance:none;background:#1a2a3c;border-radius:2px;outline:none}
-.slider-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;background:#00ccff;border-radius:50%;cursor:pointer}
-button{background:#0a2a4a;color:#00ccff;border:1px solid #00ccff44;padding:5px 12px;cursor:pointer;font-family:inherit;font-size:10px;border-radius:3px;transition:all .2s}
-button:hover{background:#0a3a6a;border-color:#00ccff}
-button.danger{border-color:#ff4444;color:#ff4444}
-button.danger:hover{background:#3a0a0a}
-button.active{background:#00ccff33;border-color:#00ccff}
-.log-area{height:100%;overflow-y:auto;font-size:9px;padding:4px;background:#060a10}
-.log-entry{padding:2px 4px;border-bottom:1px solid #0a1018}
-.log-entry.intercept{color:#00ff88}
-.log-entry.launch{color:#00ccff}
-.log-entry.miss{color:#ff4444}
-.log-entry.warning{color:#ffaa00}
-.log-entry.ai{color:#cc88ff}
-.track-item{padding:4px 6px;margin:2px 0;background:#0a1420;border:1px solid #1a2a3c;border-radius:2px;cursor:pointer}
-.track-item:hover{border-color:#00ccff}
-.track-item.hostile{border-left:3px solid #ff4444}
-.track-item.friendly{border-left:3px solid #00ff88}
-.track-item.unknown{border-left:3px solid #ffaa00}
-.threat-bar{height:3px;background:#1a2a3c;border-radius:2px;margin-top:2px}
-.threat-fill{height:100%;border-radius:2px;transition:width .3s}
-.btn-row{display:flex;gap:4px;padding:4px 8px;flex-wrap:wrap}
-.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;padding:4px}
-.stat-box{background:#0a1420;padding:6px;text-align:center;border:1px solid #1a2a3c;border-radius:3px}
-.stat-number{font-size:18px;font-weight:bold;color:#00ccff}
-.stat-label{font-size:8px;color:#668899;margin-top:2px}
-.ai-status{padding:4px 8px}
-.ai-meter{display:flex;align-items:center;gap:6px;margin:3px 0}
-.ai-meter-bar{flex:1;height:6px;background:#1a2a3c;border-radius:3px;overflow:hidden}
-.ai-meter-fill{height:100%;transition:width .5s;border-radius:3px}
-.ai-meter-label{width:60px;font-size:9px;color:#668899}
-.ai-meter-val{width:35px;font-size:9px;color:#00ff88;text-align:right}
-.controls-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:4px}
-.mini-chart{height:60px;background:#060a10;border:1px solid #1a2a3c;border-radius:3px;padding:2px}
-.tab-bar{display:flex;gap:1px;background:#0a1018;padding:2px}
-.tab{flex:1;text-align:center;padding:4px;cursor:pointer;font-size:9px;color:#668899;background:#0d1420;transition:all .2s}
-.tab.active{color:#00ccff;background:#0a2040;border-bottom:2px solid #00ccff}
-.network-viz{padding:4px;text-align:center;font-size:9px;color:#668899}
-select{background:#0a1a2a;color:#00ccff;border:1px solid #1a3a5c;padding:3px 6px;font-family:inherit;font-size:10px;border-radius:3px;outline:none}
-.checkbox-row{padding:3px 8px;display:flex;align-items:center;gap:6px}
-.checkbox-row input{accent-color:#00ccff}
-.tooltip{position:absolute;background:#0a1a2aee;border:1px solid #00ccff;padding:6px 10px;font-size:10px;border-radius:4px;pointer-events:none;z-index:100;max-width:220px}
+body{background:#050510;color:#0f0;font-family:'Courier New',monospace;overflow:hidden}
+.wrap{display:grid;grid-template-columns:240px 1fr 260px;grid-template-rows:40px 1fr 160px;height:100vh;gap:1px;background:#111}
+.hdr{grid-column:1/-1;background:linear-gradient(90deg,#080820,#0c1838,#080820);display:flex;align-items:center;justify-content:space-between;padding:0 12px;border-bottom:1px solid #1a3060}
+.hdr h1{font-size:13px;color:#0cf;letter-spacing:2px}
+.hdr .st{display:flex;gap:8px;font-size:10px}
+.hdr .st span{padding:2px 7px;border-radius:3px;border:1px solid}
+.sok{border-color:#0f8!important;color:#0f8;background:#0f81}
+.swn{border-color:#fa0!important;color:#fa0;background:#fa01;animation:bl .8s infinite}
+.scr{border-color:#f33!important;color:#f33;background:#f331;animation:bl .4s infinite}
+@keyframes bl{50%{opacity:.4}}
+.lp,.rp{background:#0a0e18;overflow-y:auto;font-size:10px;padding:5px}
+.lp{border-right:1px solid #152040}.rp{border-left:1px solid #152040}
+.bp{grid-column:1/-1;background:#0a0e18;border-top:1px solid #152040;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1px;padding:2px}
+.mv{position:relative;background:#030608;overflow:hidden;cursor:crosshair}
+canvas{display:block;width:100%;height:100%}
+.pt{color:#0be;font-size:10px;padding:3px 6px;background:#081828;margin-bottom:3px;border-left:2px solid #0be;letter-spacing:1px}
+.sec{margin-bottom:5px;background:#080c18;border:1px solid #152040;border-radius:2px;overflow:hidden}
+.pr{display:flex;justify-content:space-between;padding:2px 6px;border-bottom:1px solid #0a1220;font-size:10px}
+.pl{color:#568}.pv{color:#0f8;font-weight:bold}.pv.bad{color:#f44}.pv.mid{color:#fa0}
+.sr{padding:3px 6px}
+.sr label{display:block;color:#568;margin-bottom:1px;font-size:9px}
+.sr input[type=range]{width:100%;height:3px;-webkit-appearance:none;background:#152040;border-radius:2px}
+.sr input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;background:#0cf;border-radius:50%;cursor:pointer}
+.br{display:flex;gap:3px;padding:3px 6px;flex-wrap:wrap}
+.cb{padding:2px 6px;display:flex;align-items:center;gap:4px;font-size:9px}
+.cb input{accent-color:#0cf}
+.cb label{color:#689}
+button{background:#081828;color:#0cf;border:1px solid #0cf3;padding:3px 9px;cursor:pointer;font-family:inherit;font-size:9px;border-radius:2px}
+button:hover{background:#0a2848;border-color:#0cf8}
+button.on{background:#0cf2;border-color:#0cf}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:2px;padding:3px}
+.sb{background:#080c18;padding:4px;text-align:center;border:1px solid #152040;border-radius:2px}
+.sn{font-size:15px;font-weight:bold;color:#0cf}
+.sl{font-size:7px;color:#568;margin-top:1px}
+.am{display:flex;align-items:center;gap:4px;margin:2px 6px}
+.amb{flex:1;height:4px;background:#152040;border-radius:2px;overflow:hidden}
+.amf{height:100%;border-radius:2px;transition:width .3s}
+.aml{width:50px;font-size:8px;color:#568}
+.amv{width:38px;font-size:8px;color:#0f8;text-align:right}
+.la{height:100%;overflow-y:auto;font-size:8px;padding:2px;background:#030810}
+.le{padding:1px 3px;border-bottom:1px solid #080c18}
+.le.hit{color:#0f8}.le.lnc{color:#0cf}.le.mis{color:#f44}.le.wrn{color:#fa0}.le.ai{color:#c8f}
+.ti{padding:2px 4px;margin:1px 0;background:#080e1a;border:1px solid #152040;border-radius:2px;font-size:9px}
+.tb{height:3px;background:#152040;border-radius:1px;margin-top:1px}
+.tf{height:100%;border-radius:1px}
+.mc{width:100%;height:100%;background:#030810;border:1px solid #152040;border-radius:2px}
 </style>
 </head>
 <body>
-<div class="main-container">
-
-<div class="header">
-  <h1>⬡ AEGIS-AI ПРОТИВОРАКЕТНАЯ ОБОРОНА v3.7</h1>
-  <div class="status">
-    <span id="sysStatus" class="status-active">● СИСТЕМА АКТИВНА</span>
-    <span id="aiStatus" class="status-normal">◆ AI ONLINE</span>
-    <span id="threatStatus" class="status-normal">▲ УГРОЗА: НЕТ</span>
-    <span id="timeDisplay" class="status-normal">T+0000.0s</span>
-  </div>
+<div class="wrap">
+<div class="hdr">
+<h1>⬡ AEGIS-AI ПРО v5.0 — ПОЛНАЯ ВИЗУАЛИЗАЦИЯ</h1>
+<div class="st">
+<span id="sysS" class="sok">● ONLINE</span>
+<span id="aiS" class="sok">◆ AI</span>
+<span id="thrS" class="sok">▲ CLEAR</span>
+<span id="tmD" class="sok">T+0.0</span>
+<span id="fpD" class="sok">60 FPS</span>
+</div>
+</div>
+<div class="lp">
+<div class="sec">
+<div class="pt">⚙ СИМУЛЯЦИЯ</div>
+<div class="br">
+<button id="btnG" onclick="tog()">▶ СТАРТ</button>
+<button onclick="rst()">⟳ СБРОС</button>
+<button onclick="wave()">🚀 ВОЛНА</button>
+<button onclick="sp1()">● ОДНА</button>
+<button onclick="mass()">💥 МАСС</button>
+</div>
+<div class="sr"><label>Скорость: <span id="v1">1.0</span>x</label><input type="range" min="0.1" max="8" step="0.1" value="1" oninput="simSpd=+this.value;O('v1',this.value)"></div>
+<div class="sr"><label>Интервал атак: <span id="v2">4</span>с</label><input type="range" min="1" max="20" step="1" value="4" id="atkI" oninput="O('v2',this.value)"></div>
+<div class="sr"><label>Ракет в волне: <span id="v3">5</span></label><input type="range" min="1" max="25" step="1" value="5" id="wvN" oninput="O('v3',this.value)"></div>
+<div class="cb"><input type="checkbox" id="autoW" checked><label>Авто-волны</label></div>
+<div class="cb"><input type="checkbox" id="aiOn" checked><label>AI управление</label></div>
+<div class="cb"><input type="checkbox" id="shTr" checked><label>Следы</label></div>
+<div class="cb"><input type="checkbox" id="shPr" checked><label>Прогнозы</label></div>
+<div class="cb"><input type="checkbox" id="shZn" checked><label>Зоны</label></div>
+<div class="cb"><input type="checkbox" id="shLbl" checked><label>Метки</label></div>
+</div>
+<div class="sec">
+<div class="pt">🎯 ПРОТИВНИК</div>
+<div class="sr"><label>Мин V: <span id="v4">200</span></label><input type="range" min="50" max="1500" step="50" value="200" id="mnS" oninput="O('v4',this.value)"></div>
+<div class="sr"><label>Макс V: <span id="v5">900</span></label><input type="range" min="200" max="3000" step="50" value="900" id="mxS" oninput="O('v5',this.value)"></div>
+<div class="cb"><input type="checkbox" id="tB" checked><label>Баллистические</label></div>
+<div class="cb"><input type="checkbox" id="tC" checked><label>Крылатые</label></div>
+<div class="cb"><input type="checkbox" id="tM" checked><label>Маневрирующие</label></div>
+<div class="cb"><input type="checkbox" id="tH"><label>Гиперзвуковые</label></div>
+</div>
+<div class="sec">
+<div class="pt">🛡 ПРО</div>
+<div class="sr"><label>ПУ: <span id="v6">4</span></label><input type="range" min="1" max="8" step="1" value="4" id="nL" oninput="mkL(+this.value);O('v6',this.value)"></div>
+<div class="sr"><label>Ракет/ПУ: <span id="v7">8</span></label><input type="range" min="2" max="20" step="1" value="8" id="mP" oninput="O('v7',this.value)"></div>
+<div class="sr"><label>V перехв: <span id="v8">1400</span></label><input type="range" min="400" max="4000" step="100" value="1400" id="iS" oninput="O('v8',this.value)"></div>
+<div class="sr"><label>Перезарядка: <span id="v9">2.5</span>с</label><input type="range" min="0.5" max="10" step="0.5" value="2.5" id="rT" oninput="O('v9',this.value)"></div>
+<div class="sr"><label>R поражения: <span id="vA">35</span></label><input type="range" min="5" max="120" step="5" value="35" id="kR" oninput="O('vA',this.value)"></div>
+</div>
+<div class="sec">
+<div class="pt">🧠 AI</div>
+<div class="sr"><label>LR: <span id="vB">0.003</span></label><input type="range" min="0.0001" max="0.02" step="0.0001" value="0.003" id="lr" oninput="O('vB',(+this.value).toFixed(4))"></div>
+<div class="sr"><label>Горизонт: <span id="vC">3</span>с</label><input type="range" min="0.5" max="10" step="0.5" value="3" id="hz" oninput="O('vC',this.value)"></div>
+<div class="br">
+<button onclick="resetAI()">⟳ AI</button>
+<button onclick="trainN(50)">⚡50</button>
+<button onclick="trainN(500)">⚡500</button>
+</div>
+<div class="pr"><span class="pl">Буфер</span><span class="pv" id="rbS">0</span></div>
+</div>
 </div>
 
-<div class="left-panel">
-  <div class="section">
-    <div class="panel-title">⚙ Управление симуляцией</div>
-    <div class="btn-row">
-      <button id="btnStart" onclick="toggleSimulation()">▶ СТАРТ</button>
-      <button id="btnReset" onclick="resetSimulation()">⟳ СБРОС</button>
-      <button onclick="launchWave()">🚀 ВОЛНА</button>
-      <button onclick="launchSingle()">● ОДНА</button>
-    </div>
-    <div class="slider-row">
-      <label>Скорость симуляции: <span id="simSpeedVal">1.0</span>x</label>
-      <input type="range" min="0.1" max="5" step="0.1" value="1" oninput="simSpeed=+this.value;document.getElementById('simSpeedVal').textContent=this.value">
-    </div>
-    <div class="slider-row">
-      <label>Интервал атак: <span id="atkIntervalVal">5</span>с</label>
-      <input type="range" min="1" max="30" step="1" value="5" id="atkInterval" oninput="document.getElementById('atkIntervalVal').textContent=this.value">
-    </div>
-    <div class="slider-row">
-      <label>Ракет в волне: <span id="waveCountVal">5</span></label>
-      <input type="range" min="1" max="20" step="1" value="5" id="waveCount" oninput="document.getElementById('waveCountVal').textContent=this.value">
-    </div>
-    <div class="checkbox-row">
-      <input type="checkbox" id="autoWaves" checked><label for="autoWaves">Авто-волны</label>
-    </div>
-    <div class="checkbox-row">
-      <input type="checkbox" id="aiEnabled" checked><label for="aiEnabled">AI управление</label>
-    </div>
-    <div class="checkbox-row">
-      <input type="checkbox" id="showTrails" checked><label for="showTrails">Следы траекторий</label>
-    </div>
-    <div class="checkbox-row">
-      <input type="checkbox" id="showPredictions" checked><label for="showPredictions">Прогнозы AI</label>
-    </div>
-    <div class="checkbox-row">
-      <input type="checkbox" id="showZones" checked><label for="showZones">Зоны поражения</label>
-    </div>
-  </div>
+<div class="mv" id="mV"><canvas id="cv"></canvas></div>
 
-  <div class="section">
-    <div class="panel-title">🎯 Параметры ракет противника</div>
-    <div class="slider-row">
-      <label>Мин. скорость: <span id="minSpdVal">200</span> м/с</label>
-      <input type="range" min="100" max="1000" step="50" value="200" id="minSpd" oninput="document.getElementById('minSpdVal').textContent=this.value">
-    </div>
-    <div class="slider-row">
-      <label>Макс. скорость: <span id="maxSpdVal">800</span> м/с</label>
-      <input type="range" min="200" max="3000" step="50" value="800" id="maxSpd" oninput="document.getElementById('maxSpdVal').textContent=this.value">
-    </div>
-    <div class="slider-row">
-      <label>Типы траекторий:</label>
-    </div>
-    <div class="checkbox-row"><input type="checkbox" id="trajBallistic" checked><label for="trajBallistic">Баллистические</label></div>
-    <div class="checkbox-row"><input type="checkbox" id="trajCruise" checked><label for="trajCruise">Крылатые</label></div>
-    <div class="checkbox-row"><input type="checkbox" id="trajManeuvering" checked><label for="trajManeuvering">Маневрирующие</label></div>
-    <div class="checkbox-row"><input type="checkbox" id="trajHypersonic"><label for="trajHypersonic">Гиперзвуковые</label></div>
-  </div>
-
-  <div class="section">
-    <div class="panel-title">🛡 Параметры ПРО</div>
-    <div class="slider-row">
-      <label>Кол-во ПУ: <span id="launcherCountVal">4</span></label>
-      <input type="range" min="1" max="8" step="1" value="4" id="launcherCount" oninput="updateLaunchers(+this.value);document.getElementById('launcherCountVal').textContent=this.value">
-    </div>
-    <div class="slider-row">
-      <label>Ракет на ПУ: <span id="missilesPerVal">8</span></label>
-      <input type="range" min="2" max="16" step="1" value="8" id="missilesPerLauncher" oninput="document.getElementById('missilesPerVal').textContent=this.value">
-    </div>
-    <div class="slider-row">
-      <label>Скорость перехватчика: <span id="intSpdVal">1200</span> м/с</label>
-      <input type="range" min="400" max="4000" step="100" value="1200" id="interceptorSpeed" oninput="document.getElementById('intSpdVal').textContent=this.value">
-    </div>
-    <div class="slider-row">
-      <label>Перезарядка: <span id="reloadVal">3</span>с</label>
-      <input type="range" min="1" max="15" step="0.5" value="3" id="reloadTime" oninput="document.getElementById('reloadVal').textContent=this.value">
-    </div>
-    <div class="slider-row">
-      <label>Радиус поражения: <span id="killRadVal">30</span>м</label>
-      <input type="range" min="5" max="100" step="5" value="30" id="killRadius" oninput="document.getElementById('killRadVal').textContent=this.value">
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="panel-title">🧠 Параметры AI</div>
-    <div class="slider-row">
-      <label>Скорость обучения: <span id="lrVal">0.001</span></label>
-      <input type="range" min="0.0001" max="0.01" step="0.0001" value="0.001" id="learningRate" oninput="document.getElementById('lrVal').textContent=(+this.value).toFixed(4)">
-    </div>
-    <div class="slider-row">
-      <label>Горизонт прогноза: <span id="horizonVal">3</span>с</label>
-      <input type="range" min="1" max="10" step="0.5" value="3" id="predHorizon" oninput="document.getElementById('horizonVal').textContent=this.value">
-    </div>
-    <div class="slider-row">
-      <label>Порог уверенности: <span id="confThreshVal">0.6</span></label>
-      <input type="range" min="0.1" max="0.95" step="0.05" value="0.6" id="confThreshold" oninput="document.getElementById('confThreshVal').textContent=this.value">
-    </div>
-    <div class="btn-row">
-      <button onclick="resetAI()">⟳ Сброс AI</button>
-      <button onclick="trainBatch()">⚡ Обучить</button>
-    </div>
-  </div>
+<div class="rp">
+<div class="sec">
+<div class="pt">📊 СТАТИСТИКА</div>
+<div class="sg">
+<div class="sb"><div class="sn" id="sL">0</div><div class="sl">АТАКУЮЩИХ</div></div>
+<div class="sb"><div class="sn" id="sI">0</div><div class="sl">ПЕРЕХВАЧЕНО</div></div>
+<div class="sb"><div class="sn" id="sM">0</div><div class="sl">ПРОПУЩЕНО</div></div>
+<div class="sb"><div class="sn" id="sA">0%</div><div class="sl">ТОЧНОСТЬ</div></div>
+<div class="sb"><div class="sn" id="sF">0</div><div class="sl">ВЫПУЩЕНО</div></div>
+<div class="sb"><div class="sn" id="sE">0%</div><div class="sl">КПД</div></div>
 </div>
-
-<div class="main-view" id="mainView">
-  <canvas id="bgCanvas"></canvas>
-  <canvas id="mainCanvas"></canvas>
-  <canvas id="uiCanvas"></canvas>
 </div>
-
-<div class="right-panel">
-  <div class="section">
-    <div class="panel-title">📊 Статистика</div>
-    <div class="stats-grid">
-      <div class="stat-box"><div class="stat-number" id="statLaunched">0</div><div class="stat-label">АТАК.РАКЕТ</div></div>
-      <div class="stat-box"><div class="stat-number" id="statIntercepted">0</div><div class="stat-label">ПЕРЕХВАЧЕНО</div></div>
-      <div class="stat-box"><div class="stat-number" id="statMissed">0</div><div class="stat-label">ПРОПУЩЕНО</div></div>
-      <div class="stat-box"><div class="stat-number" id="statAccuracy">0%</div><div class="stat-label">ТОЧНОСТЬ</div></div>
-      <div class="stat-box"><div class="stat-number" id="statFired">0</div><div class="stat-label">ВЫПУЩЕНО ПРО</div></div>
-      <div class="stat-box"><div class="stat-number" id="statEfficiency">0%</div><div class="stat-label">ЭФФЕКТИВНОСТЬ</div></div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="panel-title">🎯 Активные цели</div>
-    <div id="trackList" style="max-height:180px;overflow-y:auto"></div>
-  </div>
-
-  <div class="section">
-    <div class="panel-title">🧠 AI Transformer</div>
-    <div class="ai-status">
-      <div class="ai-meter">
-        <span class="ai-meter-label">Уверенность</span>
-        <div class="ai-meter-bar"><div class="ai-meter-fill" id="aiConfBar" style="width:0%;background:#00ccff"></div></div>
-        <span class="ai-meter-val" id="aiConfVal">0%</span>
-      </div>
-      <div class="ai-meter">
-        <span class="ai-meter-label">Loss</span>
-        <div class="ai-meter-bar"><div class="ai-meter-fill" id="aiLossBar" style="width:50%;background:#ff8800"></div></div>
-        <span class="ai-meter-val" id="aiLossVal">1.00</span>
-      </div>
-      <div class="ai-meter">
-        <span class="ai-meter-label">Эпохи</span>
-        <div class="ai-meter-bar"><div class="ai-meter-fill" id="aiEpochBar" style="width:0%;background:#cc88ff"></div></div>
-        <span class="ai-meter-val" id="aiEpochVal">0</span>
-      </div>
-      <div class="ai-meter">
-        <span class="ai-meter-label">Нагрузка</span>
-        <div class="ai-meter-bar"><div class="ai-meter-fill" id="aiLoadBar" style="width:0%;background:#00ff88"></div></div>
-        <span class="ai-meter-val" id="aiLoadVal">0%</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="section">
-    <div class="panel-title">🚀 Пусковые установки</div>
-    <div id="launcherStatus"></div>
-  </div>
-
-  <div class="section">
-    <div class="panel-title">📡 Радар</div>
-    <div class="param-row"><span class="param-label">Дальность</span><span class="param-value" id="radarRange">150 км</span></div>
-    <div class="param-row"><span class="param-label">Обновление</span><span class="param-value" id="radarUpdate">100 мс</span></div>
-    <div class="param-row"><span class="param-label">Целей</span><span class="param-value" id="radarTargets">0</span></div>
-    <div class="param-row"><span class="param-label">СНР</span><span class="param-value" id="radarSNR">--</span></div>
-  </div>
+<div class="sec">
+<div class="pt">🎯 ЦЕЛИ</div>
+<div id="tL" style="max-height:150px;overflow-y:auto"></div>
 </div>
-
-<div class="bottom-panel">
-  <div class="section" style="grid-row:span 1">
-    <div class="panel-title">📈 График перехватов</div>
-    <canvas id="chartIntercepts" class="mini-chart" style="width:100%;height:100%"></canvas>
-  </div>
-  <div class="section">
-    <div class="panel-title">📉 Loss AI</div>
-    <canvas id="chartLoss" class="mini-chart" style="width:100%;height:100%"></canvas>
-  </div>
-  <div class="section">
-    <div class="panel-title">🧠 Активность нейронов</div>
-    <canvas id="chartNeurons" class="mini-chart" style="width:100%;height:100%"></canvas>
-  </div>
-  <div class="section">
-    <div class="panel-title">📋 Журнал событий</div>
-    <div class="log-area" id="logArea"></div>
-  </div>
+<div class="sec">
+<div class="pt">🧠 AI TRANSFORMER</div>
+<div class="am"><span class="aml">Уверен.</span><div class="amb"><div class="amf" id="bC" style="width:0;background:#0cf"></div></div><span class="amv" id="vC2">0%</span></div>
+<div class="am"><span class="aml">P-Loss</span><div class="amb"><div class="amf" id="bP" style="width:50%;background:#f80"></div></div><span class="amv" id="vP">1.0</span></div>
+<div class="am"><span class="aml">V-Loss</span><div class="amb"><div class="amf" id="bV" style="width:50%;background:#f48"></div></div><span class="amv" id="vV">1.0</span></div>
+<div class="am"><span class="aml">Эпохи</span><div class="amb"><div class="amf" id="bE" style="width:0;background:#c8f"></div></div><span class="amv" id="vE">0</span></div>
+<div class="am"><span class="aml">Inference</span><div class="amb"><div class="amf" id="bI" style="width:0;background:#0f8"></div></div><span class="amv" id="vI">0ms</span></div>
 </div>
-
+<div class="sec">
+<div class="pt">🚀 ПУ СТАТУС</div>
+<div id="lS"></div>
+</div>
+</div>
+<div class="bp">
+<div class="sec"><div class="pt">📈 Точность</div><canvas id="c1" class="mc"></canvas></div>
+<div class="sec"><div class="pt">📉 Loss</div><canvas id="c2" class="mc"></canvas></div>
+<div class="sec"><div class="pt">🧠 Attention</div><canvas id="c3" class="mc"></canvas></div>
+<div class="sec"><div class="pt">📋 Журнал</div><div class="la" id="logA"></div></div>
+</div>
 </div>
 
 <script>
-// ============================================================
-// MATH UTILITIES
-// ============================================================
-const {sin,cos,sqrt,atan2,PI,abs,min,max,floor,random,exp,log,pow,hypot,round,sign,tanh}=Math;
+"use strict";
+const{sin,cos,sqrt,atan2,PI,abs,min,max,floor,random,exp,pow,hypot,round,tanh}=Math;
 const TAU=PI*2;
-const rand=(a=0,b=1)=>a+(b-a)*random();
-const randInt=(a,b)=>floor(rand(a,b+1));
-const clamp=(v,lo,hi)=>max(lo,min(hi,v));
-const lerp=(a,b,t)=>a+(b-a)*t;
-const dist=(a,b)=>hypot(a.x-b.x,a.y-b.y);
-const normalize=(v)=>{const m=hypot(v.x,v.y)||1;return{x:v.x/m,y:v.y/m}};
-const vec2=(x,y)=>({x,y});
+const $=id=>document.getElementById(id);
+const O=(id,v)=>$(id).textContent=v;
+const R=(a=0,b=1)=>a+(b-a)*random();
+const RI=(a,b)=>floor(R(a,b+1));
+const CL=(v,l,h)=>max(l,min(h,v));
+const LR=(a,b,t)=>a+(b-a)*t;
 
-// ============================================================
-// TENSOR OPERATIONS (minimal neural net framework)
-// ============================================================
-class Tensor {
-  constructor(rows, cols, data=null) {
-    this.rows=rows; this.cols=cols;
-    this.data=data||new Float32Array(rows*cols);
-  }
-  static zeros(r,c){return new Tensor(r,c)}
-  static rand(r,c,scale=0.1){
-    const t=new Tensor(r,c);
-    const s=scale/sqrt(c);
-    for(let i=0;i<t.data.length;i++)t.data[i]=(random()-0.5)*2*s;
-    return t;
-  }
-  static fromArray(arr){
-    if(Array.isArray(arr[0])){
-      const r=arr.length,c=arr[0].length,t=new Tensor(r,c);
-      for(let i=0;i<r;i++)for(let j=0;j<c;j++)t.data[i*c+j]=arr[i][j];
-      return t;
-    }
-    const t=new Tensor(1,arr.length);
-    for(let i=0;i<arr.length;i++)t.data[i]=arr[i];
-    return t;
-  }
-  get(i,j){return this.data[i*this.cols+j]}
-  set(i,j,v){this.data[i*this.cols+j]=v}
-  clone(){return new Tensor(this.rows,this.cols,new Float32Array(this.data))}
-  add(other){
-    const r=new Tensor(this.rows,this.cols);
-    if(other.rows===1&&this.rows>1){
-      for(let i=0;i<this.rows;i++)for(let j=0;j<this.cols;j++)r.data[i*this.cols+j]=this.data[i*this.cols+j]+other.data[j];
-    } else {
-      for(let i=0;i<this.data.length;i++)r.data[i]=this.data[i]+other.data[i];
-    }
-    return r;
-  }
-  sub(other){
-    const r=new Tensor(this.rows,this.cols);
-    for(let i=0;i<this.data.length;i++)r.data[i]=this.data[i]-other.data[i];
-    return r;
-  }
-  mul(s){const r=new Tensor(this.rows,this.cols);for(let i=0;i<this.data.length;i++)r.data[i]=this.data[i]*s;return r}
-  elementMul(other){const r=new Tensor(this.rows,this.cols);for(let i=0;i<this.data.length;i++)r.data[i]=this.data[i]*other.data[i];return r}
-  matmul(other){
-    const r=new Tensor(this.rows,other.cols);
-    for(let i=0;i<this.rows;i++)for(let j=0;j<other.cols;j++){
-      let s=0;for(let k=0;k<this.cols;k++)s+=this.data[i*this.cols+k]*other.data[k*other.cols+j];
-      r.data[i*other.cols+j]=s;
-    }
-    return r;
-  }
-  transpose(){
-    const r=new Tensor(this.cols,this.rows);
-    for(let i=0;i<this.rows;i++)for(let j=0;j<this.cols;j++)r.data[j*this.rows+i]=this.data[i*this.cols+j];
-    return r;
-  }
-  relu(){const r=new Tensor(this.rows,this.cols);for(let i=0;i<this.data.length;i++)r.data[i]=max(0,this.data[i]);return r}
-  gelu(){
-    const r=new Tensor(this.rows,this.cols);
-    for(let i=0;i<this.data.length;i++){
-      const x=this.data[i];
-      r.data[i]=0.5*x*(1+tanh(sqrt(2/PI)*(x+0.044715*x*x*x)));
-    }
-    return r;
-  }
-  sigmoid(){const r=new Tensor(this.rows,this.cols);for(let i=0;i<this.data.length;i++)r.data[i]=1/(1+exp(-this.data[i]));return r}
-  tanhAct(){const r=new Tensor(this.rows,this.cols);for(let i=0;i<this.data.length;i++)r.data[i]=tanh(this.data[i]);return r}
-  softmax(){
-    const r=new Tensor(this.rows,this.cols);
-    for(let i=0;i<this.rows;i++){
-      let mx=-1e9;
-      for(let j=0;j<this.cols;j++)mx=max(mx,this.get(i,j));
-      let s=0;
-      for(let j=0;j<this.cols;j++){const e=exp(this.get(i,j)-mx);r.set(i,j,e);s+=e;}
-      for(let j=0;j<this.cols;j++)r.set(i,j,r.get(i,j)/s);
-    }
-    return r;
-  }
-  layerNorm(gamma,beta){
-    const r=new Tensor(this.rows,this.cols);
-    for(let i=0;i<this.rows;i++){
-      let mean=0;for(let j=0;j<this.cols;j++)mean+=this.get(i,j);mean/=this.cols;
-      let variance=0;for(let j=0;j<this.cols;j++){const d=this.get(i,j)-mean;variance+=d*d;}variance/=this.cols;
-      const std=sqrt(variance+1e-5);
-      for(let j=0;j<this.cols;j++)r.set(i,j,(this.get(i,j)-mean)/std*(gamma?gamma.data[j]:1)+(beta?beta.data[j]:0));
-    }
-    return r;
-  }
-  meanAll(){let s=0;for(let i=0;i<this.data.length;i++)s+=this.data[i];return s/this.data.length}
-  row(i){const r=new Tensor(1,this.cols);for(let j=0;j<this.cols;j++)r.data[j]=this.data[i*this.cols+j];return r}
-  sumRows(){const r=new Tensor(1,this.cols);for(let i=0;i<this.rows;i++)for(let j=0;j<this.cols;j++)r.data[j]+=this.data[i*this.cols+j];return r}
-}
+// ========== WORLD ==========
+const WS=1600;
+const BX=WS/2, BY=WS*.82;
+const BASE={x:BX,y:BY};
 
-// ============================================================
-// WORLD MODEL TRANSFORMER
-// ============================================================
-class TransformerLayer {
-  constructor(dim, heads) {
-    this.dim=dim; this.heads=heads; this.headDim=dim/heads;
-    this.Wq=Tensor.rand(dim,dim,0.02);
-    this.Wk=Tensor.rand(dim,dim,0.02);
-    this.Wv=Tensor.rand(dim,dim,0.02);
-    this.Wo=Tensor.rand(dim,dim,0.02);
-    this.bq=Tensor.zeros(1,dim);
-    this.bk=Tensor.zeros(1,dim);
-    this.bv=Tensor.zeros(1,dim);
-    this.bo=Tensor.zeros(1,dim);
-    this.ln1g=new Tensor(1,dim);this.ln1g.data.fill(1);
-    this.ln1b=Tensor.zeros(1,dim);
-    this.ff1=Tensor.rand(dim,dim*4,0.02);
-    this.ff1b=Tensor.zeros(1,dim*4);
-    this.ff2=Tensor.rand(dim*4,dim,0.02);
-    this.ff2b=Tensor.zeros(1,dim);
-    this.ln2g=new Tensor(1,dim);this.ln2g.data.fill(1);
-    this.ln2b=Tensor.zeros(1,dim);
-    this.attentionWeights=null;
+let canvas,ctx,vW,vH,scX,scY;
+let simOn=false,sT=0,simSpd=1,fc=0,lastWv=0;
+let stats={launched:0,hit:0,miss:0,fired:0};
+let enemies=[],missiles=[],booms=[],parts=[],lau=[],debris=[];
+let aiDecs=[];
+let rAngle=0;
+let hAcc=[],hLoss=[];
+
+// ========== SIMPLE AI (direct computation, no framework overhead) ==========
+class SimpleAI{
+  constructor(){
+    this.epoch=0;this.pLoss=1;this.vLoss=1;this.conf=0;this.infTime=0;
+    this.buf=[];this.maxBuf=3000;this.lastAttn=null;
+    // Weights - small network focused on decision quality
+    this.dim=32;
+    // Input projection 18->32
+    this.Wi=this.rw(18,32);this.bi=new Float32Array(32);
+    // Attention weights
+    this.Wq=this.rw(32,32);this.Wk=this.rw(32,32);this.Wv=this.rw(32,32);this.Wo=this.rw(32,32);
+    // FFN 32->64->32
+    this.W1=this.rw(32,64);this.b1=new Float32Array(64);
+    this.W2=this.rw(64,32);this.b2=new Float32Array(32);
+    // Policy head 32->16->5
+    this.Wp1=this.rw(32,16);this.bp1=new Float32Array(16);
+    this.Wp2=this.rw(16,5);this.bp2=new Float32Array(5);
+    // Value head 32->16->1
+    this.Wv1=this.rw(32,16);this.bv1=new Float32Array(16);
+    this.Wv2=this.rw(16,1);this.bv2=new Float32Array(1);
+    // World model 32->16->4
+    this.Ww1=this.rw(32,16);this.bw1=new Float32Array(16);
+    this.Ww2=this.rw(16,4);this.bw2=new Float32Array(4);
+    // Adam state
+    this.adamT=0;
+    this.allW=this.getAllWeights();
+    this.m=this.allW.map(w=>new Float32Array(w.length));
+    this.v=this.allW.map(w=>new Float32Array(w.length));
   }
-  forward(x) {
-    const n=x.rows, d=this.dim, h=this.heads, hd=this.headDim;
-    // LN1
-    const normed=x.layerNorm(this.ln1g,this.ln1b);
-    // QKV
-    const Q=normed.matmul(this.Wq).add(this.bq);
-    const K=normed.matmul(this.Wk).add(this.bk);
-    const V=normed.matmul(this.Wv).add(this.bv);
-    // Multi-head attention (simplified single-head for perf)
-    const scale=1/sqrt(d);
-    const scores=Q.matmul(K.transpose()).mul(scale);
-    const attn=scores.softmax();
-    this.attentionWeights=attn;
-    const attended=attn.matmul(V);
-    const projected=attended.matmul(this.Wo).add(this.bo);
-    const residual1=x.add(projected);
-    // LN2 + FFN
-    const normed2=residual1.layerNorm(this.ln2g,this.ln2b);
-    const ff=normed2.matmul(this.ff1).add(this.ff1b).gelu();
-    const ffOut=ff.matmul(this.ff2).add(this.ff2b);
-    return residual1.add(ffOut);
-  }
-  getParams(){return[this.Wq,this.Wk,this.Wv,this.Wo,this.bq,this.bk,this.bv,this.bo,this.ff1,this.ff1b,this.ff2,this.ff2b,this.ln1g,this.ln1b,this.ln2g,this.ln2b]}
-}
+  rw(r,c){const w=new Float32Array(r*c);const s=sqrt(2/r);for(let i=0;i<w.length;i++)w[i]=(random()-.5)*s;return w}
+  getAllWeights(){return[this.Wi,this.bi,this.Wq,this.Wk,this.Wv,this.Wo,this.W1,this.b1,this.W2,this.b2,this.Wp1,this.bp1,this.Wp2,this.bp2,this.Wv1,this.bv1,this.Wv2,this.bv2,this.Ww1,this.bw1,this.Ww2,this.bw2]}
 
-class WorldModelTransformer {
-  constructor() {
-    this.inputDim=16;   // [x,y,vx,vy,ax,ay,speed,heading,dist,threat,type,age,covX,covY,isManeuv,timeNorm]
-    this.embedDim=32;
-    this.nHeads=4;
-    this.nLayers=2;
-    this.outputDim=6; // [priority, nMissiles, launchTimeOffset, interceptX, interceptY, confidence]
+  mm(a,ar,ac,b,br,bc,out){for(let i=0;i<ar;i++)for(let j=0;j<bc;j++){let s=0;for(let k=0;k<ac;k++)s+=a[i*ac+k]*b[k*bc+j];out[i*bc+j]=s}}
+  addBias(a,b,n,d){for(let i=0;i<n;i++)for(let j=0;j<d;j++)a[i*d+j]+=b[j]}
+  gelu(a){for(let i=0;i<a.length;i++){const x=a[i];a[i]=.5*x*(1+tanh(sqrt(2/PI)*(x+.044715*x*x*x)))}}
+  sig(x){return 1/(1+exp(-CL(x,-12,12)))}
 
-    // Input embedding
-    this.inputProj=Tensor.rand(this.inputDim,this.embedDim,0.1);
-    this.inputBias=Tensor.zeros(1,this.embedDim);
-
-    // Context embedding (system state)
-    this.contextDim=8; // [readyMissiles, totalLaunchers, activeTracks, threatLevel, avgDist, time, interceptorSpeed, reloadPct]
-    this.contextProj=Tensor.rand(this.contextDim,this.embedDim,0.1);
-    this.contextBias=Tensor.zeros(1,this.embedDim);
-
-    // Transformer layers
-    this.layers=[];
-    for(let i=0;i<this.nLayers;i++)this.layers.push(new TransformerLayer(this.embedDim,this.nHeads));
-
-    // World Model Head - trajectory prediction
-    this.worldHead1=Tensor.rand(this.embedDim,this.embedDim,0.1);
-    this.worldHead1b=Tensor.zeros(1,this.embedDim);
-    this.worldHead2=Tensor.rand(this.embedDim,4,0.1); // predX, predY, predVX, predVY
-    this.worldHead2b=Tensor.zeros(1,4);
-
-    // Policy Head - action decisions
-    this.policyHead1=Tensor.rand(this.embedDim,this.embedDim,0.1);
-    this.policyHead1b=Tensor.zeros(1,this.embedDim);
-    this.policyHead2=Tensor.rand(this.embedDim,this.outputDim,0.1);
-    this.policyHead2b=Tensor.zeros(1,this.outputDim);
-
-    // Final LayerNorm
-    this.finalLNg=new Tensor(1,this.embedDim);this.finalLNg.data.fill(1);
-    this.finalLNb=Tensor.zeros(1,this.embedDim);
-
-    // Training state
-    this.trainEpoch=0;
-    this.totalLoss=1.0;
-    this.replayBuffer=[];
-    this.maxReplay=2000;
-    this.confidence=0;
-    this.lastInferenceTime=0;
-  }
-
-  encodeTargets(targets, systemState, time) {
-    if(targets.length===0) return null;
-    // Build target features
-    const features=[];
-    for(const t of targets) {
-      const d=hypot(t.x-BASE.x,t.y-BASE.y);
-      const spd=hypot(t.vx,t.vy);
-      const heading=atan2(t.vy,t.vx);
-      features.push([
-        t.x/WORLD_SIZE, t.y/WORLD_SIZE,
-        t.vx/1000, t.vy/1000,
-        (t.ax||0)/100, (t.ay||0)/100,
-        spd/1000, heading/PI,
-        d/WORLD_SIZE, t.threat||0.5,
-        t.type/3, (time-t.spawnTime)/60,
-        (t.covX||1)/100, (t.covY||1)/100,
-        t.maneuvering?1:0, time/300
-      ]);
-    }
-    return Tensor.fromArray(features);
-  }
-
-  encodeContext(systemState) {
-    return Tensor.fromArray([[
-      systemState.readyMissiles/32,
-      systemState.totalLaunchers/8,
-      systemState.activeTracks/20,
-      systemState.threatLevel,
-      systemState.avgDistance/WORLD_SIZE,
-      systemState.time/300,
-      systemState.interceptorSpeed/3000,
-      systemState.reloadPct
-    ]]);
-  }
-
-  forward(targetFeatures, contextFeatures) {
+  forward(feats,nTargets){
     const t0=performance.now();
-    const n=targetFeatures.rows;
+    const D=32;
+    // Project input: feats[n*18] -> h[n*32]
+    const h=new Float32Array(nTargets*D);
+    this.mm(feats,nTargets,18,this.Wi,18,D,h);
+    this.addBias(h,this.bi,nTargets,D);
+    this.gelu(h);
 
-    // Embed targets
-    let embedded=targetFeatures.matmul(this.inputProj).add(this.inputBias);
+    // Self-attention
+    const Q=new Float32Array(nTargets*D);
+    const K=new Float32Array(nTargets*D);
+    const V=new Float32Array(nTargets*D);
+    this.mm(h,nTargets,D,this.Wq,D,D,Q);
+    this.mm(h,nTargets,D,this.Wk,D,D,K);
+    this.mm(h,nTargets,D,this.Wv,D,D,V);
 
-    // Embed context and add to all target embeddings
-    const ctxEmb=contextFeatures.matmul(this.contextProj).add(this.contextBias);
-    for(let i=0;i<n;i++){
-      for(let j=0;j<this.embedDim;j++){
-        embedded.data[i*this.embedDim+j]+=ctxEmb.data[j];
+    // Attention scores
+    const scores=new Float32Array(nTargets*nTargets);
+    const scale=1/sqrt(D);
+    for(let i=0;i<nTargets;i++){
+      let maxS=-1e9;
+      for(let j=0;j<nTargets;j++){
+        let s=0;for(let k=0;k<D;k++)s+=Q[i*D+k]*K[j*D+k];
+        scores[i*nTargets+j]=s*scale;
+        maxS=max(maxS,s*scale);
       }
+      let sum=0;
+      for(let j=0;j<nTargets;j++){scores[i*nTargets+j]=exp(scores[i*nTargets+j]-maxS);sum+=scores[i*nTargets+j]}
+      for(let j=0;j<nTargets;j++)scores[i*nTargets+j]/=sum+1e-10;
     }
+    this.lastAttn={d:scores,n:nTargets};
 
-    // Positional encoding (simple sinusoidal)
+    // Attended values
+    const att=new Float32Array(nTargets*D);
+    this.mm(scores,nTargets,nTargets,V,nTargets,D,att);
+    const proj=new Float32Array(nTargets*D);
+    this.mm(att,nTargets,D,this.Wo,D,D,proj);
+
+    // Residual
+    const h2=new Float32Array(nTargets*D);
+    for(let i=0;i<h2.length;i++)h2[i]=h[i]+proj[i];
+
+    // FFN
+    const ff1=new Float32Array(nTargets*64);
+    this.mm(h2,nTargets,D,this.W1,D,64,ff1);
+    this.addBias(ff1,this.b1,nTargets,64);
+    this.gelu(ff1);
+    const ff2=new Float32Array(nTargets*D);
+    this.mm(ff1,nTargets,64,this.W2,64,D,ff2);
+    this.addBias(ff2,this.b2,nTargets,D);
+
+    // Residual
+    const h3=new Float32Array(nTargets*D);
+    for(let i=0;i<h3.length;i++)h3[i]=h2[i]+ff2[i];
+
+    // Policy head per target
+    const pol=new Float32Array(nTargets*5);
+    const ph1=new Float32Array(nTargets*16);
+    this.mm(h3,nTargets,D,this.Wp1,D,16,ph1);
+    this.addBias(ph1,this.bp1,nTargets,16);
+    this.gelu(ph1);
+    this.mm(ph1,nTargets,16,this.Wp2,16,5,pol);
+    this.addBias(pol,this.bp2,nTargets,5);
+
+    // Value head (mean pool)
+    const pooled=new Float32Array(D);
+    for(let i=0;i<nTargets;i++)for(let j=0;j<D;j++)pooled[j]+=h3[i*D+j]/nTargets;
+    const vh1=new Float32Array(16);
+    for(let i=0;i<16;i++){let s=this.bv1[i];for(let j=0;j<D;j++)s+=pooled[j]*this.Wv1[j*16+i];vh1[i]=max(0,s)}
+    let val=this.bv2[0];for(let i=0;i<16;i++)val+=vh1[i]*this.Wv2[i];
+
+    // World model
+    const wm=new Float32Array(nTargets*4);
+    const wh1=new Float32Array(nTargets*16);
+    this.mm(h3,nTargets,D,this.Ww1,D,16,wh1);
+    this.addBias(wh1,this.bw1,nTargets,16);
+    this.gelu(wh1);
+    this.mm(wh1,nTargets,16,this.Ww2,16,4,wm);
+    this.addBias(wm,this.bw2,nTargets,4);
+
+    this.infTime=performance.now()-t0;
+    return{pol,val,wm};
+  }
+
+  decide(targets){
+    if(!targets.length)return[];
+    const n=targets.length;
+    const feats=new Float32Array(n*18);
     for(let i=0;i<n;i++){
-      for(let j=0;j<this.embedDim;j++){
-        const pe=j%2===0?sin(i/pow(10000,j/this.embedDim)):cos(i/pow(10000,(j-1)/this.embedDim));
-        embedded.data[i*this.embedDim+j]+=pe*0.1;
-      }
+      const t=targets[i];
+      const d=hypot(t.x-BX,t.y-BY);
+      const spd=hypot(t.vx,t.vy);
+      const hdg=atan2(t.vy,t.vx);
+      const cl=-((t.x-BX)*t.vx+(t.y-BY)*t.vy)/(d*spd+1);
+      const j=i*18;
+      feats[j]=t.x/WS;feats[j+1]=t.y/WS;feats[j+2]=t.vx/1500;feats[j+3]=t.vy/1500;
+      feats[j+4]=(t.ax||0)/200;feats[j+5]=(t.ay||0)/200;
+      feats[j+6]=spd/1500;feats[j+7]=hdg/PI;feats[j+8]=d/WS;feats[j+9]=t.threat;
+      feats[j+10]=t.type/4;feats[j+11]=min((sT-t.born)/60,1);
+      feats[j+12]=t.maneuv?1:0;feats[j+13]=cl;
+      feats[j+14]=t.engaged?1:0;feats[j+15]=t.assigned/3;
+      feats[j+16]=sT/300;feats[j+17]=d/(spd*max(.1,cl)+1)/30;
     }
-
-    // Transformer layers
-    let h=embedded;
-    for(const layer of this.layers) h=layer.forward(h);
-
-    // Final norm
-    h=h.layerNorm(this.finalLNg,this.finalLNb);
-
-    // World Model Head (trajectory prediction)
-    const worldH=h.matmul(this.worldHead1).add(this.worldHead1b).gelu();
-    const worldPred=worldH.matmul(this.worldHead2).add(this.worldHead2b);
-
-    // Policy Head (decisions)
-    const policyH=h.matmul(this.policyHead1).add(this.policyHead1b).gelu();
-    const policyRaw=policyH.matmul(this.policyHead2).add(this.policyHead2b);
-
-    // Apply activations to policy output
-    const policy=new Tensor(n,this.outputDim);
-    for(let i=0;i<n;i++){
-      policy.set(i,0,1/(1+exp(-policyRaw.get(i,0)))); // priority [0,1]
-      policy.set(i,1,clamp(round(1+2/(1+exp(-policyRaw.get(i,1)))),1,3)); // nMissiles [1..3]
-      policy.set(i,2,policyRaw.get(i,2)*2); // launchTimeOffset
-      policy.set(i,3,policyRaw.get(i,3)*WORLD_SIZE); // interceptX
-      policy.set(i,4,policyRaw.get(i,4)*WORLD_SIZE); // interceptY
-      policy.set(i,5,1/(1+exp(-policyRaw.get(i,5)))); // confidence
-    }
-
-    this.lastInferenceTime=performance.now()-t0;
-    return {worldPred, policy, hiddenStates:h};
+    const{pol,val,wm}=this.forward(feats,n);
+    let tc=0;
+    const decs=targets.map((t,i)=>{
+      const pri=this.sig(pol[i*5]);
+      const conf=this.sig(pol[i*5+4]);
+      tc+=conf;
+      const hz=+$('hz').value;
+      return{
+        target:t,priority:pri,confidence:conf,
+        intX:t.x+wm[i*4]*hz*400,
+        intY:t.y+wm[i*4+1]*hz*400,
+        predVx:wm[i*4]*1000,predVy:wm[i*4+1]*1000,value:val
+      };
+    });
+    this.conf=n?tc/n:0;
+    return decs.sort((a,b)=>b.priority-a.priority);
   }
 
-  computeDecisions(targets, systemState, time) {
-    if(targets.length===0) return [];
-    const tf=this.encodeTargets(targets,systemState,time);
-    const cf=this.encodeContext(systemState);
-    if(!tf) return [];
+  addExp(e){this.buf.push(e);if(this.buf.length>this.maxBuf)this.buf.shift()}
 
-    const {worldPred,policy,hiddenStates}=this.forward(tf,cf);
-
-    const decisions=[];
-    let totalConf=0;
-    for(let i=0;i<targets.length;i++){
-      const priority=policy.get(i,0);
-      const conf=policy.get(i,5);
-      totalConf+=conf;
-
-      // Compute intercept point using world prediction
-      const predDx=worldPred.get(i,0)*1000;
-      const predDy=worldPred.get(i,1)*1000;
-      const t_=targets[i];
-
-      decisions.push({
-        targetId:t_.id,
-        target:t_,
-        priority,
-        nMissiles:policy.get(i,1),
-        launchTimeOffset:policy.get(i,2),
-        interceptX:t_.x+predDx*+document.getElementById('predHorizon').value,
-        interceptY:t_.y+predDy*+document.getElementById('predHorizon').value,
-        confidence:conf,
-        predVx:predDx,
-        predVy:predDy
-      });
-    }
-    this.confidence=targets.length>0?totalConf/targets.length:0;
-    return decisions.sort((a,b)=>b.priority-a.priority);
-  }
-
-  addExperience(exp) {
-    this.replayBuffer.push(exp);
-    if(this.replayBuffer.length>this.maxReplay)this.replayBuffer.shift();
-  }
-
-  train(batchSize=16) {
-    if(this.replayBuffer.length<batchSize) return;
-    const lr=+document.getElementById('learningRate').value;
-    let totalLoss=0;
-    const batch=[];
-    for(let i=0;i<batchSize;i++){
-      batch.push(this.replayBuffer[randInt(0,this.replayBuffer.length-1)]);
-    }
-
-    for(const exp of batch) {
-      // exp = {targetFeatures, actualOutcome, predictedIntercept, wasHit}
-      // Simple gradient-free optimization: perturb weights toward better outcomes
-      const reward = exp.wasHit ? 1.0 : -0.5;
-      const error = exp.interceptError || 0;
-
-      // Nudge policy weights based on outcome
-      const nudgeScale = lr * reward * 0.01;
-      this.perturbWeights(nudgeScale);
-      totalLoss += abs(error) + (exp.wasHit ? 0 : 1);
-    }
-
-    this.totalLoss = totalLoss / batchSize;
-    this.trainEpoch++;
-  }
-
-  perturbWeights(scale) {
-    const allParams = [
-      this.inputProj, this.inputBias,
-      this.contextProj, this.contextBias,
-      this.worldHead1, this.worldHead1b, this.worldHead2, this.worldHead2b,
-      this.policyHead1, this.policyHead1b, this.policyHead2, this.policyHead2b
-    ];
-    for(const layer of this.layers) allParams.push(...layer.getParams());
-
-    for(const p of allParams) {
-      for(let i=0;i<p.data.length;i++) {
-        p.data[i] += (random()-0.5)*scale;
-        // Weight clipping
-        p.data[i] = clamp(p.data[i], -2, 2);
-      }
-    }
-  }
-
-  // Evolution strategy training - more effective
-  trainES(batchSize=8) {
-    if(this.replayBuffer.length < 10) return;
-    const lr = +document.getElementById('learningRate').value;
-    const sigma = 0.02;
-
-    // Save current weights
-    const saved = this.saveWeights();
-
-    // Evaluate current performance
-    let baseReward = this.evaluateOnBuffer(min(batchSize, this.replayBuffer.length));
-
-    // Try perturbations
-    const noise = this.generateNoise(sigma);
-    this.applyNoise(noise, 1);
-    let plusReward = this.evaluateOnBuffer(min(batchSize, this.replayBuffer.length));
-
-    this.loadWeights(saved);
-    this.applyNoise(noise, -1);
-    let minusReward = this.evaluateOnBuffer(min(batchSize, this.replayBuffer.length));
-
-    // Update in direction of improvement
-    this.loadWeights(saved);
-    const advantage = (plusReward - minusReward) / (2 * sigma);
-    this.applyNoise(noise, lr * advantage);
-
-    this.totalLoss = max(0, 1 - (plusReward + minusReward) / 2);
-    this.trainEpoch++;
-  }
-
-  evaluateOnBuffer(n) {
-    let reward = 0;
-    const samples = [];
-    for(let i=0;i<n;i++) samples.push(this.replayBuffer[randInt(0,this.replayBuffer.length-1)]);
-
-    for(const exp of samples) {
-      if(exp.targetFeatures && exp.contextFeatures) {
-        try {
-          const tf = Tensor.fromArray([exp.targetFeatures]);
-          const cf = Tensor.fromArray([exp.contextFeatures]);
-          const {policy} = this.forward(tf, cf);
-
-          // Reward for correct predictions
-          const predPriority = policy.get(0, 0);
-          const actualThreat = exp.actualThreat || 0.5;
-          reward += 1 - abs(predPriority - actualThreat);
-
-          if(exp.wasHit) reward += 1;
-          else reward -= 0.3;
-
-          // Reward for intercept accuracy
-          if(exp.interceptError !== undefined) {
-            reward += max(0, 1 - exp.interceptError / 200);
+  train(n=1){
+    if(this.buf.length<32)return;
+    const lr=+$('lr').value;
+    for(let it=0;it<n;it++){
+      this.adamT++;
+      // Sample batch, compute loss, approximate gradients via finite differences
+      const bsz=min(16,this.buf.length);
+      const grads=this.allW.map(w=>new Float32Array(w.length));
+      let tl=0;
+      for(let b=0;b<bsz;b++){
+        const s=this.buf[RI(0,this.buf.length-1)];
+        if(!s.feats)continue;
+        const{pol}=this.forward(s.feats,1);
+        const pred=this.sig(pol[0]);
+        const target=s.threat;
+        const err=pred-target;
+        const reward=s.hit?1:-0.5;
+        tl+=err*err;
+        // Stochastic gradient estimation
+        const eps=0.001;
+        for(let wi=0;wi<this.allW.length;wi++){
+          const w=this.allW[wi];
+          // Perturb random subset
+          const nPerturb=min(5,w.length);
+          for(let p=0;p<nPerturb;p++){
+            const idx=RI(0,w.length-1);
+            const old=w[idx];
+            w[idx]=old+eps;
+            const{pol:pol2}=this.forward(s.feats,1);
+            const pred2=this.sig(pol2[0]);
+            const err2=pred2-target;
+            const loss2=err2*err2-(s.hit?reward*pred2:0);
+            const loss1=err*err-(s.hit?reward*pred:0);
+            grads[wi][idx]+=(loss2-loss1)/eps;
+            w[idx]=old;
           }
-        } catch(e) {
-          // Skip bad samples
         }
       }
-    }
-    return reward / n;
-  }
-
-  generateNoise(sigma) {
-    const allParams = this.getAllParams();
-    const noise = [];
-    for(const p of allParams) {
-      const n = new Float32Array(p.data.length);
-      for(let i=0;i<n.length;i++) n[i] = (random()-0.5)*2*sigma;
-      noise.push(n);
-    }
-    return noise;
-  }
-
-  applyNoise(noise, scale) {
-    const allParams = this.getAllParams();
-    for(let p=0;p<allParams.length;p++) {
-      for(let i=0;i<allParams[p].data.length;i++) {
-        allParams[p].data[i] += noise[p][i] * scale;
+      // Adam update
+      const beta1=.9,beta2=.999,epsilon=1e-8;
+      for(let wi=0;wi<this.allW.length;wi++){
+        const w=this.allW[wi],g=grads[wi];
+        const mw=this.m[wi],vw=this.v[wi];
+        for(let i=0;i<w.length;i++){
+          const gi=g[i]/bsz;
+          mw[i]=beta1*mw[i]+(1-beta1)*gi;
+          vw[i]=beta2*vw[i]+(1-beta2)*gi*gi;
+          const mh=mw[i]/(1-pow(beta1,this.adamT));
+          const vh=vw[i]/(1-pow(beta2,this.adamT));
+          w[i]-=lr*mh/(sqrt(vh)+epsilon);
+          w[i]=CL(w[i],-3,3);
+        }
       }
+      this.pLoss=tl/bsz;
+      this.epoch++;
     }
-  }
-
-  getAllParams() {
-    const params = [
-      this.inputProj, this.inputBias,
-      this.contextProj, this.contextBias,
-      this.worldHead1, this.worldHead1b, this.worldHead2, this.worldHead2b,
-      this.policyHead1, this.policyHead1b, this.policyHead2, this.policyHead2b,
-      this.finalLNg, this.finalLNb
-    ];
-    for(const layer of this.layers) params.push(...layer.getParams());
-    return params;
-  }
-
-  saveWeights() {
-    return this.getAllParams().map(p=>new Float32Array(p.data));
-  }
-
-  loadWeights(saved) {
-    const params = this.getAllParams();
-    for(let i=0;i<params.length;i++) params[i].data = new Float32Array(saved[i]);
   }
 }
 
-// ============================================================
-// IMM FILTER (Interacting Multiple Model)
-// ============================================================
-class IMMTracker {
-  constructor() {
-    this.tracks = new Map();
-    this.nextId = 1;
-  }
+let ai=new SimpleAI();
 
-  update(detections, dt) {
-    // Associate detections with existing tracks (nearest neighbor)
-    const unmatched = [...detections];
-    const matchedTracks = new Set();
-
-    for(const [id, track] of this.tracks) {
-      // Predict
-      track.predX = track.x + track.vx * dt;
-      track.predY = track.y + track.vy * dt;
-
-      // Find nearest detection
-      let bestDist = Infinity, bestIdx = -1;
-      for(let i=0;i<unmatched.length;i++) {
-        const d = hypot(unmatched[i].x - track.predX, unmatched[i].y - track.predY);
-        if(d < bestDist && d < 50) { bestDist = d; bestIdx = i; }
-      }
-
-      if(bestIdx >= 0) {
-        const det = unmatched.splice(bestIdx, 1)[0];
-        // Kalman-like update
-        const alpha = 0.7; // smoothing
-        track.vx = lerp(track.vx, (det.x - track.x)/dt, alpha);
-        track.vy = lerp(track.vy, (det.y - track.y)/dt, alpha);
-        track.ax = lerp(track.ax||0, (track.vx - (track.prevVx||track.vx))/dt, 0.3);
-        track.ay = lerp(track.ay||0, (track.vy - (track.prevVy||track.vy))/dt, 0.3);
-        track.prevVx = track.vx;
-        track.prevVy = track.vy;
-        track.x = det.x;
-        track.y = det.y;
-        track.age += dt;
-        track.lastSeen = 0;
-        // Innovation for covariance estimate
-        track.covX = lerp(track.covX, abs(det.x - track.predX), 0.2);
-        track.covY = lerp(track.covY, abs(det.y - track.predY), 0.2);
-        track.maneuvering = (abs(track.ax) > 5 || abs(track.ay) > 5);
-        matchedTracks.add(id);
-      } else {
-        track.x = track.predX;
-        track.y = track.predY;
-        track.lastSeen += dt;
-      }
-    }
-
-    // Remove lost tracks
-    for(const [id, track] of this.tracks) {
-      if(track.lastSeen > 3) this.tracks.delete(id);
-    }
-
-    // Create new tracks from unmatched detections
-    for(const det of unmatched) {
-      const id = this.nextId++;
-      this.tracks.set(id, {
-        id, x:det.x, y:det.y,
-        vx:det.vx||0, vy:det.vy||0,
-        ax:0, ay:0, prevVx:0, prevVy:0,
-        covX:10, covY:10,
-        age:0, lastSeen:0,
-        type:det.type||0,
-        threat:0.5,
-        maneuvering:false,
-        spawnTime:det.spawnTime||simTime,
-        assignedInterceptors:0,
-        engaged:false
-      });
-    }
-
-    // Update threat levels
-    for(const [id, track] of this.tracks) {
-      const d = hypot(track.x - BASE.x, track.y - BASE.y);
-      const speed = hypot(track.vx, track.vy);
-      const closing = -((track.x-BASE.x)*track.vx+(track.y-BASE.y)*track.vy)/(d*speed+1);
-      track.threat = clamp(
-        0.3 * (1 - d / WORLD_SIZE) +
-        0.3 * (speed / 1000) +
-        0.2 * max(0, closing) +
-        0.2 * (track.maneuvering ? 1 : 0),
-        0, 1
-      );
-    }
-
-    return this.tracks;
-  }
-}
-
-// ============================================================
-// BALLISTIC SOLVER
-// ============================================================
-class BallisticSolver {
-  static computeIntercept(target, launchPos, interceptorSpeed, dt=0.05) {
-    // Iterative intercept point calculation with lead
-    let bestT = Infinity;
-    let bestPt = null;
-
-    // Predict target trajectory
-    const maxTime = 30; // max prediction time
-    const steps = 100;
-    const gravity = 2; // reduced gravity for simulation scale
-
-    for(let step=1;step<=steps;step++) {
-      const t = (step/steps) * maxTime;
-      // Target predicted position (with acceleration and type-dependent behavior)
-      let tx = target.x + target.vx * t + 0.5 * (target.ax||0) * t * t;
-      let ty = target.y + target.vy * t + 0.5 * (target.ay||0) * t * t;
-
-      // Add gravity for ballistic targets
-      if(target.type === 0) ty += 0.5 * gravity * t * t;
-
-      // Interceptor flight time to this point
-      const dist = hypot(tx - launchPos.x, ty - launchPos.y);
-      const interceptTime = dist / interceptorSpeed;
-
-      if(abs(interceptTime - t) < abs(bestT - t) && interceptTime <= t * 1.2) {
-        bestT = t;
-        bestPt = {x: tx, y: ty, time: t, dist};
-      }
-    }
-
-    return bestPt;
-  }
-
-  static computeLeadAngle(target, launchPos, interceptorSpeed) {
-    const intercept = this.computeIntercept(target, launchPos, interceptorSpeed);
-    if(!intercept) return null;
-    const angle = atan2(intercept.y - launchPos.y, intercept.x - launchPos.x);
-    return {angle, point: intercept};
-  }
-}
-
-// ============================================================
-// GAME/SIMULATION STATE
-// ============================================================
-const WORLD_SIZE = 1500;
-const BASE = {x: WORLD_SIZE/2, y: WORLD_SIZE * 0.85};
-const DEFENSE_RADIUS = WORLD_SIZE * 0.6;
-
-let simRunning = false;
-let simTime = 0;
-let simSpeed = 1;
-let frameCount = 0;
-let lastAutoWave = 0;
-
-// Stats
-let stats = {launched:0, intercepted:0, missed:0, fired:0, totalShots:0};
-
-// Entities
-let enemies = [];
-let interceptors = [];
-let explosions = [];
-let trails = [];
-let launchers = [];
-let particles = [];
-
-// AI
-let transformer = new WorldModelTransformer();
-let tracker = new IMMTracker();
-let aiDecisions = [];
-let lossHistory = [];
-let interceptHistory = [];
-let neuronActivity = [];
-
-// Canvas
-let bgCanvas, mainCanvas, uiCanvas;
-let bgCtx, mainCtx, uiCtx;
-let viewW, viewH;
-let radarAngle = 0;
-
-// Enemy types
-const ENEMY_TYPES = {
-  0: {name:'Баллистическая', color:'#ff4444', speed:[200,600], trail:'#ff444466'},
-  1: {name:'Крылатая', color:'#ffaa00', speed:[150,400], trail:'#ffaa0066'},
-  2: {name:'Маневрирующая', color:'#ff00ff', speed:[250,700], trail:'#ff00ff66'},
-  3: {name:'Гиперзвуковая', color:'#ff0066', speed:[800,2500], trail:'#ff006666'}
+// ========== ENTITIES ==========
+const TYPES={
+  0:{n:'Баллистическая',c:'#ff4444',glow:'#ff222244',flame:'#ff8800',s:[200,700]},
+  1:{n:'Крылатая',c:'#ffaa00',glow:'#ffaa0044',flame:'#ffcc44',s:[150,450]},
+  2:{n:'Маневрирующая',c:'#ff00ff',glow:'#ff00ff44',flame:'#ff66ff',s:[250,800]},
+  3:{n:'Гиперзвуковая',c:'#ff0066',glow:'#ff006644',flame:'#ff4488',s:[900,2500]}
 };
 
-// ============================================================
-// INITIALIZATION
-// ============================================================
-function init() {
-  bgCanvas = document.getElementById('bgCanvas');
-  mainCanvas = document.getElementById('mainCanvas');
-  uiCanvas = document.getElementById('uiCanvas');
-  bgCtx = bgCanvas.getContext('2d');
-  mainCtx = mainCanvas.getContext('2d');
-  uiCtx = uiCanvas.getContext('2d');
-
-  resize();
-  window.addEventListener('resize', resize);
-
-  initLaunchers(4);
-  drawBackground();
-  requestAnimationFrame(gameLoop);
-}
-
-function resize() {
-  const view = document.getElementById('mainView');
-  viewW = view.clientWidth;
-  viewH = view.clientHeight;
-  [bgCanvas, mainCanvas, uiCanvas].forEach(c => {
-    c.width = viewW;
-    c.height = viewH;
-  });
-  drawBackground();
-}
-
-function initLaunchers(count) {
-  launchers = [];
-  const spacing = WORLD_SIZE * 0.6 / (count + 1);
-  const startX = WORLD_SIZE * 0.2;
-  for(let i=0;i<count;i++) {
-    launchers.push({
-      id: i,
-      x: startX + spacing * (i + 1),
-      y: BASE.y + 20,
-      missiles: +document.getElementById('missilesPerLauncher').value,
-      maxMissiles: +document.getElementById('missilesPerLauncher').value,
-      reloadTimer: 0,
-      status: 'ready', // ready, firing, reloading
-      angle: -PI/2
-    });
+function mkL(n){
+  lau=[];const sp=WS*.5/(n+1),sx=WS*.25;
+  const mpl=+$('mP').value;
+  for(let i=0;i<n;i++){
+    const x=sx+sp*(i+1),y=BY+40;
+    lau.push({id:i,x,y,m:mpl,mx:mpl,rt:0,st:'ready',ang:-PI/2,fireAnim:0});
   }
 }
-function updateLaunchers(n) { initLaunchers(n); }
 
-// ============================================================
-// BACKGROUND RENDERING
-// ============================================================
-function drawBackground() {
-  const ctx = bgCtx;
-  const sx = viewW / WORLD_SIZE;
-  const sy = viewH / WORLD_SIZE;
-
-  ctx.fillStyle = '#080c14';
-  ctx.fillRect(0, 0, viewW, viewH);
-
-  // Grid
-  ctx.strokeStyle = '#0a1a2a';
-  ctx.lineWidth = 0.5;
-  const gridSize = 100;
-  for(let x=0; x<=WORLD_SIZE; x+=gridSize) {
-    ctx.beginPath();
-    ctx.moveTo(x*sx, 0);
-    ctx.lineTo(x*sx, viewH);
-    ctx.stroke();
-  }
-  for(let y=0; y<=WORLD_SIZE; y+=gridSize) {
-    ctx.beginPath();
-    ctx.moveTo(0, y*sy);
-    ctx.lineTo(viewW, y*sy);
-    ctx.stroke();
-  }
-
-  // Range circles
-  const baseX = BASE.x * sx, baseY = BASE.y * sy;
-  [200, 400, 600, 800, 1000].forEach((r, i) => {
-    ctx.beginPath();
-    ctx.arc(baseX, baseY, r*sx, 0, TAU);
-    ctx.strokeStyle = `rgba(0,100,150,${0.15 - i*0.02})`;
-    ctx.lineWidth = 1;
-    ctx.stroke();
-    ctx.fillStyle = '#0a4a6a44';
-    ctx.font = '9px monospace';
-    ctx.fillText(`${r}m`, baseX + r*sx*0.7, baseY - r*sy*0.7);
-  });
-
-  // Compass lines
-  ctx.strokeStyle = '#0a2a4a33';
-  ctx.lineWidth = 0.5;
-  for(let a=0;a<360;a+=30) {
-    const rad = a*PI/180;
-    ctx.beginPath();
-    ctx.moveTo(baseX, baseY);
-    ctx.lineTo(baseX + cos(rad)*WORLD_SIZE*sx, baseY + sin(rad)*WORLD_SIZE*sy);
-    ctx.stroke();
-  }
-
-  // Ground
-  ctx.fillStyle = '#0a1a0a';
-  ctx.fillRect(0, BASE.y*sy+30, viewW, viewH-BASE.y*sy);
-
-  // Base
-  ctx.beginPath();
-  ctx.arc(baseX, baseY, 12, 0, TAU);
-  ctx.fillStyle = '#00ff8844';
-  ctx.fill();
-  ctx.strokeStyle = '#00ff88';
-  ctx.lineWidth = 2;
-  ctx.stroke();
-  ctx.fillStyle = '#00ff88';
-  ctx.font = '10px monospace';
-  ctx.textAlign = 'center';
-  ctx.fillText('БАЗА ПРО', baseX, baseY+25);
-}
-
-// ============================================================
-// ENEMY SPAWNING
-// ============================================================
-function spawnEnemy(type=null) {
-  const types = [];
-  if(document.getElementById('trajBallistic').checked) types.push(0);
-  if(document.getElementById('trajCruise').checked) types.push(1);
-  if(document.getElementById('trajManeuvering').checked) types.push(2);
-  if(document.getElementById('trajHypersonic').checked) types.push(3);
-  if(types.length===0) types.push(0);
-
-  if(type===null) type = types[randInt(0, types.length-1)];
-
-  const minSpd = +document.getElementById('minSpd').value;
-  const maxSpd = +document.getElementById('maxSpd').value;
-  const typeInfo = ENEMY_TYPES[type];
-  const speed = clamp(rand(typeInfo.speed[0], typeInfo.speed[1]), minSpd, maxSpd);
-
-  // Spawn from edges, aim toward base area
-  const side = randInt(0, 2); // 0=top, 1=left, 2=right
-  let x, y;
-  if(side === 0) { x = rand(100, WORLD_SIZE-100); y = rand(-50, 50); }
-  else if(side === 1) { x = rand(-50, 50); y = rand(50, WORLD_SIZE*0.5); }
-  else { x = rand(WORLD_SIZE-50, WORLD_SIZE+50); y = rand(50, WORLD_SIZE*0.5); }
-
-  // Aim toward base with some randomness
-  const targetX = BASE.x + rand(-200, 200);
-  const targetY = BASE.y + rand(-100, 50);
-  const angle = atan2(targetY - y, targetX - x);
-
-  const enemy = {
-    id: 'E' + (++stats.launched),
-    x, y,
-    vx: cos(angle) * speed,
-    vy: sin(angle) * speed,
-    ax: 0, ay: 0,
-    speed,
-    type,
-    color: typeInfo.color,
-    trailColor: typeInfo.trail,
-    alive: true,
-    spawnTime: simTime,
-    trail: [],
-    threat: 0.5,
-    maneuvering: type === 2,
-    maneuverTimer: 0,
-    maneuverFreq: rand(0.5, 2),
-    maneuverAmp: rand(50, 200),
-    engaged: false,
-    assignedInterceptors: 0,
-    covX: 10, covY: 10
+function spawn(type){
+  const types=[];
+  if($('tB').checked)types.push(0);if($('tC').checked)types.push(1);
+  if($('tM').checked)types.push(2);if($('tH').checked)types.push(3);
+  if(!types.length)types.push(0);
+  if(type==null)type=types[RI(0,types.length-1)];
+  const ti=TYPES[type];
+  const spd=CL(R(ti.s[0],ti.s[1]),+$('mnS').value,+$('mxS').value);
+  const side=RI(0,2);
+  let x,y;
+  if(side===0){x=R(100,WS-100);y=R(-100,-20)}
+  else if(side===1){x=R(-100,-20);y=R(100,WS*.45)}
+  else{x=R(WS+20,WS+100);y=R(100,WS*.45)}
+  const tx=BX+R(-300,300),ty=BY+R(-150,50);
+  const ang=atan2(ty-y,tx-x);
+  const e={
+    id:'E'+(++stats.launched),x,y,
+    vx:cos(ang)*spd,vy:sin(ang)*spd,
+    ax:0,ay:0,speed:spd,type,
+    alive:true,born:sT,trail:[],threat:.5,
+    maneuv:type===2,mT:0,mF:R(.3,2),mA:R(40,200),
+    engaged:false,assigned:0,
+    sz:type===3?6:type===0?5:4,
+    flameSz:R(.7,1.3)
   };
+  if(type===0){e.vy=-spd*.2;e.vx=(tx-x)/hypot(tx-x,ty-y)*spd;e.ay=R(3,10)}
+  if(type===1){e.y=R(WS*.3,WS*.65);e.vy=R(-10,10)}
+  if(type===3){e.speed=R(1200,2500);e.vx=cos(ang)*e.speed;e.vy=sin(ang)*e.speed}
+  enemies.push(e);
+  log(`⚠ ${e.id}: ${ti.n} V=${round(spd)}м/с`,'wrn');
+}
+function wave(){const n=+$('wvN').value;for(let i=0;i<n;i++)setTimeout(()=>spawn(),i*120);log(`ВОЛНА: ${n}`,'wrn')}
+function mass(){for(let i=0;i<20;i++)setTimeout(()=>spawn(),i*60);log('МАССИРОВАННАЯ АТАКА!','wrn')}
+function sp1(){spawn()}
 
-  // Type-specific behaviors
-  if(type === 0) { // Ballistic - arc trajectory
-    enemy.vy = -speed * 0.3;
-    enemy.vx = (targetX - x) / (hypot(targetX-x, targetY-y) / speed);
-    enemy.ay = rand(5, 15); // gravity pull
+// ========== INTERCEPT SOLVER ==========
+function solveInt(tgt,lp,iSpd){
+  let best=null,be=1e9;
+  const grav=tgt.type===0?6:0;
+  for(let s=1;s<=60;s++){
+    const t=s*.5;
+    const tx=tgt.x+tgt.vx*t+.5*(tgt.ax||0)*t*t;
+    const ty=tgt.y+tgt.vy*t+.5*((tgt.ay||0)+grav)*t*t;
+    const d=hypot(tx-lp.x,ty-lp.y);
+    const it=d/iSpd;
+    const err=abs(it-t);
+    if(err<be&&it<=t*1.3){be=err;best={x:tx,y:ty,t,d}}
   }
-  if(type === 1) { // Cruise - low altitude, constant
-    enemy.y = rand(WORLD_SIZE*0.4, WORLD_SIZE*0.7);
-    enemy.vy = rand(-20, 20);
-  }
-  if(type === 3) { // Hypersonic
-    enemy.speed = rand(1200, 2500);
-    enemy.vx = cos(angle) * enemy.speed;
-    enemy.vy = sin(angle) * enemy.speed;
-  }
-
-  enemies.push(enemy);
-  addLog(`Обнаружена цель ${enemy.id}: ${typeInfo.name}, V=${round(speed)}м/с`, 'warning');
+  return best;
 }
 
-function launchWave() {
-  const count = +document.getElementById('waveCount').value;
-  for(let i=0;i<count;i++) setTimeout(()=>spawnEnemy(), i*200);
-  addLog(`АТАКА ВОЛНОЙ: ${count} ракет!`, 'warning');
+// ========== FIRE ==========
+function fire(la,tgt,ip){
+  if(la.m<=0||la.st!=='ready')return;
+  const iSpd=+$('iS').value;
+  const ang=atan2(ip.y-la.y,ip.x-la.x);
+  missiles.push({
+    id:'M'+(++stats.fired),x:la.x,y:la.y-5,
+    vx:cos(ang)*iSpd,vy:sin(ang)*iSpd,speed:iSpd,
+    target:tgt,alive:true,age:0,trail:[],
+    ip,lt:sT,phase:'mid',
+    pLOS:atan2(tgt.y-la.y,tgt.x-la.x),
+    flameSz:R(.6,1),
+    smokeTimer:0
+  });
+  la.m--;la.st='reload';la.rt=+$('rT').value;la.fireAnim=1;
+  tgt.engaged=true;tgt.assigned++;
+  log(`→ ${missiles[missiles.length-1].id}→${tgt.id} ПУ${la.id}`,'lnc');
+  boom(la.x,la.y-5,'#00ccff',12,.4);
+  // Launch smoke
+  for(let i=0;i<25;i++){
+    const a=R(PI*.3,PI*.7);const s=R(20,80);
+    parts.push({x:la.x,y:la.y,vx:cos(a)*s,vy:-abs(sin(a))*s*.5,life:R(.5,1.5),ml:1.5,c:'#aaaaaa',sz:R(2,5),type:'smoke'});
+  }
 }
 
-function launchSingle() { spawnEnemy(); }
-
-// ============================================================
-// INTERCEPTOR LAUNCH
-// ============================================================
-function launchInterceptor(launcher, target, interceptPoint) {
-  if(launcher.missiles <= 0 || launcher.status !== 'ready') return false;
-
-  const intSpeed = +document.getElementById('interceptorSpeed').value;
-  const angle = atan2(interceptPoint.y - launcher.y, interceptPoint.x - launcher.x);
-
-  const interceptor = {
-    id: 'I' + (++stats.fired),
-    x: launcher.x,
-    y: launcher.y,
-    vx: cos(angle) * intSpeed,
-    vy: sin(angle) * intSpeed,
-    speed: intSpeed,
-    targetId: target.id,
-    target: target,
-    alive: true,
-    age: 0,
-    trail: [],
-    interceptPoint,
-    launchTime: simTime,
-    guidancePhase: 'midcourse', // midcourse, terminal
-    killRadius: +document.getElementById('killRadius').value,
-    // Proportional navigation constants
-    N: 3, // navigation constant
-    prevLOS: atan2(target.y - launcher.y, target.x - launcher.x)
-  };
-
-  interceptors.push(interceptor);
-  launcher.missiles--;
-  launcher.status = 'reloading';
-  launcher.reloadTimer = +document.getElementById('reloadTime').value;
-  stats.totalShots++;
-
-  target.engaged = true;
-  target.assignedInterceptors++;
-
-  addLog(`ПУСК ${interceptor.id} → ${target.id} из ПУ-${launcher.id}`, 'launch');
-  createExplosion(launcher.x, launcher.y, '#00ccff', 8, 0.3);
-
-  return true;
-}
-
-// ============================================================
-// PROPORTIONAL NAVIGATION GUIDANCE
-// ============================================================
-function guidInterceptor(int, dt) {
-  const t = int.target;
-  if(!t || !t.alive) {
-    int.alive = false;
+// ========== GUIDANCE (PN) ==========
+function guide(m,dt){
+  const t=m.target;
+  if(!t||!t.alive){m.alive=false;return}
+  const dx=t.x-m.x,dy=t.y-m.y;
+  const r=hypot(dx,dy);
+  const LOS=atan2(dy,dx);
+  const LOSr=(LOS-m.pLOS)/dt;
+  m.pLOS=LOS;
+  const Vc=-((dx*(t.vx-m.vx)+dy*(t.vy-m.vy))/r);
+  const N=m.phase==='term'?5:3.5;
+  const ac=N*Vc*LOSr;
+  const va=atan2(m.vy,m.vx);
+  let ax=-sin(va)*ac,ay=cos(va)*ac;
+  const am=hypot(ax,ay),mx=500;
+  if(am>mx){ax*=mx/am;ay*=mx/am}
+  m.vx+=ax*dt;m.vy+=ay*dt;
+  const cs=hypot(m.vx,m.vy);
+  if(cs>0){m.vx=m.vx/cs*m.speed;m.vy=m.vy/cs*m.speed}
+  if(r<250&&m.phase==='mid')m.phase='term';
+  const kr=+$('kR').value;
+  if(r<kr){
+    t.alive=false;m.alive=false;stats.hit++;
+    boom((t.x+m.x)/2,(t.y+m.y)/2,'#ff8800',35,1.2);
+    boom((t.x+m.x)/2,(t.y+m.y)/2,'#ffffff',15,.3);
+    // Debris
+    for(let i=0;i<12;i++){
+      const a=R(0,TAU),s=R(60,250),sz=R(1,4);
+      debris.push({x:(t.x+m.x)/2,y:(t.y+m.y)/2,vx:cos(a)*s,vy:sin(a)*s,life:R(.5,2),ml:2,sz,rot:R(0,TAU),rv:R(-8,8)});
+    }
+    log(`✓ ПЕРЕХВАТ ${m.id}→${t.id} D=${round(r)}м`,'hit');
+    ai.addExp(makeExp(t,true,r));
     return;
   }
-
-  // Current line of sight
-  const dx = t.x - int.x;
-  const dy = t.y - int.y;
-  const range = hypot(dx, dy);
-  const LOS = atan2(dy, dx);
-
-  // LOS rate
-  const LOSrate = (LOS - int.prevLOS) / dt;
-  int.prevLOS = LOS;
-
-  // Closing velocity
-  const Vc = -((dx*(t.vx-int.vx) + dy*(t.vy-int.vy)) / range);
-
-  if(int.guidancePhase === 'midcourse' && range < 300) {
-    int.guidancePhase = 'terminal';
-  }
-
-  // Proportional navigation: a = N * Vc * LOSrate
-  const N = int.guidancePhase === 'terminal' ? 4 : 3;
-  const aCommand = N * Vc * LOSrate;
-
-  // Apply acceleration perpendicular to velocity
-  const velAngle = atan2(int.vy, int.vx);
-  const accelX = -sin(velAngle) * aCommand;
-  const accelY = cos(velAngle) * aCommand;
-
-  // Limit acceleration
-  const maxAccel = 300;
-  const accelMag = hypot(accelX, accelY);
-  const scale = accelMag > maxAccel ? maxAccel / accelMag : 1;
-
-  int.vx += accelX * scale * dt;
-  int.vy += accelY * scale * dt;
-
-  // Maintain speed
-  const currentSpeed = hypot(int.vx, int.vy);
-  if(currentSpeed > 0) {
-    int.vx = int.vx / currentSpeed * int.speed;
-    int.vy = int.vy / currentSpeed * int.speed;
-  }
-
-  // Check intercept
-  if(range < int.killRadius) {
-    // HIT!
-    t.alive = false;
-    int.alive = false;
-    stats.intercepted++;
-    createExplosion((t.x+int.x)/2, (t.y+int.y)/2, '#ff8800', 25, 1);
-    addLog(`ПЕРЕХВАТ! ${int.id} уничтожил ${t.id} (D=${round(range)}м)`, 'intercept');
-
-    // Store experience for AI training
-    transformer.addExperience({
-      targetFeatures: [
-        t.x/WORLD_SIZE, t.y/WORLD_SIZE,
-        t.vx/1000, t.vy/1000,
-        (t.ax||0)/100, (t.ay||0)/100,
-        t.speed/1000, atan2(t.vy,t.vx)/PI,
-        hypot(t.x-BASE.x,t.y-BASE.y)/WORLD_SIZE, t.threat,
-        t.type/3, (simTime-t.spawnTime)/60,
-        t.covX/100, t.covY/100,
-        t.maneuvering?1:0, simTime/300
-      ],
-      contextFeatures: getSystemState().arr,
-      actualThreat: t.threat,
-      wasHit: true,
-      interceptError: range,
-      interceptTime: simTime - int.launchTime
-    });
-  }
-
-  // Self-destruct if too old or out of bounds
-  if(int.age > 30 || int.x < -100 || int.x > WORLD_SIZE+100 || int.y < -100 || int.y > WORLD_SIZE+100) {
-    int.alive = false;
-    addLog(`${int.id} самоликвидация`, 'miss');
+  if(m.age>30||m.x<-200||m.x>WS+200||m.y<-200||m.y>WS+200){
+    m.alive=false;
+    log(`✗ ${m.id} промах`,'mis');
   }
 }
 
-// ============================================================
-// SYSTEM STATE
-// ============================================================
-function getSystemState() {
-  let readyMissiles = 0, totalLaunchers = launchers.length;
-  let reloadPct = 0;
-  for(const l of launchers) {
-    readyMissiles += l.missiles;
-    reloadPct += l.status === 'ready' ? 1 : 0;
-  }
-  reloadPct /= totalLaunchers;
-
-  const activeTracks = tracker.tracks.size;
-  let avgDist = 0, maxThreat = 0;
-  for(const [, t] of tracker.tracks) {
-    avgDist += hypot(t.x-BASE.x, t.y-BASE.y);
-    maxThreat = max(maxThreat, t.threat);
-  }
-  avgDist = activeTracks > 0 ? avgDist / activeTracks : WORLD_SIZE;
-
-  const state = {
-    readyMissiles,
-    totalLaunchers,
-    activeTracks,
-    threatLevel: maxThreat,
-    avgDistance: avgDist,
-    time: simTime,
-    interceptorSpeed: +document.getElementById('interceptorSpeed').value,
-    reloadPct,
-    arr: [readyMissiles/32, totalLaunchers/8, activeTracks/20, maxThreat,
-          avgDist/WORLD_SIZE, simTime/300,
-          (+document.getElementById('interceptorSpeed').value)/3000, reloadPct]
-  };
-  return state;
+function makeExp(t,hit,err){
+  const d=hypot(t.x-BX,t.y-BY),spd=hypot(t.vx,t.vy);
+  const hdg=atan2(t.vy,t.vx);
+  const cl=-((t.x-BX)*t.vx+(t.y-BY)*t.vy)/(d*spd+1);
+  const feats=new Float32Array(18);
+  feats[0]=t.x/WS;feats[1]=t.y/WS;feats[2]=t.vx/1500;feats[3]=t.vy/1500;
+  feats[4]=(t.ax||0)/200;feats[5]=(t.ay||0)/200;feats[6]=spd/1500;feats[7]=hdg/PI;
+  feats[8]=d/WS;feats[9]=t.threat;feats[10]=t.type/4;feats[11]=min((sT-t.born)/60,1);
+  feats[12]=t.maneuv?1:0;feats[13]=cl;feats[14]=t.engaged?1:0;feats[15]=t.assigned/3;
+  feats[16]=sT/300;feats[17]=d/(spd*max(.1,cl)+1)/30;
+  return{feats,threat:t.threat,hit,err:err||999,reward:hit?(1+d/WS*.5):(d<50?-2:-.5)};
 }
 
-// ============================================================
-// GUARDIAN - SAFETY VALIDATOR
-// ============================================================
-function validateDecision(decision, systemState) {
-  // Physical limits check
-  const t = decision.target;
-  if(!t || !t.alive) return false;
-
-  // Distance check - too close or too far
-  const d = hypot(t.x - BASE.x, t.y - BASE.y);
-  if(d > WORLD_SIZE * 1.2) return false;
-  if(d < 30) return false; // too close, can't intercept
-
-  // Already engaged enough
-  if(t.assignedInterceptors >= 2) return false;
-
-  // Resource check
-  if(systemState.readyMissiles <= 0) return false;
-
-  // Confidence threshold
-  const confThresh = +document.getElementById('confThreshold').value;
-  if(decision.confidence < confThresh * 0.5 && transformer.trainEpoch > 50) return false;
-
-  // Moving away from base?
-  const closing = -((t.x-BASE.x)*t.vx+(t.y-BASE.y)*t.vy)/(d*hypot(t.vx,t.vy)+1);
-  if(closing < -0.3 && d > WORLD_SIZE*0.5) return false;
-
-  return true;
+// ========== BOOM ==========
+function boom(x,y,c,sz,dur){
+  booms.push({x,y,c,sz,dur,t:0});
+  const n=sz>20?30:15;
+  for(let i=0;i<n;i++){
+    const a=R(0,TAU),s=R(30,200);
+    parts.push({x,y,vx:cos(a)*s,vy:sin(a)*s,life:R(.2,1),ml:1,c,sz:R(1,4),type:'spark'});
+  }
 }
 
-// ============================================================
-// AI DECISION CYCLE
-// ============================================================
-function aiDecisionCycle() {
-  if(!document.getElementById('aiEnabled').checked) return;
-
-  const targets = [];
-  for(const [, track] of tracker.tracks) {
-    if(track.lastSeen < 1) targets.push(track);
+// ========== AI CYCLE ==========
+function aiCycle(){
+  const targets=enemies.filter(e=>e.alive);
+  if(!targets.length)return;
+  // Update threats
+  for(const t of targets){
+    const d=hypot(t.x-BX,t.y-BY);
+    const spd=hypot(t.vx,t.vy);
+    const cl=-((t.x-BX)*t.vx+(t.y-BY)*t.vy)/(d*spd+1);
+    t.threat=CL(.25*(1-d/WS)+.25*(spd/1200)+.25*max(0,cl)+.15*(t.maneuv?1:0)+.1*(t.type===3?1:0),0,1);
   }
 
-  if(targets.length === 0) return;
+  if($('aiOn').checked){
+    aiDecs=ai.decide(targets);
+    for(const dec of aiDecs){
+      const t=dec.target;
+      if(!t.alive||t.assigned>=2)continue;
+      const d=hypot(t.x-BX,t.y-BY);
+      if(d>WS*1.1||d<20)continue;
+      const cl=-((t.x-BX)*t.vx+(t.y-BY)*t.vy)/(d*hypot(t.vx,t.vy)+1);
+      if(cl<-.3&&d>WS*.5)continue;
+      if(dec.priority<.2)continue;
 
-  const systemState = getSystemState();
-  aiDecisions = transformer.computeDecisions(targets, systemState, simTime);
-
-  // Process decisions through guardian
-  for(const decision of aiDecisions) {
-    if(!validateDecision(decision, systemState)) continue;
-    if(decision.priority < 0.3) continue;
-
-    // Find best launcher
-    let bestLauncher = null, bestDist = Infinity;
-    for(const l of launchers) {
-      if(l.missiles > 0 && l.status === 'ready') {
-        const d = hypot(l.x - decision.interceptX, l.y - decision.interceptY);
-        if(d < bestDist) { bestDist = d; bestLauncher = l; }
-      }
+      let bl=null,bd=1e9;
+      for(const l of lau){if(l.m>0&&l.st==='ready'){const d2=hypot(l.x-t.x,l.y-t.y);if(d2<bd){bd=d2;bl=l}}}
+      if(!bl)continue;
+      const ip=solveInt(t,bl,+$('iS').value);
+      if(ip){fire(bl,t,ip);break}
     }
-
-    if(bestLauncher) {
-      const target = decision.target;
-      const intSpeed = +document.getElementById('interceptorSpeed').value;
-
-      // Use AI's predicted intercept point, refined by ballistic solver
-      let interceptPt = BallisticSolver.computeIntercept(target, bestLauncher, intSpeed);
-      if(!interceptPt) {
-        interceptPt = {x: decision.interceptX, y: decision.interceptY, time: 5};
-      }
-
-      launchInterceptor(bestLauncher, target, interceptPt);
-      break; // One launch per cycle to avoid overwhelming
+  }else{
+    // Simple greedy
+    const sorted=[...targets].filter(e=>!e.engaged).sort((a,b)=>hypot(a.x-BX,a.y-BY)-hypot(b.x-BX,b.y-BY));
+    for(const t of sorted){
+      const d=hypot(t.x-BX,t.y-BY);
+      if(d>WS*.7)continue;
+      let bl=null;for(const l of lau)if(l.m>0&&l.st==='ready')if(!bl||l.m>bl.m)bl=l;
+      if(!bl)continue;
+      const ip=solveInt(t,bl,+$('iS').value);
+      if(ip){fire(bl,t,ip);break}
     }
   }
 }
 
-// ============================================================
-// SIMPLE AI FALLBACK (when AI is disabled or fresh)
-// ============================================================
-function simpleDefense() {
-  if(document.getElementById('aiEnabled').checked && transformer.trainEpoch > 10) return;
+// ========== UPDATE ==========
+function update(dt){
+  for(const e of enemies){
+    if(!e.alive)continue;
+    if(e.type===2){e.mT+=dt;const a=sin(e.mT*e.mF*TAU)*e.mA;const h=atan2(e.vy,e.vx);e.ax=cos(h+PI/2)*a;e.ay=sin(h+PI/2)*a}
+    if(e.type===0)e.ay=(e.ay||0)+2*dt;
+    e.vx+=(e.ax||0)*dt;e.vy+=(e.ay||0)*dt;
+    e.x+=e.vx*dt;e.y+=e.vy*dt;
+    if($('shTr').checked){e.trail.push({x:e.x,y:e.y,t:sT});while(e.trail.length>80)e.trail.shift()}
+    const dB=hypot(e.x-BX,e.y-BY);
+    if(dB<20){
+      e.alive=false;stats.miss++;
+      boom(e.x,e.y,'#ff0000',40,2);boom(BX,BY,'#ff4400',20,1);
+      log(`✗ ПРОПУСК! ${e.id} попала в базу!`,'mis');
+      ai.addExp(makeExp(e,false,999));
+    }
+    if(e.x<-300||e.x>WS+300||e.y<-300||e.y>WS+300)e.alive=false;
+  }
 
-  for(const enemy of enemies) {
-    if(!enemy.alive || enemy.engaged) continue;
-
-    const d = hypot(enemy.x - BASE.x, enemy.y - BASE.y);
-    if(d > WORLD_SIZE * 0.8) continue;
-
-    // Simple threat-based engagement
-    if(enemy.threat > 0.3 || d < WORLD_SIZE * 0.4) {
-      let bestLauncher = null;
-      for(const l of launchers) {
-        if(l.missiles > 0 && l.status === 'ready') {
-          if(!bestLauncher || l.missiles > bestLauncher.missiles) bestLauncher = l;
-        }
-      }
-
-      if(bestLauncher) {
-        const intSpeed = +document.getElementById('interceptorSpeed').value;
-        const interceptPt = BallisticSolver.computeIntercept(enemy, bestLauncher, intSpeed);
-        if(interceptPt) {
-          launchInterceptor(bestLauncher, enemy, interceptPt);
-        }
-      }
+  for(const m of missiles){
+    if(!m.alive)continue;
+    m.age+=dt;guide(m,dt);
+    m.x+=m.vx*dt;m.y+=m.vy*dt;
+    if($('shTr').checked){m.trail.push({x:m.x,y:m.y,t:sT});while(m.trail.length>60)m.trail.shift()}
+    // Smoke trail
+    m.smokeTimer-=dt;
+    if(m.smokeTimer<=0){
+      m.smokeTimer=.03;
+      parts.push({x:m.x-m.vx*.01,y:m.y-m.vy*.01,vx:R(-10,10),vy:R(-10,10),life:R(.3,.8),ml:.8,c:'#888',sz:R(1,3),type:'smoke'});
     }
   }
+
+  for(const l of lau){
+    if(l.st==='reload'){l.rt-=dt;if(l.rt<=0){l.st='ready';l.rt=0}}
+    if(l.fireAnim>0)l.fireAnim=max(0,l.fireAnim-dt*3);
+  }
+
+  for(const e of booms)e.t+=dt;
+  booms=booms.filter(e=>e.t<e.dur);
+
+  for(const p of parts){
+    p.x+=p.vx*dt;p.y+=p.vy*dt;
+    if(p.type==='smoke'){p.vx*=.9;p.vy*=.9;p.vy-=20*dt}
+    else{p.vx*=.95;p.vy*=.95;p.vy+=30*dt}
+    p.life-=dt;
+  }
+  parts=parts.filter(p=>p.life>0);
+
+  for(const d of debris){d.x+=d.vx*dt;d.y+=d.vy*dt;d.vy+=80*dt;d.rot+=d.rv*dt;d.life-=dt}
+  debris=debris.filter(d=>d.life>0);
+
+  enemies=enemies.filter(e=>e.alive);
+  missiles=missiles.filter(m=>m.alive);
+
+  if(fc%5===0)aiCycle();
+  if(fc%40===0&&ai.buf.length>40)ai.train(1);
+
+  if($('autoW').checked){
+    const iv=+$('atkI').value;
+    if(sT-lastWv>iv){lastWv=sT;const n=RI(1,+$('wvN').value);for(let i=0;i<n;i++)setTimeout(()=>spawn(),i*80)}
+  }
+
+  rAngle=(rAngle+dt*2)%TAU;
 }
 
-// ============================================================
-// EXPLOSIONS AND PARTICLES
-// ============================================================
-function createExplosion(x, y, color, size, duration) {
-  explosions.push({x, y, color, size, duration, maxDuration: duration, t:0});
+// ========== RENDER ==========
+function render(){
+  ctx.clearRect(0,0,vW,vH);
+  const sx=scX,sy=scY;
+  const bx=BX*sx,by=BY*sy;
 
-  for(let i=0;i<20;i++){
-    const angle=rand(0,TAU);
-    const speed=rand(50,200);
-    particles.push({
-      x, y,
-      vx:cos(angle)*speed, vy:sin(angle)*speed,
-      life:rand(0.3,1), maxLife:rand(0.3,1),
-      color, size:rand(1,3)
-    });
+  // ---- BACKGROUND ----
+  // Sky gradient
+  const skyG=ctx.createLinearGradient(0,0,0,vH);
+  skyG.addColorStop(0,'#050510');skyG.addColorStop(.6,'#080c18');skyG.addColorStop(.85,'#0a1810');skyG.addColorStop(1,'#0a1a0a');
+  ctx.fillStyle=skyG;ctx.fillRect(0,0,vW,vH);
+
+  // Stars
+  if(fc===0||!render._stars){
+    render._stars=[];for(let i=0;i<80;i++)render._stars.push({x:R(0,vW),y:R(0,vH*.7),s:R(.3,1.5),b:R(.3,1)});
   }
-}
-
-// ============================================================
-// SIMULATION UPDATE
-// ============================================================
-function updateSimulation(dt) {
-  // Update enemies
-  const detections = [];
-  for(const e of enemies) {
-    if(!e.alive) continue;
-
-    // Type-specific movement
-    if(e.type === 2) { // Maneuvering
-      e.maneuverTimer += dt;
-      const mAngle = sin(e.maneuverTimer * e.maneuverFreq * TAU) * e.maneuverAmp;
-      const heading = atan2(e.vy, e.vx);
-      e.ax = cos(heading + PI/2) * mAngle;
-      e.ay = sin(heading + PI/2) * mAngle;
-    }
-    if(e.type === 0) { // Ballistic
-      e.ay = (e.ay || 0) + 2 * dt; // gravity
-    }
-
-    e.vx += (e.ax || 0) * dt;
-    e.vy += (e.ay || 0) * dt;
-    e.x += e.vx * dt;
-    e.y += e.vy * dt;
-
-    // Trail
-    if(document.getElementById('showTrails').checked) {
-      e.trail.push({x:e.x, y:e.y});
-      if(e.trail.length > 100) e.trail.shift();
-    }
-
-    // Check if reached base
-    const dBase = hypot(e.x - BASE.x, e.y - BASE.y);
-    if(dBase < 25) {
-      e.alive = false;
-      stats.missed++;
-      createExplosion(e.x, e.y, '#ff0000', 30, 1.5);
-      addLog(`ПРОПУСК! ${e.id} достигла базы!`, 'miss');
-
-      // Negative experience
-      transformer.addExperience({
-        targetFeatures: [
-          e.x/WORLD_SIZE, e.y/WORLD_SIZE,
-          e.vx/1000, e.vy/1000,
-          (e.ax||0)/100, (e.ay||0)/100,
-          e.speed/1000, atan2(e.vy,e.vx)/PI,
-          dBase/WORLD_SIZE, e.threat,
-          e.type/3, (simTime-e.spawnTime)/60,
-          e.covX/100, e.covY/100,
-          e.maneuvering?1:0, simTime/300
-        ],
-        contextFeatures: getSystemState().arr,
-        actualThreat: 1.0,
-        wasHit: false,
-        interceptError: 999
-      });
-    }
-
-    // Out of bounds
-    if(e.x < -200 || e.x > WORLD_SIZE+200 || e.y < -200 || e.y > WORLD_SIZE+200) {
-      e.alive = false;
-    }
-
-    if(e.alive) {
-      detections.push({
-        x: e.x + rand(-5, 5), // radar noise
-        y: e.y + rand(-5, 5),
-        vx: e.vx, vy: e.vy,
-        type: e.type,
-        spawnTime: e.spawnTime
-      });
-    }
+  for(const s of render._stars){
+    const b=s.b*(.7+.3*sin(sT*2+s.x));
+    ctx.beginPath();ctx.arc(s.x,s.y,s.s,0,TAU);
+    ctx.fillStyle=`rgba(200,220,255,${b})`;ctx.fill();
   }
-
-  // Update tracker
-  tracker.update(detections, dt);
-
-  // Sync tracker threat back to enemies
-  for(const e of enemies) {
-    for(const [, track] of tracker.tracks) {
-      if(hypot(e.x-track.x, e.y-track.y) < 30) {
-        e.threat = track.threat;
-        track.engaged = e.engaged;
-        track.assignedInterceptors = e.assignedInterceptors;
-      }
-    }
-  }
-
-  // Update interceptors
-  for(const int of interceptors) {
-    if(!int.alive) continue;
-    int.age += dt;
-    guidInterceptor(int, dt);
-    int.x += int.vx * dt;
-    int.y += int.vy * dt;
-
-    if(document.getElementById('showTrails').checked) {
-      int.trail.push({x:int.x, y:int.y});
-      if(int.trail.length > 60) int.trail.shift();
-    }
-  }
-
-  // Update launchers
-  for(const l of launchers) {
-    if(l.status === 'reloading') {
-      l.reloadTimer -= dt;
-      if(l.reloadTimer <= 0) {
-        l.status = 'ready';
-        l.reloadTimer = 0;
-      }
-    }
-  }
-
-  // Update explosions
-  for(const ex of explosions) {
-    ex.t += dt;
-  }
-  explosions = explosions.filter(e => e.t < e.maxDuration);
-
-  // Update particles
-  for(const p of particles) {
-    p.x += p.vx * dt;
-    p.y += p.vy * dt;
-    p.vx *= 0.95;
-    p.vy *= 0.95;
-    p.life -= dt;
-  }
-  particles = particles.filter(p => p.life > 0);
-
-  // Cleanup dead
-  enemies = enemies.filter(e => e.alive);
-  interceptors = interceptors.filter(i => i.alive);
-
-  // AI cycle (every ~200ms sim time)
-  if(frameCount % 12 === 0) {
-    aiDecisionCycle();
-    simpleDefense();
-  }
-
-  // Training cycle (every ~1s)
-  if(frameCount % 60 === 0 && transformer.replayBuffer.length > 20) {
-    transformer.trainES(8);
-  }
-
-  // Auto waves
-  if(document.getElementById('autoWaves').checked) {
-    const interval = +document.getElementById('atkInterval').value;
-    if(simTime - lastAutoWave > interval) {
-      lastAutoWave = simTime;
-      const count = randInt(1, +document.getElementById('waveCount').value);
-      for(let i=0;i<count;i++) setTimeout(()=>spawnEnemy(), i*100);
-    }
-  }
-
-  // Radar sweep
-  radarAngle = (radarAngle + dt * 1.5) % TAU;
-}
-
-// ============================================================
-// RENDERING
-// ============================================================
-function render() {
-  const ctx = mainCtx;
-  const sx = viewW / WORLD_SIZE;
-  const sy = viewH / WORLD_SIZE;
-
-  ctx.clearRect(0, 0, viewW, viewH);
-
-  // Defense zones
-  if(document.getElementById('showZones').checked) {
-    const baseX = BASE.x*sx, baseY = BASE.y*sy;
-
-    // Engagement zone
-    ctx.beginPath();
-    ctx.arc(baseX, baseY, DEFENSE_RADIUS*0.7*sx, 0, TAU);
-    ctx.fillStyle = '#00ff8808';
-    ctx.fill();
-    ctx.strokeStyle = '#00ff8833';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([5,10]);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    // Kill zone
-    ctx.beginPath();
-    ctx.arc(baseX, baseY, DEFENSE_RADIUS*0.4*sx, 0, TAU);
-    ctx.fillStyle = '#ff880808';
-    ctx.fill();
-    ctx.strokeStyle = '#ff880833';
-    ctx.stroke();
-  }
-
-  // Radar sweep
-  const baseX = BASE.x*sx, baseY = BASE.y*sy;
-  const grad = ctx.createConicalGradient ? null : null;
-  ctx.save();
-  ctx.globalAlpha = 0.15;
-  ctx.beginPath();
-  ctx.moveTo(baseX, baseY);
-  ctx.arc(baseX, baseY, WORLD_SIZE*sx, radarAngle - 0.3, radarAngle);
-  ctx.closePath();
-  ctx.fillStyle = '#00ff88';
-  ctx.fill();
-  ctx.restore();
-
-  // Trails
-  if(document.getElementById('showTrails').checked) {
-    for(const e of enemies) {
-      if(e.trail.length < 2) continue;
-      ctx.beginPath();
-      ctx.moveTo(e.trail[0].x*sx, e.trail[0].y*sy);
-      for(let i=1;i<e.trail.length;i++) {
-        ctx.lineTo(e.trail[i].x*sx, e.trail[i].y*sy);
-      }
-      ctx.strokeStyle = e.trailColor;
-      ctx.lineWidth = 1;
-      ctx.globalAlpha = 0.4;
-      ctx.stroke();
-      ctx.globalAlpha = 1;
-    }
-
-    for(const int of interceptors) {
-      if(int.trail.length < 2) continue;
-      ctx.beginPath();
-      ctx.moveTo(int.trail[0].x*sx, int.trail[0].y*sy);
-      for(let i=1;i<int.trail.length;i++) {
-        ctx.lineTo(int.trail[i].x*sx, int.trail[i].y*sy);
-      }
-      ctx.strokeStyle = '#00ccff44';
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    }
-  }
-
-  // AI predictions
-  if(document.getElementById('showPredictions').checked) {
-    for(const dec of aiDecisions) {
-      if(!dec.target.alive) continue;
-      const tx = dec.target.x*sx, ty = dec.target.y*sy;
-      const ix = dec.interceptX*sx, iy = dec.interceptY*sy;
-
-      // Predicted trajectory
-      ctx.beginPath();
-      ctx.moveTo(tx, ty);
-      ctx.lineTo(ix, iy);
-      ctx.strokeStyle = `rgba(204,136,255,${dec.confidence})`;
-      ctx.lineWidth = 1;
-      ctx.setLineDash([3,6]);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // Intercept point
-      ctx.beginPath();
-      ctx.arc(ix, iy, 6, 0, TAU);
-      ctx.strokeStyle = '#cc88ff';
-      ctx.lineWidth = 1;
-      ctx.stroke();
-
-      // Priority indicator
-      if(dec.priority > 0.5) {
-        ctx.fillStyle = `rgba(255,${round(255*(1-dec.priority))},0,0.7)`;
-        ctx.font = '9px monospace';
-        ctx.fillText(`P:${(dec.priority*100).toFixed(0)}%`, tx+12, ty-12);
-      }
-    }
-  }
-
-  // Enemies
-  for(const e of enemies) {
-    const ex = e.x*sx, ey = e.y*sy;
-
-    // Threat glow
-    ctx.beginPath();
-    ctx.arc(ex, ey, 8 + e.threat*8, 0, TAU);
-    ctx.fillStyle = e.color + '22';
-    ctx.fill();
-
-    // Enemy body
-    ctx.save();
-    ctx.translate(ex, ey);
-    ctx.rotate(atan2(e.vy, e.vx));
-
-    // Missile shape
-    ctx.beginPath();
-    ctx.moveTo(8, 0);
-    ctx.lineTo(-5, -4);
-    ctx.lineTo(-3, 0);
-    ctx.lineTo(-5, 4);
-    ctx.closePath();
-    ctx.fillStyle = e.color;
-    ctx.fill();
-    ctx.strokeStyle = '#ffffff44';
-    ctx.lineWidth = 0.5;
-    ctx.stroke();
-
-    // Engine flame
-    ctx.beginPath();
-    ctx.moveTo(-3, 0);
-    ctx.lineTo(-8-random()*4, -2);
-    ctx.lineTo(-8-random()*4, 2);
-    ctx.closePath();
-    ctx.fillStyle = '#ffaa00';
-    ctx.fill();
-
-    ctx.restore();
-
-    // ID label
-    ctx.fillStyle = e.color;
-    ctx.font = '8px monospace';
-    ctx.fillText(e.id, ex+10, ey-8);
-
-    // Velocity vector
-    ctx.beginPath();
-    ctx.moveTo(ex, ey);
-    ctx.lineTo(ex + e.vx*0.02*sx, ey + e.vy*0.02*sy);
-    ctx.strokeStyle = e.color + '88';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-  }
-
-  // Interceptors
-  for(const int of interceptors) {
-    const ix = int.x*sx, iy = int.y*sy;
-
-    // Glow
-    ctx.beginPath();
-    ctx.arc(ix, iy, 6, 0, TAU);
-    ctx.fillStyle = '#00ccff22';
-    ctx.fill();
-
-    // Interceptor body
-    ctx.save();
-    ctx.translate(ix, iy);
-    ctx.rotate(atan2(int.vy, int.vx));
-
-    ctx.beginPath();
-    ctx.moveTo(7, 0);
-    ctx.lineTo(-4, -3);
-    ctx.lineTo(-2, 0);
-    ctx.lineTo(-4, 3);
-    ctx.closePath();
-    ctx.fillStyle = int.guidancePhase === 'terminal' ? '#00ff88' : '#00ccff';
-    ctx.fill();
-
-    // Engine
-    ctx.beginPath();
-    ctx.moveTo(-2, 0);
-    ctx.lineTo(-6-random()*3, -1.5);
-    ctx.lineTo(-6-random()*3, 1.5);
-    ctx.closePath();
-    ctx.fillStyle = '#00ffcc';
-    ctx.fill();
-
-    ctx.restore();
-
-    // Guidance line to target
-    if(int.target && int.target.alive) {
-      ctx.beginPath();
-      ctx.moveTo(ix, iy);
-      ctx.lineTo(int.target.x*sx, int.target.y*sy);
-      ctx.strokeStyle = '#00ccff22';
-      ctx.lineWidth = 0.5;
-      ctx.setLineDash([2,4]);
-      ctx.stroke();
-      ctx.setLineDash([]);
-    }
-  }
-
-  // Launchers
-  for(const l of launchers) {
-    const lx = l.x*sx, ly = l.y*sy;
-
-    // Launcher base
-    ctx.fillStyle = '#1a3a2a';
-    ctx.fillRect(lx-8, ly-4, 16, 12);
-    ctx.strokeStyle = l.status==='ready' ? '#00ff88' : '#ffaa00';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(lx-8, ly-4, 16, 12);
-
-    // Barrel
-    ctx.save();
-    ctx.translate(lx, ly);
-    // Point at nearest threat
-    let angle = -PI/2;
-    let nearestEnemy = null, nearestDist = Infinity;
-    for(const e of enemies) {
-      const d = hypot(e.x-l.x, e.y-l.y);
-      if(d < nearestDist) { nearestDist = d; nearestEnemy = e; }
-    }
-    if(nearestEnemy) angle = atan2(nearestEnemy.y-l.y, nearestEnemy.x-l.x);
-    l.angle = lerp(l.angle, angle, 0.05);
-
-    ctx.rotate(l.angle);
-    ctx.fillStyle = '#446644';
-    ctx.fillRect(0, -2, 12, 4);
-    ctx.restore();
-
-    // Status text
-    ctx.fillStyle = l.status==='ready' ? '#00ff88' : '#ffaa00';
-    ctx.font = '8px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText(`ПУ${l.id} [${l.missiles}]`, lx, ly+18);
-    if(l.status === 'reloading') {
-      ctx.fillStyle = '#ffaa00';
-      ctx.fillText(`${l.reloadTimer.toFixed(1)}s`, lx, ly+26);
-    }
-    ctx.textAlign = 'left';
-  }
-
-  // Explosions
-  for(const ex of explosions) {
-    const progress = ex.t / ex.maxDuration;
-    const r = ex.size * (1 + progress * 2);
-    ctx.beginPath();
-    ctx.arc(ex.x*sx, ex.y*sy, r, 0, TAU);
-
-    const alpha = 1 - progress;
-    ctx.fillStyle = ex.color + Math.round(alpha*255).toString(16).padStart(2,'0');
-    ctx.fill();
-
-    // Shockwave ring
-    ctx.beginPath();
-    ctx.arc(ex.x*sx, ex.y*sy, r*1.5, 0, TAU);
-    ctx.strokeStyle = ex.color + Math.round(alpha*128).toString(16).padStart(2,'0');
-    ctx.lineWidth = 2;
-    ctx.stroke();
-  }
-
-  // Particles
-  for(const p of particles) {
-    const alpha = p.life / p.maxLife;
-    ctx.beginPath();
-    ctx.arc(p.x*sx, p.y*sy, p.size*alpha, 0, TAU);
-    ctx.fillStyle = p.color + Math.round(alpha*200).toString(16).padStart(2,'0');
-    ctx.fill();
-  }
-
-  // UI overlay
-  const uctx = uiCtx;
-  uctx.clearRect(0, 0, viewW, viewH);
-
-  // Compass
-  uctx.save();
-  uctx.translate(viewW - 50, 50);
-  uctx.beginPath();
-  uctx.arc(0, 0, 30, 0, TAU);
-  uctx.strokeStyle = '#1a3a5c';
-  uctx.lineWidth = 1;
-  uctx.stroke();
-  ['С','В','Ю','З'].forEach((l,i)=>{
-    const a = i*PI/2 - PI/2;
-    uctx.fillStyle = '#00ccff88';
-    uctx.font = '9px monospace';
-    uctx.textAlign = 'center';
-    uctx.fillText(l, cos(a)*35, sin(a)*35+3);
-  });
-  uctx.restore();
-
-  // Time and frame info
-  uctx.fillStyle = '#00ccff88';
-  uctx.font = '10px monospace';
-  uctx.fillText(`T+${simTime.toFixed(1)}s | FPS:${fps} | AI:${transformer.lastInferenceTime.toFixed(1)}ms`, 10, 20);
-  uctx.fillText(`Цели: ${enemies.length} | Перехватчики: ${interceptors.length} | Треки: ${tracker.tracks.size}`, 10, 35);
-}
-
-// ============================================================
-// UI UPDATES
-// ============================================================
-function updateUI() {
-  // Stats
-  document.getElementById('statLaunched').textContent = stats.launched;
-  document.getElementById('statIntercepted').textContent = stats.intercepted;
-  document.getElementById('statMissed').textContent = stats.missed;
-  const total = stats.intercepted + stats.missed;
-  const acc = total > 0 ? round(stats.intercepted/total*100) : 0;
-  document.getElementById('statAccuracy').textContent = acc + '%';
-  document.getElementById('statAccuracy').className = 'stat-number' + (acc<50?' danger':acc<80?' warning':'');
-  document.getElementById('statFired').textContent = stats.fired;
-  const eff = stats.fired > 0 ? round(stats.intercepted/stats.fired*100) : 0;
-  document.getElementById('statEfficiency').textContent = eff + '%';
-
-  // Threat status
-  let maxThreat = 0;
-  for(const e of enemies) maxThreat = max(maxThreat, e.threat||0);
-  const ts = document.getElementById('threatStatus');
-  if(maxThreat > 0.7) { ts.textContent = '▲ УГРОЗА: ВЫСОКАЯ'; ts.className = 'status-alert'; }
-  else if(maxThreat > 0.3) { ts.textContent = '▲ УГРОЗА: СРЕДНЯЯ'; ts.className = 'status-normal'; }
-  else if(enemies.length > 0) { ts.textContent = '▲ УГРОЗА: НИЗКАЯ'; ts.className = 'status-normal'; }
-  else { ts.textContent = '▲ УГРОЗА: НЕТ'; ts.className = 'status-normal'; }
-
-  document.getElementById('timeDisplay').textContent = `T+${simTime.toFixed(1)}s`;
-
-  // Track list
-  let trackHTML = '';
-  const sortedTracks = [...tracker.tracks.values()].sort((a,b) => b.threat - a.threat);
-  for(const t of sortedTracks.slice(0, 10)) {
-    const d = round(hypot(t.x-BASE.x, t.y-BASE.y));
-    const spd = round(hypot(t.vx, t.vy));
-    const threatPct = round(t.threat*100);
-    const threatColor = t.threat > 0.7 ? '#ff4444' : t.threat > 0.4 ? '#ffaa00' : '#00ff88';
-    trackHTML += `<div class="track-item hostile">
-      <div style="display:flex;justify-content:space-between">
-        <span style="color:${threatColor}">●T${t.id}</span>
-        <span style="color:#668899">${['BAL','CRU','MAN','HYP'][t.type||0]}</span>
-      </div>
-      <div style="color:#668899;font-size:9px">D:${d}m V:${spd}m/s ${t.engaged?'⚔':''}${t.maneuvering?'↻':''}</div>
-      <div class="threat-bar"><div class="threat-fill" style="width:${threatPct}%;background:${threatColor}"></div></div>
-    </div>`;
-  }
-  document.getElementById('trackList').innerHTML = trackHTML;
-
-  // Launcher status
-  let launcherHTML = '';
-  for(const l of launchers) {
-    const pct = round(l.missiles/l.maxMissiles*100);
-    const color = l.status==='ready'?'#00ff88':'#ffaa00';
-    launcherHTML += `<div class="param-row">
-      <span class="param-label">ПУ-${l.id}</span>
-      <span class="param-value" style="color:${color}">${l.missiles}/${l.maxMissiles} ${l.status==='reloading'?'⟳':'✓'}</span>
-    </div>`;
-  }
-  document.getElementById('launcherStatus').innerHTML = launcherHTML;
-
-  // AI metrics
-  document.getElementById('aiConfBar').style.width = (transformer.confidence*100)+'%';
-  document.getElementById('aiConfVal').textContent = round(transformer.confidence*100)+'%';
-  document.getElementById('aiLossBar').style.width = min(100,transformer.totalLoss*50)+'%';
-  document.getElementById('aiLossVal').textContent = transformer.totalLoss.toFixed(3);
-  document.getElementById('aiEpochBar').style.width = min(100,transformer.trainEpoch/10)+'%';
-  document.getElementById('aiEpochVal').textContent = transformer.trainEpoch;
-  document.getElementById('aiLoadBar').style.width = min(100,transformer.lastInferenceTime/30*100)+'%';
-  document.getElementById('aiLoadVal').textContent = round(transformer.lastInferenceTime)+'ms';
-
-  // Radar info
-  document.getElementById('radarTargets').textContent = tracker.tracks.size;
-
-  // History tracking
-  if(frameCount % 30 === 0) {
-    interceptHistory.push(acc);
-    if(interceptHistory.length > 100) interceptHistory.shift();
-    lossHistory.push(transformer.totalLoss);
-    if(lossHistory.length > 100) lossHistory.shift();
-    neuronActivity.push(transformer.confidence);
-    if(neuronActivity.length > 100) neuronActivity.shift();
-  }
-
-  // Draw mini charts
-  if(frameCount % 15 === 0) {
-    drawMiniChart('chartIntercepts', interceptHistory, '#00ff88', '% перехват');
-    drawMiniChart('chartLoss', lossHistory, '#ff8800', 'Loss');
-    drawMiniChart('chartNeurons', neuronActivity, '#cc88ff', 'Уверенность');
-  }
-}
-
-function drawMiniChart(canvasId, data, color, label) {
-  const canvas = document.getElementById(canvasId);
-  if(!canvas) return;
-  const rect = canvas.parentElement.getBoundingClientRect();
-  canvas.width = rect.width - 4;
-  canvas.height = rect.height - 24;
-  const ctx = canvas.getContext('2d');
-  const w = canvas.width, h = canvas.height;
-
-  ctx.clearRect(0, 0, w, h);
-
-  if(data.length < 2) return;
-
-  const maxVal = max(...data, 0.01);
-  const minVal = min(...data, 0);
-  const range = maxVal - minVal || 1;
 
   // Grid
-  ctx.strokeStyle = '#1a2a3c';
-  ctx.lineWidth = 0.5;
-  for(let i=0;i<5;i++){
-    const y = h * i / 4;
-    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
+  ctx.strokeStyle='#0a182808';ctx.lineWidth=.5;
+  for(let x=0;x<=WS;x+=100){ctx.beginPath();ctx.moveTo(x*sx,0);ctx.lineTo(x*sx,vH);ctx.stroke()}
+  for(let y=0;y<=WS;y+=100){ctx.beginPath();ctx.moveTo(0,y*sy);ctx.lineTo(vW,y*sy);ctx.stroke()}
+
+  // Range circles
+  ctx.lineWidth=1;
+  [200,400,600,800,1000].forEach((r,i)=>{
+    ctx.beginPath();ctx.arc(bx,by,r*sx,0,TAU);
+    ctx.strokeStyle=`rgba(0,100,140,${.08-i*.012})`;ctx.stroke();
+  });
+
+  // Ground
+  ctx.fillStyle='#0c1a0c';
+  ctx.fillRect(0,(BY+50)*sy,vW,vH);
+  // Ground detail
+  ctx.strokeStyle='#1a2a1a';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(0,(BY+50)*sy);ctx.lineTo(vW,(BY+50)*sy);ctx.stroke();
+
+  // ---- ZONES ----
+  if($('shZn').checked){
+    // Engagement envelope
+    ctx.beginPath();ctx.arc(bx,by,WS*.55*sx,PI*.05,PI*.95);
+    ctx.strokeStyle='#0f84';ctx.lineWidth=1;ctx.setLineDash([5,8]);ctx.stroke();ctx.setLineDash([]);
+    // Kill zone
+    ctx.beginPath();ctx.arc(bx,by,WS*.3*sx,0,TAU);
+    ctx.strokeStyle='#f802';ctx.lineWidth=1;ctx.setLineDash([3,6]);ctx.stroke();ctx.setLineDash([]);
+    // Labels
+    ctx.fillStyle='#0f83';ctx.font='9px monospace';
+    ctx.fillText('ЗОНА ОБНАРУЖЕНИЯ',bx+WS*.53*sx,by-20);
+    ctx.fillStyle='#f803';
+    ctx.fillText('ЗОНА ПОРАЖЕНИЯ',bx+WS*.28*sx,by-20);
   }
 
-  // Line
-  ctx.beginPath();
+  // ---- RADAR SWEEP ----
+  ctx.save();ctx.globalAlpha=.08;
+  ctx.beginPath();ctx.moveTo(bx,by);
+  ctx.arc(bx,by,WS*.8*sx,rAngle-.2,rAngle);ctx.closePath();
+  ctx.fillStyle='#0f8';ctx.fill();ctx.restore();
+
+  // ---- TRAILS ----
+  if($('shTr').checked){
+    for(const e of enemies){
+      if(e.trail.length<2)continue;
+      for(let i=1;i<e.trail.length;i++){
+        const a=i/e.trail.length;
+        ctx.beginPath();
+        ctx.moveTo(e.trail[i-1].x*sx,e.trail[i-1].y*sy);
+        ctx.lineTo(e.trail[i].x*sx,e.trail[i].y*sy);
+        ctx.strokeStyle=TYPES[e.type].c;ctx.globalAlpha=a*.3;ctx.lineWidth=1+a;ctx.stroke();
+      }
+      ctx.globalAlpha=1;
+    }
+    for(const m of missiles){
+      if(m.trail.length<2)continue;
+      for(let i=1;i<m.trail.length;i++){
+        const a=i/m.trail.length;
+        ctx.beginPath();
+        ctx.moveTo(m.trail[i-1].x*sx,m.trail[i-1].y*sy);
+        ctx.lineTo(m.trail[i].x*sx,m.trail[i].y*sy);
+        ctx.strokeStyle='#00ccff';ctx.globalAlpha=a*.4;ctx.lineWidth=1+a;ctx.stroke();
+      }
+      ctx.globalAlpha=1;
+    }
+  }
+
+  // ---- AI PREDICTIONS ----
+  if($('shPr').checked){
+    for(const d of aiDecs){
+      if(!d.target.alive)continue;
+      const tx=d.target.x*sx,ty=d.target.y*sy;
+      const ix=CL(d.intX,0,WS)*sx,iy=CL(d.intY,0,WS)*sy;
+      // Prediction line
+      ctx.beginPath();ctx.moveTo(tx,ty);ctx.lineTo(ix,iy);
+      ctx.strokeStyle=`rgba(180,120,255,${d.confidence*.5})`;ctx.lineWidth=1;ctx.setLineDash([3,4]);ctx.stroke();ctx.setLineDash([]);
+      // Intercept marker
+      ctx.beginPath();ctx.arc(ix,iy,6,0,TAU);ctx.strokeStyle='#b88f';ctx.lineWidth=1.5;ctx.stroke();
+      ctx.beginPath();ctx.moveTo(ix-4,iy);ctx.lineTo(ix+4,iy);ctx.moveTo(ix,iy-4);ctx.lineTo(ix,iy+4);ctx.stroke();
+      // Priority label
+      if(d.priority>.3&&$('shLbl').checked){
+        ctx.fillStyle=`rgba(255,${round(255*(1-d.priority))},0,.9)`;ctx.font='bold 9px monospace';
+        ctx.fillText(`P:${(d.priority*100)|0}%`,tx+12,ty-12);
+        ctx.fillStyle='#b88f';ctx.font='8px monospace';
+        ctx.fillText(`C:${(d.confidence*100)|0}%`,tx+12,ty-3);
+      }
+    }
+  }
+
+  // ---- BASE ----
+  // Base building
+  ctx.save();ctx.translate(bx,by);
+  // Radar dish
+  ctx.strokeStyle='#0f8';ctx.lineWidth=2;
+  ctx.beginPath();ctx.arc(0,-15,12,PI+.5,TAU-.5);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(0,-3);ctx.lineTo(0,-15);ctx.stroke();
+  // Building
+  ctx.fillStyle='#1a3a2a';ctx.fillRect(-20,-3,40,12);
+  ctx.strokeStyle='#0f8';ctx.lineWidth=1.5;ctx.strokeRect(-20,-3,40,12);
+  // Windows
+  ctx.fillStyle='#0f85';
+  for(let i=-15;i<=10;i+=8)ctx.fillRect(i,0,5,4);
+  // Base circle
+  ctx.beginPath();ctx.arc(0,0,25,0,TAU);
+  ctx.strokeStyle='#0f84';ctx.lineWidth=1;ctx.setLineDash([2,4]);ctx.stroke();ctx.setLineDash([]);
+  // Label
+  ctx.fillStyle='#0f8';ctx.font='bold 10px monospace';ctx.textAlign='center';
+  ctx.fillText('БАЗА ПРО',0,25);
+  ctx.textAlign='left';
+  ctx.restore();
+
+  // ---- LAUNCHERS ----
+  for(const l of lau){
+    const lx=l.x*sx,ly=l.y*sy;
+    ctx.save();ctx.translate(lx,ly);
+
+    // Platform
+    ctx.fillStyle='#1a2818';ctx.fillRect(-14,-6,28,16);
+    ctx.strokeStyle=l.st==='ready'?'#0f8':'#fa0';ctx.lineWidth=1.5;ctx.strokeRect(-14,-6,28,16);
+
+    // Rails/tubes
+    for(let i=-1;i<=1;i+=2){
+      ctx.fillStyle='#2a4a2a';ctx.fillRect(-3+i*4,-8,6,4);
+    }
+
+    // Turret - point at nearest enemy
+    let ang=-PI/2,nd=1e9;
+    for(const e of enemies){const d=hypot(e.x-l.x,e.y-l.y);if(d<nd){nd=d;ang=atan2(e.y-l.y,e.x-l.x)}}
+    l.ang=LR(l.ang,ang,.08);
+
+    ctx.save();ctx.rotate(l.ang);
+    ctx.fillStyle='#3a6a3a';ctx.fillRect(0,-3,18,6);
+    ctx.fillStyle='#4a8a4a';ctx.fillRect(14,-2,6,4);
+    // Muzzle flash
+    if(l.fireAnim>0){
+      ctx.fillStyle=`rgba(0,255,200,${l.fireAnim})`;
+      ctx.beginPath();ctx.arc(20,0,5+l.fireAnim*8,0,TAU);ctx.fill();
+    }
+    ctx.restore();
+
+    // Status
+    ctx.fillStyle=l.st==='ready'?'#0f8':'#fa0';ctx.font='bold 8px monospace';ctx.textAlign='center';
+    ctx.fillText(`ПУ-${l.id}`,0,22);
+    // Missile count dots
+    for(let i=0;i<l.mx;i++){
+      ctx.beginPath();ctx.arc(-l.mx*2.5+i*5,28,2,0,TAU);
+      ctx.fillStyle=i<l.m?'#0f8':'#333';ctx.fill();
+    }
+    if(l.st==='reload'){
+      ctx.fillStyle='#fa0';ctx.font='8px monospace';
+      ctx.fillText(`⟳${l.rt.toFixed(1)}s`,0,38);
+    }
+    ctx.textAlign='left';
+    ctx.restore();
+  }
+
+  // ---- ENEMIES ----
+  for(const e of enemies){
+    const ex=e.x*sx,ey=e.y*sy;
+    const ti=TYPES[e.type];
+    const hdg=atan2(e.vy,e.vx);
+    const spd=hypot(e.vx,e.vy);
+
+    // Threat glow
+    const glowR=10+e.threat*15;
+    const grd=ctx.createRadialGradient(ex,ey,0,ex,ey,glowR);
+    grd.addColorStop(0,ti.c+'44');grd.addColorStop(1,ti.c+'00');
+    ctx.beginPath();ctx.arc(ex,ey,glowR,0,TAU);ctx.fillStyle=grd;ctx.fill();
+
+    ctx.save();ctx.translate(ex,ey);ctx.rotate(hdg);
+    const sz=e.sz;
+
+    // Missile body
+    ctx.beginPath();
+    ctx.moveTo(sz*2,0);
+    ctx.lineTo(sz*.5,-sz*.8);
+    ctx.lineTo(-sz*1.2,-sz*.6);
+    ctx.lineTo(-sz*1.5,-sz*.9);// fin
+    ctx.lineTo(-sz*1.2,-sz*.3);
+    ctx.lineTo(-sz*1.5,0);
+    ctx.lineTo(-sz*1.2,sz*.3);
+    ctx.lineTo(-sz*1.5,sz*.9);// fin
+    ctx.lineTo(-sz*1.2,sz*.6);
+    ctx.lineTo(sz*.5,sz*.8);
+    ctx.closePath();
+    ctx.fillStyle=ti.c;ctx.fill();
+    ctx.strokeStyle='#fff3';ctx.lineWidth=.5;ctx.stroke();
+
+    // Nosecone highlight
+    ctx.beginPath();ctx.moveTo(sz*2,0);ctx.lineTo(sz*.8,-sz*.3);ctx.lineTo(sz*.8,sz*.3);ctx.closePath();
+    ctx.fillStyle='#fff2';ctx.fill();
+
+    // Engine flame
+    const fl=e.flameSz*(1+R(-.2,.2));
+    ctx.beginPath();
+    ctx.moveTo(-sz*1.5,0);
+    ctx.lineTo(-sz*1.5-sz*fl*2,-sz*.4*fl);
+    ctx.lineTo(-sz*1.5-sz*fl*3,0);
+    ctx.lineTo(-sz*1.5-sz*fl*2,sz*.4*fl);
+    ctx.closePath();
+    ctx.fillStyle=ti.flame;ctx.fill();
+    // Inner flame
+    ctx.beginPath();
+    ctx.moveTo(-sz*1.5,0);
+    ctx.lineTo(-sz*1.5-sz*fl,-sz*.2*fl);
+    ctx.lineTo(-sz*1.5-sz*fl*1.5,0);
+    ctx.lineTo(-sz*1.5-sz*fl,sz*.2*fl);
+    ctx.closePath();
+    ctx.fillStyle='#fff8';ctx.fill();
+
+    ctx.restore();
+
+    // Velocity vector
+    ctx.beginPath();ctx.moveTo(ex,ey);
+    ctx.lineTo(ex+e.vx*.03*sx,ey+e.vy*.03*sy);
+    ctx.strokeStyle=ti.c+'66';ctx.lineWidth=1;ctx.stroke();
+    // Arrow head
+    const vax=ex+e.vx*.03*sx,vay=ey+e.vy*.03*sy;
+    ctx.beginPath();ctx.arc(vax,vay,2,0,TAU);ctx.fillStyle=ti.c+'88';ctx.fill();
+
+    // Labels
+    if($('shLbl').checked){
+      ctx.fillStyle=ti.c;ctx.font='bold 8px monospace';
+      ctx.fillText(e.id,ex+sz*3,ey-sz*2);
+      ctx.fillStyle='#aaa';ctx.font='7px monospace';
+      ctx.fillText(`V:${round(spd)} T:${(e.threat*100)|0}%`,ex+sz*3,ey-sz*2+9);
+      ctx.fillText(ti.n.substr(0,5),ex+sz*3,ey-sz*2+17);
+      if(e.engaged){ctx.fillStyle='#0cf';ctx.fillText('⚔ENGAGED',ex+sz*3,ey-sz*2+25)}
+    }
+
+    // Threat indicator ring
+    if(e.threat>.5){
+      ctx.beginPath();ctx.arc(ex,ey,sz*3+4,0,TAU*e.threat);
+      ctx.strokeStyle=e.threat>.7?'#f44':'#fa0';ctx.lineWidth=2;ctx.stroke();
+    }
+  }
+
+  // ---- INTERCEPTORS ----
+  for(const m of missiles){
+    const mx=m.x*sx,my=m.y*sy;
+    const hdg=atan2(m.vy,m.vx);
+
+    // Glow
+    const grd=ctx.createRadialGradient(mx,my,0,mx,my,12);
+    grd.addColorStop(0,m.phase==='term'?'#0f844':'#0cf44');grd.addColorStop(1,'transparent');
+    ctx.beginPath();ctx.arc(mx,my,12,0,TAU);ctx.fillStyle=grd;ctx.fill();
+
+    ctx.save();ctx.translate(mx,my);ctx.rotate(hdg);
+
+    // Missile body
+    ctx.beginPath();
+    ctx.moveTo(8,0);
+    ctx.lineTo(2,-3);ctx.lineTo(-4,-2.5);
+    ctx.lineTo(-6,-4);// fin
+    ctx.lineTo(-5,-1.5);ctx.lineTo(-7,0);
+    ctx.lineTo(-5,1.5);ctx.lineTo(-6,4);// fin
+    ctx.lineTo(-4,2.5);ctx.lineTo(2,3);
+    ctx.closePath();
+    ctx.fillStyle=m.phase==='term'?'#00ff88':'#00ccff';ctx.fill();
+    ctx.strokeStyle='#fff3';ctx.lineWidth=.5;ctx.stroke();
+
+    // Engine
+    const fl=m.flameSz*(1+R(-.2,.2));
+    ctx.beginPath();
+    ctx.moveTo(-7,0);ctx.lineTo(-7-fl*8,-2*fl);ctx.lineTo(-7-fl*10,0);ctx.lineTo(-7-fl*8,2*fl);ctx.closePath();
+    ctx.fillStyle='#00ffcc';ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(-7,0);ctx.lineTo(-7-fl*4,-1*fl);ctx.lineTo(-7-fl*5,0);ctx.lineTo(-7-fl*4,1*fl);ctx.closePath();
+    ctx.fillStyle='#ffffff88';ctx.fill();
+
+    ctx.restore();
+
+    // Guidance line
+    if(m.target&&m.target.alive){
+      ctx.beginPath();ctx.moveTo(mx,my);ctx.lineTo(m.target.x*sx,m.target.y*sy);
+      ctx.strokeStyle=m.phase==='term'?'#0f82':'#0cf2';ctx.lineWidth=.5;ctx.setLineDash([2,3]);ctx.stroke();ctx.setLineDash([]);
+    }
+
+    // Label
+    if($('shLbl').checked){
+      ctx.fillStyle=m.phase==='term'?'#0f8':'#0cf';ctx.font='7px monospace';
+      ctx.fillText(m.id,mx+10,my-5);
+      ctx.fillStyle='#888';ctx.fillText(m.phase==='term'?'TERMINAL':'MIDCOURSE',mx+10,my+3);
+    }
+  }
+
+  // ---- EXPLOSIONS ----
+  for(const e of booms){
+    const p=e.t/e.dur;
+    const r=e.sz*(1+p*3)*(1-p*.3);
+    const a=1-p;
+    // Fireball
+    const grd=ctx.createRadialGradient(e.x*sx,e.y*sy,0,e.x*sx,e.y*sy,r);
+    grd.addColorStop(0,`rgba(255,255,200,${a})`);
+    grd.addColorStop(.3,e.c+hex(a*255));
+    grd.addColorStop(.7,e.c+hex(a*128));
+    grd.addColorStop(1,'transparent');
+    ctx.beginPath();ctx.arc(e.x*sx,e.y*sy,r,0,TAU);ctx.fillStyle=grd;ctx.fill();
+    // Shockwave
+    if(e.sz>15){
+      ctx.beginPath();ctx.arc(e.x*sx,e.y*sy,r*2*p,0,TAU);
+      ctx.strokeStyle=e.c+hex(a*80);ctx.lineWidth=2;ctx.stroke();
+    }
+  }
+
+  // ---- DEBRIS ----
+  for(const d of debris){
+    const a=d.life/d.ml;
+    ctx.save();ctx.translate(d.x*sx,d.y*sy);ctx.rotate(d.rot);
+    ctx.fillStyle=`rgba(200,150,100,${a})`;
+    ctx.fillRect(-d.sz,-d.sz*.5,d.sz*2,d.sz);
+    ctx.restore();
+  }
+
+  // ---- PARTICLES ----
+  for(const p of parts){
+    const a=CL(p.life/p.ml,0,1);
+    if(p.type==='smoke'){
+      ctx.beginPath();ctx.arc(p.x*sx,p.y*sy,p.sz*(2-a),0,TAU);
+      ctx.fillStyle=`rgba(150,150,150,${a*.3})`;ctx.fill();
+    }else{
+      ctx.beginPath();ctx.arc(p.x*sx,p.y*sy,p.sz*a,0,TAU);
+      ctx.fillStyle=p.c+hex(a*220);ctx.fill();
+    }
+  }
+
+  // ---- HUD OVERLAY ----
+  // Top info bar
+  ctx.fillStyle='#0cf6';ctx.font='9px monospace';
+  ctx.fillText(`T+${sT.toFixed(1)}s  FPS:${fps}  AI:${ai.infTime.toFixed(1)}ms  Epoch:${ai.epoch}  Targets:${enemies.length}  Missiles:${missiles.length}`,8,14);
+
+  // Compass
+  ctx.save();ctx.translate(vW-40,40);
+  ctx.beginPath();ctx.arc(0,0,25,0,TAU);ctx.strokeStyle='#1a3a5c';ctx.lineWidth=1;ctx.stroke();
+  ['N','E','S','W'].forEach((l,i)=>{const a=i*PI/2-PI/2;ctx.fillStyle='#0cf6';ctx.font='8px monospace';ctx.textAlign='center';ctx.fillText(l,cos(a)*30,sin(a)*30+3)});
+  ctx.textAlign='left';ctx.restore();
+
+  // Scale bar
+  ctx.strokeStyle='#0cf4';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(10,vH-20);ctx.lineTo(10+200*sx,vH-20);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(10,vH-24);ctx.lineTo(10,vH-16);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(10+200*sx,vH-24);ctx.lineTo(10+200*sx,vH-16);ctx.stroke();
+  ctx.fillStyle='#0cf4';ctx.font='8px monospace';ctx.fillText('200m',10+100*sx-12,vH-24);
+}
+
+function hex(n){return round(CL(n,0,255)).toString(16).padStart(2,'0')}
+
+// ========== UI ==========
+function upUI(){
+  O('sL',stats.launched);O('sI',stats.hit);O('sM',stats.miss);
+  const tot=stats.hit+stats.miss;const acc=tot?round(stats.hit/tot*100):0;
+  $('sA').textContent=acc+'%';$('sA').className='sn'+(acc<50?' bad':acc<75?' mid':'');
+  O('sF',stats.fired);
+  const eff=stats.fired?round(stats.hit/stats.fired*100):0;
+  $('sE').textContent=eff+'%';
+
+  let mt=0;for(const e of enemies)mt=max(mt,e.threat);
+  const ts=$('thrS');
+  if(mt>.7){ts.textContent='▲ КРИТ';ts.className='scr'}
+  else if(mt>.3){ts.textContent='▲ СРЕДН';ts.className='swn'}
+  else if(enemies.length){ts.textContent='▲ НИЗК';ts.className='sok'}
+  else{ts.textContent='▲ ЧИСТО';ts.className='sok'}
+  $('tmD').textContent=`T+${sT.toFixed(1)}`;
+
+  // Targets
+  let th='';
+  const st=[...enemies].sort((a,b)=>b.threat-a.threat);
+  for(const t of st.slice(0,8)){
+    const d=round(hypot(t.x-BX,t.y-BY)),sp=round(hypot(t.vx,t.vy));
+    const tp=round(t.threat*100),tc=t.threat>.7?'#f44':t.threat>.4?'#fa0':'#0f8';
+    th+=`<div class="ti" style="border-left:3px solid ${tc}"><div style="display:flex;justify-content:space-between"><span style="color:${tc}">●${t.id}</span><span style="color:#568">${TYPES[t.type].n.substr(0,4)}</span></div><div style="color:#568;font-size:8px">D:${d} V:${sp} ${t.engaged?'⚔':''}${t.maneuv?'↻':''}</div><div class="tb"><div class="tf" style="width:${tp}%;background:${tc}"></div></div></div>`;
+  }
+  $('tL').innerHTML=th;
+
+  // Launchers
+  let lh='';
+  for(const l of lau){
+    const c=l.st==='ready'?'#0f8':'#fa0';
+    lh+=`<div class="pr"><span class="pl">ПУ-${l.id}</span><span class="pv" style="color:${c}">${l.m}/${l.mx} ${l.st==='reload'?'⟳'+l.rt.toFixed(1)+'s':'✓'}</span></div>`;
+  }
+  $('lS').innerHTML=lh;
+
+  // AI
+  $('bC').style.width=(ai.conf*100)+'%';O('vC2',round(ai.conf*100)+'%');
+  $('bP').style.width=min(100,ai.pLoss*30)+'%';O('vP',ai.pLoss.toFixed(4));
+  $('bV').style.width=min(100,(ai.vLoss||1)*30)+'%';O('vV',(ai.vLoss||0).toFixed(4));
+  $('bE').style.width=min(100,ai.epoch/5)+'%';O('vE',ai.epoch);
+  $('bI').style.width=min(100,ai.infTime/20*100)+'%';O('vI',round(ai.infTime)+'ms');
+  O('rbS',ai.buf.length);
+
+  if(fc%15===0){
+    hAcc.push(acc);if(hAcc.length>100)hAcc.shift();
+    hLoss.push(ai.pLoss);if(hLoss.length>100)hLoss.shift();
+    miniC('c1',hAcc,'#0f8');
+    miniC('c2',hLoss,'#f80');
+    drawAttn('c3');
+  }
+}
+
+function miniC(id,data,color){
+  const cv=$(id);if(!cv)return;const r=cv.parentElement.getBoundingClientRect();
+  cv.width=r.width-4;cv.height=r.height-22;
+  const c=cv.getContext('2d'),w=cv.width,h=cv.height;
+  c.clearRect(0,0,w,h);if(data.length<2)return;
+  const mx=max(...data,.01),mn=min(...data,0),rg=mx-mn||1;
+  c.beginPath();
   for(let i=0;i<data.length;i++){
-    const x = (i/(data.length-1)) * w;
-    const y = h - ((data[i]-minVal)/range) * h * 0.9 - h*0.05;
-    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    const x=i/(data.length-1)*w,y=h-((data[i]-mn)/rg)*h*.85-h*.05;
+    i?c.lineTo(x,y):c.moveTo(x,y);
   }
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
-
-  // Fill
-  ctx.lineTo(w, h);
-  ctx.lineTo(0, h);
-  ctx.closePath();
-  ctx.fillStyle = color + '15';
-  ctx.fill();
-
-  // Current value
-  ctx.fillStyle = color;
-  ctx.font = '9px monospace';
-  ctx.fillText(`${data[data.length-1].toFixed(2)}`, 3, 10);
+  c.strokeStyle=color;c.lineWidth=1.5;c.stroke();
+  c.lineTo(w,h);c.lineTo(0,h);c.closePath();c.fillStyle=color+'15';c.fill();
+  c.fillStyle=color;c.font='8px monospace';c.fillText(data[data.length-1].toFixed(2),2,9);
 }
 
-// ============================================================
-// LOG
-// ============================================================
-function addLog(msg, type='normal') {
-  const area = document.getElementById('logArea');
-  const time = simTime.toFixed(1);
-  const div = document.createElement('div');
-  div.className = 'log-entry ' + type;
-  div.textContent = `[${time}s] ${msg}`;
-  area.appendChild(div);
-  area.scrollTop = area.scrollHeight;
-
-  // Limit entries
-  while(area.children.length > 200) area.removeChild(area.firstChild);
-}
-
-// ============================================================
-// CONTROLS
-// ============================================================
-function toggleSimulation() {
-  simRunning = !simRunning;
-  document.getElementById('btnStart').textContent = simRunning ? '❚❚ ПАУЗА' : '▶ СТАРТ';
-  document.getElementById('btnStart').classList.toggle('active', simRunning);
-  if(simRunning) addLog('Симуляция запущена', 'launch');
-  else addLog('Симуляция на паузе', 'warning');
-}
-
-function resetSimulation() {
-  simRunning = false;
-  simTime = 0;
-  frameCount = 0;
-  lastAutoWave = 0;
-  enemies = [];
-  interceptors = [];
-  explosions = [];
-  particles = [];
-  tracker = new IMMTracker();
-  aiDecisions = [];
-  stats = {launched:0, intercepted:0, missed:0, fired:0, totalShots:0};
-  interceptHistory = [];
-  lossHistory = [];
-  neuronActivity = [];
-  initLaunchers(+document.getElementById('launcherCount').value);
-  document.getElementById('btnStart').textContent = '▶ СТАРТ';
-  document.getElementById('logArea').innerHTML = '';
-  addLog('Система сброшена', 'ai');
-  drawBackground();
-}
-
-function resetAI() {
-  transformer = new WorldModelTransformer();
-  addLog('AI Transformer сброшен и реинициализирован', 'ai');
-}
-
-function trainBatch() {
-  for(let i=0;i<10;i++) transformer.trainES(16);
-  addLog(`Обучение: ${transformer.trainEpoch} эпох, Loss: ${transformer.totalLoss.toFixed(4)}`, 'ai');
-}
-
-// ============================================================
-// GAME LOOP
-// ============================================================
-let lastTime = 0;
-let fps = 0;
-let fpsCounter = 0;
-let fpsTimer = 0;
-
-function gameLoop(timestamp) {
-  const rawDt = (timestamp - lastTime) / 1000;
-  lastTime = timestamp;
-  const dt = min(rawDt, 0.05) * simSpeed;
-
-  fpsCounter++;
-  fpsTimer += rawDt;
-  if(fpsTimer >= 1) { fps = fpsCounter; fpsCounter = 0; fpsTimer = 0; }
-
-  if(simRunning) {
-    simTime += dt;
-    frameCount++;
-    updateSimulation(dt);
+function drawAttn(id){
+  const cv=$(id);if(!cv||!ai.lastAttn)return;
+  const r=cv.parentElement.getBoundingClientRect();
+  cv.width=r.width-4;cv.height=r.height-22;
+  const c=cv.getContext('2d'),w=cv.width,h=cv.height;
+  c.clearRect(0,0,w,h);
+  const a=ai.lastAttn,n=a.n;if(n<1||n>15)return;
+  const cs=min(w/n,h/n,12);
+  const ox=(w-n*cs)/2,oy=(h-n*cs)/2;
+  for(let i=0;i<n;i++)for(let j=0;j<n;j++){
+    const v=CL(a.d[i*n+j],0,1);
+    c.fillStyle=`rgb(${round(v*255)},${round(v*80)},${round(255-v*200)})`;
+    c.fillRect(ox+j*cs,oy+i*cs,cs-1,cs-1);
   }
+  c.fillStyle='#689';c.font='7px monospace';c.fillText(`${n}×${n}`,2,h-2);
+}
 
+function log(m,t=''){const a=$('logA'),d=document.createElement('div');d.className='le '+t;d.textContent=`[${sT.toFixed(1)}] ${m}`;a.appendChild(d);a.scrollTop=1e9;while(a.children.length>200)a.removeChild(a.firstChild)}
+
+// ========== CONTROLS ==========
+function tog(){simOn=!simOn;$('btnG').textContent=simOn?'❚❚':'▶ СТАРТ';$('btnG').classList.toggle('on',simOn)}
+function rst(){simOn=false;sT=0;fc=0;lastWv=0;enemies=[];missiles=[];booms=[];parts=[];debris=[];aiDecs=[];stats={launched:0,hit:0,miss:0,fired:0};hAcc=[];hLoss=[];mkL(+$('nL').value);$('btnG').textContent='▶ СТАРТ';$('logA').innerHTML='';render._stars=null;log('Система перезагружена','ai')}
+function resetAI(){ai=new SimpleAI();log('AI переинициализирован','ai')}
+function trainN(n){const t0=performance.now();ai.train(n);log(`⚡ Обучение ×${n}: epoch=${ai.epoch} loss=${ai.pLoss.toFixed(5)} ${(performance.now()-t0)|0}ms`,'ai')}
+
+// ========== LOOP ==========
+let lt=0,fps=0,fpc=0,fpt=0;
+function loop(ts){
+  const rdt=(ts-lt)/1000;lt=ts;const dt=min(rdt,.05)*simSpd;
+  fpc++;fpt+=rdt;if(fpt>=1){fps=fpc;fpc=0;fpt=0;O('fpD',fps+' FPS')}
+  if(simOn){sT+=dt;fc++;update(dt)}
   render();
-
-  if(frameCount % 5 === 0) updateUI();
-
-  requestAnimationFrame(gameLoop);
+  if(fc%3===0)upUI();
+  requestAnimationFrame(loop);
 }
 
-// Start
-window.addEventListener('load', init);
+function init(){
+  canvas=$('cv');ctx=canvas.getContext('2d');
+  const v=$('mV');
+  function rs(){vW=v.clientWidth;vH=v.clientHeight;canvas.width=vW;canvas.height=vH;scX=vW/WS;scY=vH/WS;render._stars=null}
+  rs();window.onresize=rs;
+  mkL(4);
+  requestAnimationFrame(loop);
+}
+window.onload=init;
 </script>
 </body>
-  </html>
+                                                                                                                                                                 </html>
