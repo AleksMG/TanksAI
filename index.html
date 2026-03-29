@@ -2,1200 +2,2175 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>AEGIS-AI PRO v8.0 — Production Grade</title>
+<title>AEGIS-AI PRO v9.0 — Production SOLID Architecture</title>
 <style>
-:root{--bg:#050508;--bg2:#0a0e18;--bg3:#0d1220;--brd:#1a2a4a;--cyan:#00ccff;--green:#00ff88;--warn:#ffaa00;--danger:#ff4444;--ai:#cc88ff;--txt:#c0d0e0;--dim:#556678}
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font-family:Consolas,'Courier New',monospace}
-.app{display:grid;grid-template-columns:250px 1fr 270px;grid-template-rows:40px 1fr 160px;height:100vh;gap:1px;background:#0a0a14}
-.hdr{grid-column:1/-1;background:linear-gradient(90deg,#080818,#101838,#080818);display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--brd)}
-.hdr h1{font-size:12px;color:var(--cyan);letter-spacing:2px;text-shadow:0 0 10px #0cf3}
-.badges{display:flex;gap:6px;font-size:9px}
-.badge{padding:2px 7px;border-radius:3px;font-weight:600;border:1px solid var(--green);color:var(--green);background:rgba(0,255,136,.08);transition:all .3s}
-.badge.w{border-color:var(--warn);color:var(--warn);background:rgba(255,170,0,.08);animation:bp .8s infinite}
-.badge.c{border-color:var(--danger);color:var(--danger);background:rgba(255,68,68,.08);animation:bp .4s infinite}
-@keyframes bp{50%{opacity:.4}}
-.lp,.rp{background:var(--bg2);overflow-y:auto;padding:5px;font-size:10px;scrollbar-width:thin;scrollbar-color:#1a2a4a transparent}
-.lp{border-right:1px solid var(--brd)}.rp{border-left:1px solid var(--brd)}
-.lp::-webkit-scrollbar,.rp::-webkit-scrollbar{width:4px}
-.lp::-webkit-scrollbar-thumb,.rp::-webkit-scrollbar-thumb{background:#1a2a4a;border-radius:2px}
-.btm{grid-column:1/-1;background:var(--bg2);border-top:1px solid var(--brd);display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1px;padding:2px}
-.viewport{position:relative;background:#030508;overflow:hidden}
-.viewport canvas{position:absolute;top:0;left:0;width:100%;height:100%}
-.sec{margin-bottom:5px;background:rgba(8,12,22,.9);border:1px solid var(--brd);border-radius:3px;overflow:hidden}
-.sec-t{color:var(--cyan);font-size:9px;font-weight:600;padding:3px 7px;background:linear-gradient(90deg,#081828,#0a1020);border-bottom:1px solid var(--brd);border-left:2px solid var(--cyan);letter-spacing:.5px;text-transform:uppercase}
-.sec-b{padding:3px}
-.cr{padding:2px 5px}
-.cr label{display:block;color:var(--dim);font-size:8px;margin-bottom:1px}
-.cr label b{color:var(--cyan);font-weight:600}
-input[type=range]{width:100%;height:3px;-webkit-appearance:none;background:var(--brd);border-radius:2px;outline:none;margin:2px 0}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:10px;background:var(--cyan);border-radius:50%;cursor:pointer;box-shadow:0 0 4px var(--cyan)}
-.ckr{padding:1px 5px;display:flex;align-items:center;gap:4px}
-.ckr input{accent-color:var(--cyan);width:12px;height:12px;cursor:pointer}
-.ckr label{color:var(--dim);font-size:9px;cursor:pointer}
-.btnr{display:flex;gap:2px;padding:3px 5px;flex-wrap:wrap}
-button{background:linear-gradient(180deg,#0a1828,#081020);color:var(--cyan);border:1px solid rgba(0,204,255,.2);padding:3px 9px;cursor:pointer;font-family:inherit;font-size:8px;font-weight:600;border-radius:3px;transition:all .12s}
-button:hover{background:linear-gradient(180deg,#0c2040,#0a1838);border-color:var(--cyan);box-shadow:0 0 6px rgba(0,204,255,.2)}
-button:active{transform:scale(.97)}
-button.on{background:rgba(0,204,255,.12);border-color:var(--cyan)}
-.dr{display:flex;justify-content:space-between;padding:2px 5px;font-size:9px;border-bottom:1px solid rgba(26,42,74,.3)}
-.dr:last-child{border:none}
-.dl{color:var(--dim)}.dv{color:var(--green);font-weight:600}
-.sg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;padding:3px}
-.sc{background:var(--bg3);border:1px solid var(--brd);padding:4px;text-align:center;border-radius:2px}
-.sn{font-size:15px;font-weight:700;color:var(--cyan)}.sl{font-size:7px;color:var(--dim);margin-top:1px}
-.mt{display:flex;align-items:center;gap:4px;margin:2px 5px}
-.mtl{width:50px;font-size:8px;color:var(--dim);flex-shrink:0}
-.mtb{flex:1;height:4px;background:var(--brd);border-radius:2px;overflow:hidden}
-.mtf{height:100%;border-radius:2px;transition:width .3s}
-.mtv{width:38px;font-size:8px;color:var(--green);text-align:right;flex-shrink:0;font-weight:600}
-.logc{height:100%;overflow-y:auto;font-size:8px;padding:2px;background:#020408;scrollbar-width:thin;scrollbar-color:#1a2a4a transparent}
-.logc::-webkit-scrollbar{width:3px}
-.logc::-webkit-scrollbar-thumb{background:#1a2a4a}
-.le{padding:1px 3px;border-bottom:1px solid #060a10;line-height:1.3}
-.le.h{color:var(--green)}.le.l{color:var(--cyan)}.le.m{color:var(--danger)}.le.w{color:var(--warn)}.le.a{color:var(--ai)}.le.s{color:var(--dim)}
-.ti{padding:2px 4px;margin:1px 0;background:var(--bg3);border:1px solid var(--brd);border-radius:2px;font-size:8px}
-.tb{height:2px;background:var(--brd);border-radius:1px;margin-top:1px;overflow:hidden}
-.tfl{height:100%;border-radius:1px}
-.cc{width:100%;height:100%;background:#020408;border:1px solid var(--brd);border-radius:2px}
-.perf-warn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.85);color:var(--warn);padding:20px;border:1px solid var(--warn);border-radius:8px;font-size:12px;z-index:100;display:none;text-align:center}
+:root {
+  --bg-primary: #04060c;
+  --bg-panel: #080c18;
+  --bg-section: #0a1020;
+  --bg-header: #0c1428;
+  --border: #162848;
+  --border-active: #00ccff;
+  --cyan: #00ccff;
+  --green: #00ff88;
+  --warn: #ffaa00;
+  --danger: #ff4444;
+  --purple: #cc88ff;
+  --text: #b0c4d8;
+  --dim: #4a6080;
+  --glow-cyan: 0 0 8px rgba(0,204,255,0.3);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 100%; height: 100%; overflow: hidden;
+  background: var(--bg-primary);
+  color: var(--text);
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 10px;
+}
+
+/* ===== LAYOUT ===== */
+.app-grid {
+  display: grid;
+  grid-template-columns: 256px 1fr 272px;
+  grid-template-rows: 42px 1fr 164px;
+  height: 100vh;
+  gap: 1px;
+  background: #0a0e1a;
+}
+
+/* ===== HEADER ===== */
+.header {
+  grid-column: 1 / -1;
+  background: linear-gradient(90deg, var(--bg-header), #10203c, var(--bg-header));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border);
+}
+.header-brand {
+  display: flex; align-items: center; gap: 10px;
+}
+.header-brand .logo {
+  width: 26px; height: 26px;
+  border: 2px solid var(--cyan);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; color: var(--cyan);
+  text-shadow: var(--glow-cyan);
+  animation: logo-pulse 3s ease-in-out infinite;
+}
+@keyframes logo-pulse {
+  0%, 100% { box-shadow: 0 0 4px rgba(0,204,255,0.2); }
+  50% { box-shadow: 0 0 12px rgba(0,204,255,0.5); }
+}
+.header-brand h1 {
+  font-size: 12px; font-weight: 700;
+  color: var(--cyan);
+  letter-spacing: 2px;
+  text-shadow: var(--glow-cyan);
+}
+.status-row { display: flex; gap: 6px; align-items: center; }
+.badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 8px; border-radius: 3px;
+  font-size: 9px; font-weight: 600;
+  border: 1px solid; transition: all 0.3s;
+}
+.badge-ok { border-color: var(--green); color: var(--green); background: rgba(0,255,136,0.06); }
+.badge-warn { border-color: var(--warn); color: var(--warn); background: rgba(255,170,0,0.06); animation: badge-blink 1s infinite; }
+.badge-crit { border-color: var(--danger); color: var(--danger); background: rgba(255,68,68,0.06); animation: badge-blink 0.5s infinite; }
+@keyframes badge-blink { 50% { opacity: 0.4; } }
+
+/* ===== PANELS ===== */
+.panel-left, .panel-right {
+  background: var(--bg-panel);
+  overflow-y: auto; overflow-x: hidden;
+  padding: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.panel-left { border-right: 1px solid var(--border); }
+.panel-right { border-left: 1px solid var(--border); }
+.panel-left::-webkit-scrollbar, .panel-right::-webkit-scrollbar { width: 4px; }
+.panel-left::-webkit-scrollbar-thumb, .panel-right::-webkit-scrollbar-thumb {
+  background: var(--border); border-radius: 2px;
+}
+.panel-bottom {
+  grid-column: 1 / -1;
+  background: var(--bg-panel);
+  border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px; padding: 3px;
+}
+
+/* ===== VIEWPORT ===== */
+.viewport {
+  position: relative;
+  background: var(--bg-primary);
+  overflow: hidden;
+  cursor: crosshair;
+}
+.viewport canvas {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+}
+
+/* ===== SECTION ===== */
+.sec {
+  margin-bottom: 6px;
+  background: var(--bg-section);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.sec-hdr {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 8px;
+  background: linear-gradient(90deg, rgba(0,204,255,0.06), transparent);
+  border-bottom: 1px solid var(--border);
+  border-left: 3px solid var(--cyan);
+  font-size: 9px; font-weight: 600;
+  color: var(--cyan);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  user-select: none;
+}
+.sec-body { padding: 4px; }
+
+/* ===== CONTROLS ===== */
+.ctrl {
+  padding: 3px 6px;
+}
+.ctrl label {
+  display: flex; justify-content: space-between; align-items: center;
+  color: var(--dim); font-size: 8px; margin-bottom: 2px;
+  user-select: none;
+}
+.ctrl label .val { color: var(--cyan); font-weight: 700; font-size: 9px; }
+input[type="range"] {
+  width: 100%; height: 4px;
+  -webkit-appearance: none; appearance: none;
+  background: var(--border); border-radius: 2px;
+  outline: none; margin: 2px 0;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 12px; height: 12px;
+  background: var(--cyan); border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 6px rgba(0,204,255,0.4);
+}
+.chk {
+  display: flex; align-items: center; gap: 5px;
+  padding: 2px 6px;
+}
+.chk input[type="checkbox"] {
+  accent-color: var(--cyan);
+  width: 12px; height: 12px; cursor: pointer;
+}
+.chk label {
+  color: var(--dim); font-size: 9px; cursor: pointer; user-select: none;
+}
+.btn-row {
+  display: flex; gap: 3px; padding: 4px 6px; flex-wrap: wrap;
+}
+button {
+  background: linear-gradient(180deg, #0c1a30, #081020);
+  color: var(--cyan);
+  border: 1px solid rgba(0,204,255,0.2);
+  padding: 4px 10px;
+  cursor: pointer;
+  font-family: inherit; font-size: 8px; font-weight: 600;
+  border-radius: 3px; letter-spacing: 0.3px;
+  transition: all 0.12s;
+}
+button:hover {
+  background: linear-gradient(180deg, #102040, #0c1830);
+  border-color: var(--cyan);
+  box-shadow: 0 0 8px rgba(0,204,255,0.15);
+}
+button:active { transform: scale(0.97); }
+button.active { background: rgba(0,204,255,0.1); border-color: var(--cyan); }
+
+/* ===== DATA DISPLAY ===== */
+.data-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 2px 6px; font-size: 9px;
+  border-bottom: 1px solid rgba(22,40,72,0.3);
+}
+.data-row:last-child { border-bottom: none; }
+.data-lbl { color: var(--dim); }
+.data-val { color: var(--green); font-weight: 700; }
+
+/* ===== STATS ===== */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 3px; padding: 4px;
+}
+.stat-card {
+  background: rgba(10,16,32,0.8);
+  border: 1px solid var(--border);
+  border-radius: 3px; padding: 5px 4px;
+  text-align: center;
+}
+.stat-num { font-size: 16px; font-weight: 700; color: var(--cyan); line-height: 1; }
+.stat-lbl { font-size: 7px; color: var(--dim); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* ===== METER ===== */
+.meter {
+  display: flex; align-items: center; gap: 4px;
+  margin: 3px 6px;
+}
+.meter-lbl { width: 52px; font-size: 8px; color: var(--dim); flex-shrink: 0; }
+.meter-bar {
+  flex: 1; height: 5px;
+  background: var(--border); border-radius: 3px;
+  overflow: hidden;
+}
+.meter-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+.meter-val {
+  width: 40px; font-size: 8px; color: var(--green);
+  text-align: right; font-weight: 600; flex-shrink: 0;
+}
+
+/* ===== TRACK LIST ===== */
+.track-item {
+  padding: 3px 5px; margin: 2px 0;
+  background: rgba(10,16,32,0.6);
+  border: 1px solid var(--border);
+  border-radius: 3px; font-size: 8px;
+  transition: border-color 0.2s;
+}
+.track-item:hover { border-color: rgba(0,204,255,0.4); }
+.track-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1px; }
+.track-info { color: var(--dim); font-size: 7px; }
+.threat-bar { height: 3px; background: var(--border); border-radius: 2px; margin-top: 2px; overflow: hidden; }
+.threat-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
+
+/* ===== LOG ===== */
+.log-wrap {
+  height: 100%; overflow-y: auto; padding: 3px;
+  background: rgba(2,4,8,0.8);
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+}
+.log-wrap::-webkit-scrollbar { width: 3px; }
+.log-wrap::-webkit-scrollbar-thumb { background: var(--border); }
+.log-line { padding: 1px 4px; border-bottom: 1px solid rgba(6,10,16,0.5); line-height: 1.4; font-size: 8px; }
+.log-line.log-hit { color: var(--green); }
+.log-line.log-fire { color: var(--cyan); }
+.log-line.log-miss { color: var(--danger); }
+.log-line.log-warn { color: var(--warn); }
+.log-line.log-ai { color: var(--purple); }
+.log-line.log-sys { color: var(--dim); }
+
+/* ===== CHART ===== */
+.chart-area {
+  width: 100%; height: 100%;
+  background: rgba(2,4,8,0.6);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
 </style>
 </head>
 <body>
-<div class="app">
 
-<div class="hdr">
-  <h1>⬡ AEGIS-AI PRO v8.0 — PRODUCTION GRADE</h1>
-  <div class="badges">
-    <span class="badge" id="bSys">● SYSTEM</span>
-    <span class="badge" id="bAI">◆ AI</span>
-    <span class="badge" id="bThr">▲ CLEAR</span>
-    <span class="badge" id="bTm">T+0.0</span>
-    <span class="badge" id="bFps">-- FPS</span>
-    <span class="badge" id="bPerf" style="display:none">⚡ PERF</span>
+<div class="app-grid">
+
+<!-- ==================== HEADER ==================== -->
+<header class="header">
+  <div class="header-brand">
+    <div class="logo">⬡</div>
+    <h1>AEGIS-AI INTEGRATED AIR DEFENSE v9.0</h1>
+  </div>
+  <div class="status-row">
+    <span class="badge badge-ok" id="badgeSys">● SYSTEM ONLINE</span>
+    <span class="badge badge-ok" id="badgeAI">◆ AI ACTIVE</span>
+    <span class="badge badge-ok" id="badgeThreat">▲ ALL CLEAR</span>
+    <span class="badge badge-ok" id="badgeTime">T+ 0.0s</span>
+    <span class="badge badge-ok" id="badgeFps">60 FPS</span>
+  </div>
+</header>
+
+<!-- ==================== LEFT PANEL ==================== -->
+<div class="panel-left" id="panelLeft">
+
+  <!-- Sim Control -->
+  <div class="sec">
+    <div class="sec-hdr">⚙ Simulation Control</div>
+    <div class="sec-body">
+      <div class="btn-row">
+        <button id="btnPlay" onclick="Engine.toggle()">▶ START</button>
+        <button onclick="Engine.reset()">⟳ RESET</button>
+        <button onclick="Spawner.wave()">🚀 WAVE</button>
+        <button onclick="Spawner.single()">● SINGLE</button>
+        <button onclick="Spawner.massive()">💥 MASSIVE</button>
+      </div>
+      <div class="ctrl">
+        <label>Simulation Speed <span class="val" id="dSpeed">1.0</span>x</label>
+        <input type="range" min="0.1" max="8" step="0.1" value="1" oninput="Config.simSpeed=+this.value;UI.set('dSpeed',this.value)">
+      </div>
+      <div class="ctrl">
+        <label>Wave Interval <span class="val" id="dInterval">5</span>s</label>
+        <input type="range" min="1" max="25" step="1" value="5" id="cfgInterval" oninput="UI.set('dInterval',this.value)">
+      </div>
+      <div class="ctrl">
+        <label>Wave Size <span class="val" id="dWaveN">5</span></label>
+        <input type="range" min="1" max="20" step="1" value="5" id="cfgWaveN" oninput="UI.set('dWaveN',this.value)">
+      </div>
+      <div class="chk"><input type="checkbox" id="cfgAutoWave" checked><label for="cfgAutoWave">Auto Waves</label></div>
+      <div class="chk"><input type="checkbox" id="cfgAIEnabled" checked><label for="cfgAIEnabled">AI Control</label></div>
+    </div>
+  </div>
+
+  <!-- Visuals -->
+  <div class="sec">
+    <div class="sec-hdr">👁 Visual Options</div>
+    <div class="sec-body">
+      <div class="chk"><input type="checkbox" id="cfgTrails" checked><label for="cfgTrails">Missile Trails</label></div>
+      <div class="chk"><input type="checkbox" id="cfgPredictions" checked><label for="cfgPredictions">AI Predictions</label></div>
+      <div class="chk"><input type="checkbox" id="cfgZones" checked><label for="cfgZones">Defense Zones</label></div>
+      <div class="chk"><input type="checkbox" id="cfgLabels" checked><label for="cfgLabels">Entity Labels</label></div>
+      <div class="chk"><input type="checkbox" id="cfgEffects" checked><label for="cfgEffects">Smoke & Particles</label></div>
+      <div class="chk"><input type="checkbox" id="cfgGlow" checked><label for="cfgGlow">Glow Effects</label></div>
+      <div class="chk"><input type="checkbox" id="cfgGrid" checked><label for="cfgGrid">Range Grid</label></div>
+    </div>
+  </div>
+
+  <!-- Threat Config -->
+  <div class="sec">
+    <div class="sec-hdr">🎯 Threat Configuration</div>
+    <div class="sec-body">
+      <div class="ctrl">
+        <label>Min Speed <span class="val" id="dMinSpd">200</span> m/s</label>
+        <input type="range" min="50" max="1500" step="50" value="200" id="cfgMinSpd" oninput="UI.set('dMinSpd',this.value)">
+      </div>
+      <div class="ctrl">
+        <label>Max Speed <span class="val" id="dMaxSpd">1000</span> m/s</label>
+        <input type="range" min="200" max="3500" step="50" value="1000" id="cfgMaxSpd" oninput="UI.set('dMaxSpd',this.value)">
+      </div>
+      <div class="chk"><input type="checkbox" id="cfgThrBallistic" checked><label for="cfgThrBallistic">Ballistic (SRBM)</label></div>
+      <div class="chk"><input type="checkbox" id="cfgThrCruise" checked><label for="cfgThrCruise">Cruise (LACM)</label></div>
+      <div class="chk"><input type="checkbox" id="cfgThrManeuver" checked><label for="cfgThrManeuver">Maneuvering (ASBM)</label></div>
+      <div class="chk"><input type="checkbox" id="cfgThrHyper"><label for="cfgThrHyper">Hypersonic (HGV)</label></div>
+      <div class="chk"><input type="checkbox" id="cfgThrDecoy"><label for="cfgThrDecoy">Countermeasure Decoys</label></div>
+    </div>
+  </div>
+
+  <!-- Defense Config -->
+  <div class="sec">
+    <div class="sec-hdr">🛡 Defense System</div>
+    <div class="sec-body">
+      <div class="ctrl">
+        <label>Launch Units <span class="val" id="dLaunchers">4</span></label>
+        <input type="range" min="1" max="8" step="1" value="4" id="cfgLaunchers" oninput="Defense.rebuild(+this.value);UI.set('dLaunchers',this.value)">
+      </div>
+      <div class="ctrl">
+        <label>Missiles per Unit <span class="val" id="dMPU">8</span></label>
+        <input type="range" min="2" max="20" step="1" value="8" id="cfgMPU" oninput="UI.set('dMPU',this.value)">
+      </div>
+      <div class="ctrl">
+        <label>Interceptor Speed <span class="val" id="dIntSpd">1400</span> m/s</label>
+        <input type="range" min="400" max="5000" step="100" value="1400" id="cfgIntSpd" oninput="UI.set('dIntSpd',this.value)">
+      </div>
+      <div class="ctrl">
+        <label>Reload Time <span class="val" id="dReload">2.5</span>s</label>
+        <input type="range" min="0.5" max="12" step="0.5" value="2.5" id="cfgReload" oninput="UI.set('dReload',this.value)">
+      </div>
+      <div class="ctrl">
+        <label>Kill Radius <span class="val" id="dKillR">35</span>m</label>
+        <input type="range" min="5" max="120" step="5" value="35" id="cfgKillR" oninput="UI.set('dKillR',this.value)">
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Config -->
+  <div class="sec">
+    <div class="sec-hdr">🧠 AI Transformer</div>
+    <div class="sec-body">
+      <div class="ctrl">
+        <label>Learning Rate <span class="val" id="dLR">0.003</span></label>
+        <input type="range" min="0.0005" max="0.025" step="0.0005" value="0.003" id="cfgLR" oninput="UI.set('dLR',(+this.value).toFixed(4))">
+      </div>
+      <div class="ctrl">
+        <label>Prediction Horizon <span class="val" id="dHz">3.0</span>s</label>
+        <input type="range" min="0.5" max="10" step="0.5" value="3" id="cfgHz" oninput="UI.set('dHz',this.value)">
+      </div>
+      <div class="ctrl">
+        <label>Discount γ <span class="val" id="dGamma">0.99</span></label>
+        <input type="range" min="0.9" max="0.999" step="0.001" value="0.99" id="cfgGamma" oninput="UI.set('dGamma',this.value)">
+      </div>
+      <div class="ctrl">
+        <label>Batch Size <span class="val" id="dBatch">32</span></label>
+        <input type="range" min="8" max="64" step="8" value="32" id="cfgBatch" oninput="UI.set('dBatch',this.value)">
+      </div>
+      <div class="btn-row">
+        <button onclick="AISystem.reset()">⟳ Reset AI</button>
+        <button onclick="AISystem.trainBurst(50)">⚡ ×50</button>
+        <button onclick="AISystem.trainBurst(200)">⚡ ×200</button>
+        <button onclick="AISystem.trainBurst(1000)">⚡ ×1000</button>
+      </div>
+      <div class="data-row"><span class="data-lbl">Parameters</span><span class="data-val" id="dParams">—</span></div>
+      <div class="data-row"><span class="data-lbl">Replay Buffer</span><span class="data-val" id="dBuffer">0</span></div>
+    </div>
   </div>
 </div>
 
-<div class="lp">
-  <div class="sec"><div class="sec-t">⚙ SIMULATION</div><div class="sec-b">
-    <div class="btnr">
-      <button id="btnP" onclick="toggleSim()">▶ START</button>
-      <button onclick="resetAll()">⟳ RESET</button>
-      <button onclick="cmdWave()">🚀 WAVE</button>
-      <button onclick="cmdOne()">● ONE</button>
-      <button onclick="cmdMass()">💥 MASS</button>
+<!-- ==================== VIEWPORT ==================== -->
+<div class="viewport" id="viewport">
+  <canvas id="canvasBg"></canvas>
+  <canvas id="canvasMain"></canvas>
+</div>
+
+<!-- ==================== RIGHT PANEL ==================== -->
+<div class="panel-right">
+
+  <div class="sec">
+    <div class="sec-hdr">📊 Combat Statistics</div>
+    <div class="sec-body">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-num" id="statIncoming">0</div><div class="stat-lbl">Incoming</div></div>
+        <div class="stat-card"><div class="stat-num" id="statKills">0</div><div class="stat-lbl">Kills</div></div>
+        <div class="stat-card"><div class="stat-num" id="statLeakers">0</div><div class="stat-lbl">Leakers</div></div>
+        <div class="stat-card"><div class="stat-num" id="statAccuracy">—</div><div class="stat-lbl">Accuracy</div></div>
+        <div class="stat-card"><div class="stat-num" id="statFired">0</div><div class="stat-lbl">Fired</div></div>
+        <div class="stat-card"><div class="stat-num" id="statEfficiency">—</div><div class="stat-lbl">Efficiency</div></div>
+      </div>
     </div>
-    <div class="cr"><label>Speed: <b id="o1">1.0</b>x</label><input type="range" min="0.1" max="6" step="0.1" value="1" oninput="CFG.speed=+this.value;O('o1',this.value)"></div>
-    <div class="cr"><label>Interval: <b id="o2">5</b>s</label><input type="range" min="1" max="25" step="1" value="5" id="cInt" oninput="O('o2',this.value)"></div>
-    <div class="cr"><label>Wave Size: <b id="o3">5</b></label><input type="range" min="1" max="20" step="1" value="5" id="cWN" oninput="O('o3',this.value)"></div>
-    <div class="ckr"><input type="checkbox" id="cAW" checked><label for="cAW">Auto Waves</label></div>
-    <div class="ckr"><input type="checkbox" id="cAI" checked><label for="cAI">AI Control</label></div>
-  </div></div>
+  </div>
 
-  <div class="sec"><div class="sec-t">👁 VISUALS</div><div class="sec-b">
-    <div class="ckr"><input type="checkbox" id="vTr" checked><label for="vTr">Missile Trails</label></div>
-    <div class="ckr"><input type="checkbox" id="vPr" checked><label for="vPr">AI Predictions</label></div>
-    <div class="ckr"><input type="checkbox" id="vZn" checked><label for="vZn">Defense Zones</label></div>
-    <div class="ckr"><input type="checkbox" id="vLb" checked><label for="vLb">Labels</label></div>
-    <div class="ckr"><input type="checkbox" id="vSm" checked><label for="vSm">Smoke & Effects</label></div>
-    <div class="ckr"><input type="checkbox" id="vGl" checked><label for="vGl">Glow Effects</label></div>
-    <div class="ckr"><input type="checkbox" id="vGr" checked><label for="vGr">Grid & Ranges</label></div>
-  </div></div>
-
-  <div class="sec"><div class="sec-t">🎯 THREAT TYPES</div><div class="sec-b">
-    <div class="cr"><label>Min Speed: <b id="o4">200</b> m/s</label><input type="range" min="50" max="1500" step="50" value="200" id="cMinS" oninput="O('o4',this.value)"></div>
-    <div class="cr"><label>Max Speed: <b id="o5">1000</b> m/s</label><input type="range" min="200" max="3500" step="50" value="1000" id="cMaxS" oninput="O('o5',this.value)"></div>
-    <div class="ckr"><input type="checkbox" id="tBal" checked><label for="tBal">Ballistic (SRBM)</label></div>
-    <div class="ckr"><input type="checkbox" id="tCru" checked><label for="tCru">Cruise (LACM)</label></div>
-    <div class="ckr"><input type="checkbox" id="tMan" checked><label for="tMan">Maneuvering (ASBM)</label></div>
-    <div class="ckr"><input type="checkbox" id="tHyp"><label for="tHyp">Hypersonic (HGV)</label></div>
-    <div class="ckr"><input type="checkbox" id="tDec"><label for="tDec">Decoys (CM)</label></div>
-  </div></div>
-
-  <div class="sec"><div class="sec-t">🛡 DEFENSE SYSTEM</div><div class="sec-b">
-    <div class="cr"><label>Launchers: <b id="o6">4</b></label><input type="range" min="1" max="8" step="1" value="4" id="cNL" oninput="buildLaunchers(+this.value);O('o6',this.value)"></div>
-    <div class="cr"><label>Missiles/Launcher: <b id="o7">8</b></label><input type="range" min="2" max="20" step="1" value="8" id="cML" oninput="O('o7',this.value)"></div>
-    <div class="cr"><label>Interceptor Speed: <b id="o8">1400</b> m/s</label><input type="range" min="400" max="4500" step="100" value="1400" id="cIS" oninput="O('o8',this.value)"></div>
-    <div class="cr"><label>Reload Time: <b id="o9">2.5</b>s</label><input type="range" min="0.5" max="12" step="0.5" value="2.5" id="cRT" oninput="O('o9',this.value)"></div>
-    <div class="cr"><label>Kill Radius: <b id="oA">35</b>m</label><input type="range" min="5" max="120" step="5" value="35" id="cKR" oninput="O('oA',this.value)"></div>
-  </div></div>
-
-  <div class="sec"><div class="sec-t">🧠 AI TRANSFORMER</div><div class="sec-b">
-    <div class="cr"><label>Learning Rate: <b id="oB">0.003</b></label><input type="range" min="0.0005" max="0.025" step="0.0005" value="0.003" id="cLR" oninput="O('oB',(+this.value).toFixed(4))"></div>
-    <div class="cr"><label>Horizon: <b id="oC">3.0</b>s</label><input type="range" min="0.5" max="10" step="0.5" value="3" id="cHz" oninput="O('oC',this.value)"></div>
-    <div class="cr"><label>Discount γ: <b id="oD">0.99</b></label><input type="range" min="0.9" max="0.999" step="0.001" value="0.99" id="cGm" oninput="O('oD',this.value)"></div>
-    <div class="cr"><label>Batch Size: <b id="oE">32</b></label><input type="range" min="8" max="64" step="8" value="32" id="cBS" oninput="O('oE',this.value)"></div>
-    <div class="btnr">
-      <button onclick="cmdResetAI()">⟳ Reset AI</button>
-      <button onclick="cmdTrain(50)">⚡50</button>
-      <button onclick="cmdTrain(200)">⚡200</button>
-      <button onclick="cmdTrain(1000)">⚡1000</button>
+  <div class="sec">
+    <div class="sec-hdr">🎯 Active Tracks</div>
+    <div class="sec-body">
+      <div id="trackListEl" style="max-height:140px;overflow-y:auto"></div>
     </div>
-    <div class="dr"><span class="dl">Parameters</span><span class="dv" id="oParams">0</span></div>
-    <div class="dr"><span class="dl">Replay Buffer</span><span class="dv" id="oBuf">0</span></div>
-  </div></div>
-</div>
+  </div>
 
-<div class="viewport" id="vp">
-  <canvas id="cBg"></canvas>
-  <canvas id="cMain"></canvas>
-</div>
-
-<div class="rp">
-  <div class="sec"><div class="sec-t">📊 COMBAT STATISTICS</div><div class="sec-b">
-    <div class="sg">
-      <div class="sc"><div class="sn" id="sIn">0</div><div class="sl">INCOMING</div></div>
-      <div class="sc"><div class="sn" id="sKl">0</div><div class="sl">KILLS</div></div>
-      <div class="sc"><div class="sn" id="sLk">0</div><div class="sl">LEAKERS</div></div>
-      <div class="sc"><div class="sn" id="sAc">0%</div><div class="sl">ACCURACY</div></div>
-      <div class="sc"><div class="sn" id="sFr">0</div><div class="sl">FIRED</div></div>
-      <div class="sc"><div class="sn" id="sEf">0%</div><div class="sl">EFFICIENCY</div></div>
+  <div class="sec">
+    <div class="sec-hdr">🧠 AI Transformer State</div>
+    <div class="sec-body">
+      <div class="meter"><span class="meter-lbl">Confidence</span><div class="meter-bar"><div class="meter-fill" id="mConf" style="width:0;background:var(--cyan)"></div></div><span class="meter-val" id="mConfV">0%</span></div>
+      <div class="meter"><span class="meter-lbl">Policy Loss</span><div class="meter-bar"><div class="meter-fill" id="mPLoss" style="width:50%;background:var(--warn)"></div></div><span class="meter-val" id="mPLossV">1.0</span></div>
+      <div class="meter"><span class="meter-lbl">Value Loss</span><div class="meter-bar"><div class="meter-fill" id="mVLoss" style="width:50%;background:#f48"></div></div><span class="meter-val" id="mVLossV">1.0</span></div>
+      <div class="meter"><span class="meter-lbl">Grad Norm</span><div class="meter-bar"><div class="meter-fill" id="mGrad" style="width:0;background:#8f0"></div></div><span class="meter-val" id="mGradV">0</span></div>
+      <div class="meter"><span class="meter-lbl">Epochs</span><div class="meter-bar"><div class="meter-fill" id="mEpoch" style="width:0;background:var(--purple)"></div></div><span class="meter-val" id="mEpochV">0</span></div>
+      <div class="meter"><span class="meter-lbl">Inference</span><div class="meter-bar"><div class="meter-fill" id="mInfer" style="width:0;background:var(--green)"></div></div><span class="meter-val" id="mInferV">0ms</span></div>
     </div>
-  </div></div>
+  </div>
 
-  <div class="sec"><div class="sec-t">🎯 THREAT TRACKS</div><div class="sec-b">
-    <div id="trackList" style="max-height:140px;overflow-y:auto"></div>
-  </div></div>
+  <div class="sec">
+    <div class="sec-hdr">🚀 Launcher Status</div>
+    <div class="sec-body" id="launcherStatusEl"></div>
+  </div>
 
-  <div class="sec"><div class="sec-t">🧠 AI STATE</div><div class="sec-b">
-    <div class="mt"><span class="mtl">Confidence</span><div class="mtb"><div class="mtf" id="mC" style="width:0;background:var(--cyan)"></div></div><span class="mtv" id="mCv">0%</span></div>
-    <div class="mt"><span class="mtl">P-Loss</span><div class="mtb"><div class="mtf" id="mPL" style="width:50%;background:var(--warn)"></div></div><span class="mtv" id="mPLv">1.0</span></div>
-    <div class="mt"><span class="mtl">V-Loss</span><div class="mtb"><div class="mtf" id="mVL" style="width:50%;background:#f48"></div></div><span class="mtv" id="mVLv">1.0</span></div>
-    <div class="mt"><span class="mtl">Grad</span><div class="mtb"><div class="mtf" id="mGr" style="width:0;background:#8f0"></div></div><span class="mtv" id="mGrv">0</span></div>
-    <div class="mt"><span class="mtl">Epochs</span><div class="mtb"><div class="mtf" id="mEp" style="width:0;background:var(--ai)"></div></div><span class="mtv" id="mEpv">0</span></div>
-    <div class="mt"><span class="mtl">Inference</span><div class="mtb"><div class="mtf" id="mIn" style="width:0;background:var(--green)"></div></div><span class="mtv" id="mInv">0ms</span></div>
-  </div></div>
-
-  <div class="sec"><div class="sec-t">🚀 LAUNCHER STATUS</div><div class="sec-b" id="launcherPanel"></div></div>
-
-  <div class="sec"><div class="sec-t">📡 RADAR</div><div class="sec-b">
-    <div class="dr"><span class="dl">Scan Rate</span><span class="dv">360°/4s</span></div>
-    <div class="dr"><span class="dl">Max Range</span><span class="dv">1200m</span></div>
-    <div class="dr"><span class="dl">Active Tracks</span><span class="dv" id="rTrk">0</span></div>
-    <div class="dr"><span class="dl">Active Missiles</span><span class="dv" id="rMsl">0</span></div>
-  </div></div>
+  <div class="sec">
+    <div class="sec-hdr">📡 Sensor Status</div>
+    <div class="sec-body">
+      <div class="data-row"><span class="data-lbl">Scan Rate</span><span class="data-val">360°/4s</span></div>
+      <div class="data-row"><span class="data-lbl">Max Range</span><span class="data-val">1200m</span></div>
+      <div class="data-row"><span class="data-lbl">Tracked Objects</span><span class="data-val" id="sensorTracks">0</span></div>
+      <div class="data-row"><span class="data-lbl">In-Flight Missiles</span><span class="data-val" id="sensorMissiles">0</span></div>
+      <div class="data-row"><span class="data-lbl">Particles</span><span class="data-val" id="sensorParticles">0</span></div>
+    </div>
+  </div>
 </div>
 
-<div class="btm">
-  <div class="sec"><div class="sec-t">📈 Intercept Rate</div><div class="sec-b" style="padding:0;height:calc(100% - 22px)"><canvas id="ch1" class="cc"></canvas></div></div>
-  <div class="sec"><div class="sec-t">📉 Training Loss</div><div class="sec-b" style="padding:0;height:calc(100% - 22px)"><canvas id="ch2" class="cc"></canvas></div></div>
-  <div class="sec"><div class="sec-t">🧠 Attention Map</div><div class="sec-b" style="padding:0;height:calc(100% - 22px)"><canvas id="ch3" class="cc"></canvas></div></div>
-  <div class="sec"><div class="sec-t">📋 Event Log</div><div class="sec-b" style="padding:0;height:calc(100% - 22px)"><div class="logc" id="logBox"></div></div></div>
+<!-- ==================== BOTTOM PANEL ==================== -->
+<div class="panel-bottom">
+  <div class="sec"><div class="sec-hdr">📈 Intercept Rate</div><div class="sec-body" style="padding:0;height:calc(100% - 24px)"><canvas id="chartAcc" class="chart-area"></canvas></div></div>
+  <div class="sec"><div class="sec-hdr">📉 Training Loss</div><div class="sec-body" style="padding:0;height:calc(100% - 24px)"><canvas id="chartLoss" class="chart-area"></canvas></div></div>
+  <div class="sec"><div class="sec-hdr">🧠 Attention Map</div><div class="sec-body" style="padding:0;height:calc(100% - 24px)"><canvas id="chartAttn" class="chart-area"></canvas></div></div>
+  <div class="sec"><div class="sec-hdr">📋 Event Log</div><div class="sec-body" style="padding:0;height:calc(100% - 24px)"><div class="log-wrap" id="logWrap"></div></div></div>
 </div>
+
 </div>
 
 <script>
+// ================================================================
+// PART 1: FOUNDATION — Math, Config, DOM helpers
+// ================================================================
 "use strict";
 
-// ================================================================
-// MATH UTILITIES
-// ================================================================
-const{sin,cos,sqrt,atan2,PI,abs,min,max,floor,random,exp,pow,hypot,round,tanh}=Math;
-const TAU=PI*2;
-const rand=(a=0,b=1)=>a+(b-a)*random();
-const rI=(a,b)=>floor(rand(a,b+.999));
-const cl=(v,l,h)=>v<l?l:v>h?h:v;
-const lr=(a,b,t)=>a+(b-a)*t;
-const$=id=>document.getElementById(id);
-const O=(id,v)=>{const e=$(id);if(e)e.textContent=v};
-const hx=a=>round(cl(a,0,255)).toString(16).padStart(2,'0');
-const ck=id=>{const e=$(id);return e&&e.checked};
+const M = Math;
+const { sin, cos, sqrt, atan2, PI, abs, min, max, floor, random, exp, pow, hypot, round, tanh, ceil } = M;
+const TAU = PI * 2;
 
-// ================================================================
-// WORLD CONSTANTS
-// ================================================================
-const WS=1800, BX=WS/2, BY=WS*.82;
-const CFG={speed:1};
+// ===== Pure Utility Functions (no side effects) =====
+function rand(lo = 0, hi = 1) { return lo + (hi - lo) * random(); }
+function randInt(lo, hi) { return floor(rand(lo, hi + 0.999)); }
+function clamp(val, lo, hi) { return val < lo ? lo : val > hi ? hi : val; }
+function lerp(a, b, t) { return a + (b - a) * t; }
+function hexByte(n) { return round(clamp(n, 0, 255)).toString(16).padStart(2, '0'); }
+function rgbaStr(r, g, b, a) { return `rgba(${r},${g},${b},${a})`; }
 
-// ================================================================
-// ENTITY POOL (pre-allocated, no GC pressure)
-// ================================================================
-class Pool{
-  constructor(maxSize,factory){
-    this.items=[];
-    this.active=0;
-    this.max=maxSize;
-    for(let i=0;i<maxSize;i++)this.items.push(factory(i));
-  }
-  acquire(){
-    if(this.active>=this.max)return null;
-    const item=this.items[this.active];
-    item._poolActive=true;
-    this.active++;
-    return item;
-  }
-  release(idx){
-    if(idx<0||idx>=this.active)return;
-    this.active--;
-    const temp=this.items[idx];
-    this.items[idx]=this.items[this.active];
-    this.items[this.active]=temp;
-    // Update swap indices
-    this.items[idx]._poolIdx=idx;
-    this.items[this.active]._poolIdx=this.active;
-    this.items[this.active]._poolActive=false;
-  }
-  forEach(fn){for(let i=0;i<this.active;i++)fn(this.items[i],i)}
-  releaseWhere(pred){
-    for(let i=this.active-1;i>=0;i--){
-      if(pred(this.items[i]))this.release(i);
-    }
-  }
-  get count(){return this.active}
-  get available(){return this.max-this.active}
-}
-
-// ================================================================
-// ENTITY FACTORIES
-// ================================================================
-function mkEnemy(i){
-  return{_poolIdx:i,_poolActive:false,
-    id:'',x:0,y:0,vx:0,vy:0,ax:0,ay:0,speed:0,type:0,
-    alive:false,born:0,threat:0,maneuvering:false,
-    mTimer:0,mFreq:1,mAmp:100,
-    engaged:false,assigned:0,size:5,flameFlicker:1,
-    trail:new Float32Array(160),trailLen:0,trailHead:0, // circular buffer: x,y pairs
-    remove:false
-  };
-}
-function mkMissile(i){
-  return{_poolIdx:i,_poolActive:false,
-    id:'',x:0,y:0,vx:0,vy:0,speed:0,
-    targetIdx:-1,alive:false,age:0,
-    phase:'mid',prevLOS:0,flameFlicker:1,smokeTimer:0,
-    trail:new Float32Array(120),trailLen:0,trailHead:0,
-    remove:false
-  };
-}
-function mkParticle(i){
-  return{_poolIdx:i,_poolActive:false,
-    x:0,y:0,vx:0,vy:0,life:0,maxLife:1,size:2,type:0, // 0=spark,1=smoke
-    r:200,g:200,b:200,remove:false
-  };
-}
-function mkExplosion(i){
-  return{_poolIdx:i,_poolActive:false,
-    x:0,y:0,size:10,duration:1,elapsed:0,
-    r:255,g:136,b:0,remove:false
-  };
-}
-function mkDebrisItem(i){
-  return{_poolIdx:i,_poolActive:false,
-    x:0,y:0,vx:0,vy:0,life:0,maxLife:1,
-    size:2,rot:0,rotSpd:0,remove:false
-  };
-}
-
-// Pre-allocate pools
-const enemyPool=new Pool(60,mkEnemy);
-const missilePool=new Pool(40,mkMissile);
-const particlePool=new Pool(300,mkParticle);
-const explosionPool=new Pool(20,mkExplosion);
-const debrisPool=new Pool(80,mkDebrisItem);
-
-let launchers=[];
-let aiDecisions=[];
-
-// ================================================================
-// THREAT DATABASE
-// ================================================================
-const THREATS={
-  0:{name:'SRBM',color:[255,68,68],flame:[255,136,0],inner:[255,221,68],speed:[250,750],grav:7,size:5.5},
-  1:{name:'LACM',color:[255,170,0],flame:[255,204,68],inner:[255,255,255],speed:[150,500],grav:0,size:4.5},
-  2:{name:'ASBM',color:[255,0,255],flame:[255,102,255],inner:[255,170,255],speed:[300,850],grav:2,size:5},
-  3:{name:'HGV',color:[255,0,102],flame:[255,68,136],inner:[255,204,221],speed:[1000,2800],grav:1,size:6},
-  4:{name:'DECOY',color:[136,136,136],flame:[170,170,170],inner:[204,204,204],speed:[100,350],grav:5,size:3.5}
+// ===== DOM Helpers =====
+const UI = {
+  el: id => document.getElementById(id),
+  set: (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; },
+  checked: id => { const e = document.getElementById(id); return e ? e.checked : false; },
+  val: id => { const e = document.getElementById(id); return e ? +e.value : 0; },
 };
 
 // ================================================================
-// STATS & STATE
+// PART 2: CONFIGURATION — Single source of truth
 // ================================================================
-let simActive=false, simTime=0, frameNum=0, lastWaveTime=0;
-let globalEnemyCounter=0, globalMissileCounter=0;
-const stats={incoming:0,kills:0,leakers:0,fired:0};
+const Config = {
+  worldSize: 1800,
+  baseX: 900,
+  baseY: 1476, // 0.82 * 1800
+  simSpeed: 1,
 
-let bgCanvas,bgCtx,mainCanvas,mainCtx;
-let vW,vH,scX,scY;
-let bgNeedsRedraw=true;
-let radarAngle=0;
-let starCache=null;
+  // Threat type definitions
+  threats: {
+    0: { id: 0, name: 'SRBM',  fullName: 'Ballistic',    color: [255,68,68],   flame: [255,136,0],  inner: [255,221,68],  speedRange: [250,750],  gravity: 7,  size: 5.5, maneuvers: false },
+    1: { id: 1, name: 'LACM',  fullName: 'Cruise',       color: [255,170,0],   flame: [255,204,68], inner: [255,255,255], speedRange: [150,500],  gravity: 0,  size: 4.5, maneuvers: false },
+    2: { id: 2, name: 'ASBM',  fullName: 'Maneuvering',  color: [255,0,255],   flame: [255,102,255],inner: [255,170,255], speedRange: [300,850],  gravity: 2,  size: 5.0, maneuvers: true  },
+    3: { id: 3, name: 'HGV',   fullName: 'Hypersonic',   color: [255,0,102],   flame: [255,68,136], inner: [255,204,221], speedRange: [1000,2800], gravity: 1, size: 6.0, maneuvers: false },
+    4: { id: 4, name: 'DECOY', fullName: 'Decoy',        color: [136,136,136], flame: [170,170,170],inner: [204,204,204], speedRange: [100,350],  gravity: 5,  size: 3.5, maneuvers: false },
+  },
 
-// Performance monitoring
-let fps=0,fpsCount=0,fpsTimer=0;
-let frameTimeAvg=0;
-let qualityLevel=1.0; // 1.0=full, auto-degrades
+  // Pool capacities
+  maxEnemies: 60,
+  maxMissiles: 40,
+  maxParticles: 300,
+  maxExplosions: 20,
+  maxDebris: 80,
+  maxTrailPoints: 80,
 
-// History for charts
-let histAcc=[],histLoss=[];
+  // AI
+  aiInputDim: 18,
+  aiEmbedDim: 36,
+  aiFFDim: 72,
+  aiOutputDim: 5,
+  aiMaxTargets: 20,
+  aiInferenceInterval: 0.4, // seconds between AI runs
+};
 
 // ================================================================
-// AI TRANSFORMER (optimized, no object creation in hot path)
+// PART 3: ENTITY SYSTEM — Pool-based, zero GC
 // ================================================================
-class TransformerAI{
-  constructor(){
-    this.D=36;this.FF=72;this.IN=18;this.OUT=5;
-    // Weights - all Float32Array, zero GC
-    this.Wi=this._rw(this.IN,this.D);this.bi=new Float32Array(this.D);
-    this.Wq=this._rw(this.D,this.D);this.Wk=this._rw(this.D,this.D);
-    this.Wv=this._rw(this.D,this.D);this.Wo=this._rw(this.D,this.D);
-    this.Wq2=this._rw(this.D,this.D);this.Wk2=this._rw(this.D,this.D);
-    this.Wv2=this._rw(this.D,this.D);this.Wo2=this._rw(this.D,this.D);
-    this.Wf1=this._rw(this.D,this.FF);this.bf1=new Float32Array(this.FF);
-    this.Wf2=this._rw(this.FF,this.D);this.bf2=new Float32Array(this.D);
-    this.Wf3=this._rw(this.D,this.FF);this.bf3=new Float32Array(this.FF);
-    this.Wf4=this._rw(this.FF,this.D);this.bf4=new Float32Array(this.D);
-    this.Wp1=this._rw(this.D,20);this.bp1=new Float32Array(20);
-    this.Wp2=this._rw(20,this.OUT);this.bp2=new Float32Array(this.OUT);
-    this.Ww1=this._rw(this.D,20);this.bw1=new Float32Array(20);
-    this.Ww2=this._rw(20,4);this.bw2=new Float32Array(4);
-    this.Wvh1=this._rw(this.D,20);this.bvh1=new Float32Array(20);
-    this.Wvh2=this._rw(20,1);this.bvh2=new Float32Array(1);
-
-    // Pre-allocated work buffers (max 20 targets)
-    const MN=20;
-    this._H=new Float32Array(MN*this.D);
-    this._Q=new Float32Array(MN*this.D);
-    this._K=new Float32Array(MN*this.D);
-    this._V=new Float32Array(MN*this.D);
-    this._S=new Float32Array(MN*MN);
-    this._A=new Float32Array(MN*this.D);
-    this._P=new Float32Array(MN*this.D);
-    this._FF1=new Float32Array(MN*this.FF);
-    this._FF2=new Float32Array(MN*this.D);
-    this._PH=new Float32Array(MN*20);
-    this._POL=new Float32Array(MN*this.OUT);
-    this._WH=new Float32Array(MN*20);
-    this._WM=new Float32Array(MN*4);
-
-    this.epoch=0;this.pLoss=1;this.vLoss=1;this.gradNorm=0;
-    this.confidence=0;this.inferenceTime=0;
-    this.lastAttnData=null;this.lastAttnN=0;
-
-    this._allW=this._collectAll();
-    this._adamM=this._allW.map(w=>new Float32Array(w.length));
-    this._adamV=this._allW.map(w=>new Float32Array(w.length));
-    this._adamT=0;
-
-    this.buffer=[];this.maxBuffer=4000;
-  }
-  _rw(r,c){const w=new Float32Array(r*c);const s=sqrt(2/r);for(let i=0;i<w.length;i++)w[i]=(random()-.5)*s;return w}
-  _collectAll(){return[this.Wi,this.bi,this.Wq,this.Wk,this.Wv,this.Wo,this.Wq2,this.Wk2,this.Wv2,this.Wo2,this.Wf1,this.bf1,this.Wf2,this.bf2,this.Wf3,this.bf3,this.Wf4,this.bf4,this.Wp1,this.bp1,this.Wp2,this.bp2,this.Ww1,this.bw1,this.Ww2,this.bw2,this.Wvh1,this.bvh1,this.Wvh2,this.bvh2]}
-  nParams(){let n=0;for(const w of this._allW)n+=w.length;return n}
-
-  // Core ops - reuse output arrays
-  _mm(A,m,k,B,n,C){for(let i=0;i<m;i++){const ro=i*k;for(let j=0;j<n;j++){let s=0;for(let p=0;p<k;p++)s+=A[ro+p]*B[p*n+j];C[i*n+j]=s}}}
-  _ab(A,b,m,n){for(let i=0;i<m;i++){const o=i*n;for(let j=0;j<n;j++)A[o+j]+=b[j]}}
-  _gelu(A,len){for(let i=0;i<len;i++){const x=A[i];A[i]=.5*x*(1+tanh(.7978845608*(x+.044715*x*x*x)))}}
-  _sig(x){return 1/(1+exp(-cl(x,-12,12)))}
-  _softmaxRows(A,rows,cols){for(let i=0;i<rows;i++){const o=i*cols;let mx=-1e9;for(let j=0;j<cols;j++)mx=max(mx,A[o+j]);let sm=0;for(let j=0;j<cols;j++){A[o+j]=exp(A[o+j]-mx);sm+=A[o+j]}const iv=1/(sm+1e-10);for(let j=0;j<cols;j++)A[o+j]*=iv}}
-  _ln(A,rows,cols){for(let i=0;i<rows;i++){const o=i*cols;let m=0;for(let j=0;j<cols;j++)m+=A[o+j];m/=cols;let v=0;for(let j=0;j<cols;j++){const d=A[o+j]-m;v+=d*d}const s=1/sqrt(v/cols+1e-5);for(let j=0;j<cols;j++)A[o+j]=(A[o+j]-m)*s}}
-  // Residual add: C = A + B (in-place into C which may alias A)
-  _resAdd(A,B,len,C){for(let i=0;i<len;i++)C[i]=A[i]+B[i]}
-
-  // Self-attention using pre-allocated buffers
-  _selfAttn(H,n,D,Wq,Wk,Wv,Wo,Q,K,V,S,A,P){
-    this._mm(H,n,D,Wq,D,Q);this._mm(H,n,D,Wk,D,K);this._mm(H,n,D,Wv,D,V);
-    const sc=1/sqrt(D);
-    for(let i=0;i<n;i++){let mx=-1e9;for(let j=0;j<n;j++){let s=0;for(let k=0;k<D;k++)s+=Q[i*D+k]*K[j*D+k];S[i*n+j]=s*sc;mx=max(mx,s*sc)}let sm=0;for(let j=0;j<n;j++){S[i*n+j]=exp(S[i*n+j]-mx);sm+=S[i*n+j]}for(let j=0;j<n;j++)S[i*n+j]/=(sm+1e-10)}
-    this._mm(S,n,n,V,D,A);this._mm(A,n,D,Wo,D,P);
+class EntityPool {
+  constructor(capacity, createFn) {
+    this.capacity = capacity;
+    this.items = new Array(capacity);
+    this.activeCount = 0;
+    for (let i = 0; i < capacity; i++) {
+      this.items[i] = createFn(i);
+      this.items[i]._poolIndex = i;
+      this.items[i]._active = false;
+    }
   }
 
-  forward(feats,n){
-    const t0=performance.now();
-    if(n>20)n=20;
-    const D=this.D,ND=n*D;
-    const H=this._H,Q=this._Q,K=this._K,V=this._V,S=this._S,A=this._A,P=this._P;
+  acquire() {
+    if (this.activeCount >= this.capacity) return null;
+    const entity = this.items[this.activeCount];
+    entity._active = true;
+    entity._markedForRelease = false;
+    this.activeCount++;
+    return entity;
+  }
 
-    // Input projection
-    this._mm(feats,n,this.IN,this.Wi,D,H);this._ab(H,this.bi,n,D);this._gelu(H,ND);
+  release(index) {
+    if (index < 0 || index >= this.activeCount) return;
+    this.activeCount--;
+    // Swap with last active
+    const removed = this.items[index];
+    const last = this.items[this.activeCount];
+    this.items[index] = last;
+    this.items[this.activeCount] = removed;
+    last._poolIndex = index;
+    removed._poolIndex = this.activeCount;
+    removed._active = false;
+  }
 
-    // Positional encoding
-    for(let i=0;i<n;i++)for(let j=0;j<D;j+=2){const f=1/pow(10000,j/D);H[i*D+j]+=sin(i*f)*.1;if(j+1<D)H[i*D+j+1]+=cos(i*f)*.1}
+  sweepReleased() {
+    for (let i = this.activeCount - 1; i >= 0; i--) {
+      if (this.items[i]._markedForRelease) {
+        this.release(i);
+      }
+    }
+  }
 
-    // Layer 1: LN → Attn → Residual
-    const H1=new Float32Array(ND);H1.set(H.subarray(0,ND));
-    this._ln(H1,n,D);
-    this._selfAttn(H1,n,D,this.Wq,this.Wk,this.Wv,this.Wo,Q,K,V,S,A,P);
-    for(let i=0;i<ND;i++)H[i]+=P[i];
+  forEach(callback) {
+    for (let i = 0; i < this.activeCount; i++) {
+      callback(this.items[i], i);
+    }
+  }
 
-    // Layer 1: FFN
-    const H1b=new Float32Array(ND);H1b.set(H.subarray(0,ND));
-    this._ln(H1b,n,D);
-    this._mm(H1b,n,D,this.Wf1,this.FF,this._FF1);this._ab(this._FF1,this.bf1,n,this.FF);this._gelu(this._FF1,n*this.FF);
-    this._mm(this._FF1,n,this.FF,this.Wf2,D,this._FF2);this._ab(this._FF2,this.bf2,n,D);
-    for(let i=0;i<ND;i++)H[i]+=this._FF2[i];
+  find(predicate) {
+    for (let i = 0; i < this.activeCount; i++) {
+      if (predicate(this.items[i])) return this.items[i];
+    }
+    return null;
+  }
 
-    // Layer 2: Attn
-    const H2=new Float32Array(ND);H2.set(H.subarray(0,ND));
-    this._ln(H2,n,D);
-    this._selfAttn(H2,n,D,this.Wq2,this.Wk2,this.Wv2,this.Wo2,Q,K,V,S,A,P);
-    for(let i=0;i<ND;i++)H[i]+=P[i];
-    // Store attention
-    if(!this.lastAttnData||this.lastAttnData.length<n*n)this.lastAttnData=new Float32Array(n*n);
-    this.lastAttnData.set(S.subarray(0,n*n));this.lastAttnN=n;
+  toArray() {
+    const arr = [];
+    for (let i = 0; i < this.activeCount; i++) arr.push(this.items[i]);
+    return arr;
+  }
 
-    // Layer 2: FFN
-    const H2b=new Float32Array(ND);H2b.set(H.subarray(0,ND));
-    this._ln(H2b,n,D);
-    this._mm(H2b,n,D,this.Wf3,this.FF,this._FF1);this._ab(this._FF1,this.bf3,n,this.FF);this._gelu(this._FF1,n*this.FF);
-    this._mm(this._FF1,n,this.FF,this.Wf4,D,this._FF2);this._ab(this._FF2,this.bf4,n,D);
-    for(let i=0;i<ND;i++)H[i]+=this._FF2[i];
+  get count() { return this.activeCount; }
+  get available() { return this.capacity - this.activeCount; }
+}
 
-    // Final LN
-    this._ln(H,n,D);
+// ===== Entity Factories =====
+function createEnemyEntity(index) {
+  return {
+    _poolIndex: index, _active: false, _markedForRelease: false,
+    id: '', x: 0, y: 0, vx: 0, vy: 0, ax: 0, ay: 0,
+    speed: 0, type: 0, alive: false, spawnTime: 0,
+    threat: 0.5, maneuvering: false,
+    maneuverTimer: 0, maneuverFreq: 1, maneuverAmp: 100,
+    engaged: false, assignedCount: 0,
+    size: 5, flameFlicker: 1,
+    trailX: new Float32Array(Config.maxTrailPoints),
+    trailY: new Float32Array(Config.maxTrailPoints),
+    trailLen: 0, trailHead: 0,
+  };
+}
+
+function createMissileEntity(index) {
+  return {
+    _poolIndex: index, _active: false, _markedForRelease: false,
+    id: '', x: 0, y: 0, vx: 0, vy: 0,
+    speed: 0, targetPoolIndex: -1,
+    alive: false, age: 0,
+    guidancePhase: 'midcourse', prevLOS: 0,
+    flameFlicker: 1, smokeTimer: 0,
+    trailX: new Float32Array(60),
+    trailY: new Float32Array(60),
+    trailLen: 0, trailHead: 0,
+  };
+}
+
+function createParticleEntity(index) {
+  return {
+    _poolIndex: index, _active: false, _markedForRelease: false,
+    x: 0, y: 0, vx: 0, vy: 0,
+    life: 0, maxLife: 1, size: 2,
+    type: 0, // 0=spark, 1=smoke
+    r: 200, g: 200, b: 200,
+  };
+}
+
+function createExplosionEntity(index) {
+  return {
+    _poolIndex: index, _active: false, _markedForRelease: false,
+    x: 0, y: 0, size: 10, duration: 1, elapsed: 0,
+    r: 255, g: 136, b: 0,
+  };
+}
+
+function createDebrisEntity(index) {
+  return {
+    _poolIndex: index, _active: false, _markedForRelease: false,
+    x: 0, y: 0, vx: 0, vy: 0,
+    life: 0, maxLife: 1, size: 2,
+    rotation: 0, rotSpeed: 0,
+  };
+}
+
+// ================================================================
+// PART 4: TRAIL SYSTEM — Circular buffer, zero allocation
+// ================================================================
+const TrailSystem = {
+  push(entity, x, y) {
+    const idx = entity.trailHead % entity.trailX.length;
+    entity.trailX[idx] = x;
+    entity.trailY[idx] = y;
+    entity.trailHead++;
+    if (entity.trailLen < entity.trailX.length) entity.trailLen++;
+  },
+
+  draw(ctx, entity, color, scaleX, scaleY, maxPoints) {
+    const len = min(entity.trailLen, maxPoints || entity.trailX.length);
+    if (len < 2) return;
+    const bufLen = entity.trailX.length;
+    ctx.beginPath();
+    for (let i = 0; i < len; i++) {
+      const idx = ((entity.trailHead - len + i) % bufLen + bufLen) % bufLen;
+      const px = entity.trailX[idx] * scaleX;
+      const py = entity.trailY[idx] * scaleY;
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+  }
+};
+
+// ================================================================
+// PART 5: PHYSICS — Ballistic solver, PN guidance
+// ================================================================
+const Physics = {
+  solveIntercept(target, launchPos, interceptorSpeed) {
+    let bestX = 0, bestY = 0, bestErr = Infinity, found = false;
+    const gravity = Config.threats[target.type]?.gravity || 0;
+
+    for (let step = 1; step <= 55; step++) {
+      const t = step * 0.45;
+      const px = target.x + target.vx * t + 0.5 * (target.ax || 0) * t * t;
+      const py = target.y + target.vy * t + 0.5 * ((target.ay || 0) + gravity) * t * t;
+      const d = hypot(px - launchPos.x, py - launchPos.y);
+      const tIntercept = d / interceptorSpeed;
+      const err = abs(tIntercept - t);
+      if (err < bestErr && tIntercept <= t * 1.35) {
+        bestErr = err; bestX = px; bestY = py; found = true;
+      }
+    }
+    return found ? { x: bestX, y: bestY } : null;
+  },
+
+  updateProNav(missile, target, dt) {
+    const dx = target.x - missile.x;
+    const dy = target.y - missile.y;
+    const range = hypot(dx, dy);
+    const LOS = atan2(dy, dx);
+    const LOSrate = (LOS - missile.prevLOS) / dt;
+    missile.prevLOS = LOS;
+
+    const closingV = -((dx * (target.vx - missile.vx) + dy * (target.vy - missile.vy)) / range);
+
+    if (range < 220 && missile.guidancePhase === 'midcourse') {
+      missile.guidancePhase = 'terminal';
+    }
+
+    const N = missile.guidancePhase === 'terminal' ? 5.0 : 3.5;
+    const accelCmd = N * closingV * LOSrate;
+    const velAngle = atan2(missile.vy, missile.vx);
+    let ax = -sin(velAngle) * accelCmd;
+    let ay = cos(velAngle) * accelCmd;
+
+    const accelMag = hypot(ax, ay);
+    const maxAccel = 500;
+    if (accelMag > maxAccel) {
+      const s = maxAccel / accelMag;
+      ax *= s; ay *= s;
+    }
+
+    missile.vx += ax * dt;
+    missile.vy += ay * dt;
+
+    // Maintain speed
+    const cs = hypot(missile.vx, missile.vy);
+    if (cs > 0) {
+      missile.vx = missile.vx / cs * missile.speed;
+      missile.vy = missile.vy / cs * missile.speed;
+    }
+
+    return range;
+  },
+
+  computeThreat(enemy, baseX, baseY, simTime) {
+    const d = hypot(enemy.x - baseX, enemy.y - baseY);
+    const speed = hypot(enemy.vx, enemy.vy);
+    const closing = -((enemy.x - baseX) * enemy.vx + (enemy.y - baseY) * enemy.vy) / (d * speed + 1);
+    return clamp(
+      0.22 * (1 - d / Config.worldSize) +
+      0.22 * (speed / 1500) +
+      0.22 * max(0, closing) +
+      0.15 * (enemy.maneuvering ? 1 : 0) +
+      0.10 * (enemy.type === 3 ? 1 : 0) +
+      0.09 * (enemy.type === 4 ? -0.5 : 0),
+      0, 1
+    );
+  }
+};
+
+// ================================================================
+// PART 6: AI TRANSFORMER — Full implementation
+// ================================================================
+class TransformerNetwork {
+  constructor() {
+    const D = Config.aiEmbedDim;
+    const FF = Config.aiFFDim;
+    const IN = Config.aiInputDim;
+    const OUT = Config.aiOutputDim;
+    const MN = Config.aiMaxTargets;
+
+    // Weight matrices
+    this.Wi = this._initW(IN, D); this.bi = new Float32Array(D);
+    // Layer 1 attention
+    this.Wq1 = this._initW(D, D); this.Wk1 = this._initW(D, D);
+    this.Wv1 = this._initW(D, D); this.Wo1 = this._initW(D, D);
+    // Layer 1 FFN
+    this.Wff1a = this._initW(D, FF); this.bff1a = new Float32Array(FF);
+    this.Wff1b = this._initW(FF, D); this.bff1b = new Float32Array(D);
+    // Layer 2 attention
+    this.Wq2 = this._initW(D, D); this.Wk2 = this._initW(D, D);
+    this.Wv2 = this._initW(D, D); this.Wo2 = this._initW(D, D);
+    // Layer 2 FFN
+    this.Wff2a = this._initW(D, FF); this.bff2a = new Float32Array(FF);
+    this.Wff2b = this._initW(FF, D); this.bff2b = new Float32Array(D);
+    // Policy head
+    this.Wp1 = this._initW(D, 20); this.bp1 = new Float32Array(20);
+    this.Wp2 = this._initW(20, OUT); this.bp2 = new Float32Array(OUT);
+    // Value head
+    this.Wvh1 = this._initW(D, 20); this.bvh1 = new Float32Array(20);
+    this.Wvh2 = this._initW(20, 1); this.bvh2 = new Float32Array(1);
+    // World model head
+    this.Wwm1 = this._initW(D, 20); this.bwm1 = new Float32Array(20);
+    this.Wwm2 = this._initW(20, 4); this.bwm2 = new Float32Array(4);
+
+    // Pre-allocated work buffers
+    this._H = new Float32Array(MN * D);
+    this._Q = new Float32Array(MN * D);
+    this._K = new Float32Array(MN * D);
+    this._V = new Float32Array(MN * D);
+    this._S = new Float32Array(MN * MN);
+    this._A = new Float32Array(MN * D);
+    this._P = new Float32Array(MN * D);
+    this._FF = new Float32Array(MN * FF);
+    this._FFO = new Float32Array(MN * D);
+    this._TMP = new Float32Array(MN * D);
+    this._PH1 = new Float32Array(MN * 20);
+    this._POL = new Float32Array(MN * OUT);
+    this._WH1 = new Float32Array(MN * 20);
+    this._WM = new Float32Array(MN * 4);
+    this._POOL = new Float32Array(D);
+    this._VH = new Float32Array(20);
+
+    // State
+    this.epoch = 0;
+    this.policyLoss = 1.0;
+    this.valueLoss = 1.0;
+    this.gradientNorm = 0;
+    this.confidence = 0;
+    this.inferenceTime = 0;
+    this.lastAttnMap = null;
+    this.lastAttnSize = 0;
+
+    // Adam optimizer
+    this._weights = this._collectWeights();
+    this._adamM = this._weights.map(w => new Float32Array(w.length));
+    this._adamV = this._weights.map(w => new Float32Array(w.length));
+    this._adamStep = 0;
+
+    // Experience replay
+    this.replayBuffer = [];
+    this.maxReplaySize = 4000;
+  }
+
+  _initW(rows, cols) {
+    const w = new Float32Array(rows * cols);
+    const scale = sqrt(2.0 / rows);
+    for (let i = 0; i < w.length; i++) w[i] = (random() - 0.5) * scale;
+    return w;
+  }
+
+  _collectWeights() {
+    return [
+      this.Wi, this.bi,
+      this.Wq1, this.Wk1, this.Wv1, this.Wo1,
+      this.Wff1a, this.bff1a, this.Wff1b, this.bff1b,
+      this.Wq2, this.Wk2, this.Wv2, this.Wo2,
+      this.Wff2a, this.bff2a, this.Wff2b, this.bff2b,
+      this.Wp1, this.bp1, this.Wp2, this.bp2,
+      this.Wvh1, this.bvh1, this.Wvh2, this.bvh2,
+      this.Wwm1, this.bwm1, this.Wwm2, this.bwm2,
+    ];
+  }
+
+  countParams() {
+    let n = 0;
+    for (const w of this._weights) n += w.length;
+    return n;
+  }
+
+  // ===== Core tensor ops (operate on flat Float32Arrays) =====
+  _matmul(A, rowsA, colsA, B, colsB, Out) {
+    for (let i = 0; i < rowsA; i++) {
+      const rOff = i * colsA;
+      for (let j = 0; j < colsB; j++) {
+        let sum = 0;
+        for (let k = 0; k < colsA; k++) sum += A[rOff + k] * B[k * colsB + j];
+        Out[i * colsB + j] = sum;
+      }
+    }
+  }
+
+  _addBias(A, bias, rows, cols) {
+    for (let i = 0; i < rows; i++) {
+      const off = i * cols;
+      for (let j = 0; j < cols; j++) A[off + j] += bias[j];
+    }
+  }
+
+  _gelu(A, length) {
+    const C = 0.7978845608; // sqrt(2/pi)
+    for (let i = 0; i < length; i++) {
+      const x = A[i];
+      A[i] = 0.5 * x * (1 + tanh(C * (x + 0.044715 * x * x * x)));
+    }
+  }
+
+  _layerNorm(A, rows, cols) {
+    for (let i = 0; i < rows; i++) {
+      const off = i * cols;
+      let mean = 0;
+      for (let j = 0; j < cols; j++) mean += A[off + j];
+      mean /= cols;
+      let variance = 0;
+      for (let j = 0; j < cols; j++) { const d = A[off + j] - mean; variance += d * d; }
+      const invStd = 1 / sqrt(variance / cols + 1e-5);
+      for (let j = 0; j < cols; j++) A[off + j] = (A[off + j] - mean) * invStd;
+    }
+  }
+
+  _softmaxRows(A, rows, cols) {
+    for (let i = 0; i < rows; i++) {
+      const off = i * cols;
+      let mx = -1e9;
+      for (let j = 0; j < cols; j++) mx = max(mx, A[off + j]);
+      let sum = 0;
+      for (let j = 0; j < cols; j++) { A[off + j] = exp(A[off + j] - mx); sum += A[off + j]; }
+      const inv = 1 / (sum + 1e-10);
+      for (let j = 0; j < cols; j++) A[off + j] *= inv;
+    }
+  }
+
+  _sigmoid(x) { return 1 / (1 + exp(-clamp(x, -12, 12))); }
+
+  // Self-attention with pre-allocated buffers
+  _selfAttention(H, n, D, Wq, Wk, Wv, Wo) {
+    const Q = this._Q, K = this._K, V = this._V;
+    const S = this._S, A = this._A, P = this._P;
+
+    this._matmul(H, n, D, Wq, D, Q);
+    this._matmul(H, n, D, Wk, D, K);
+    this._matmul(H, n, D, Wv, D, V);
+
+    const scale = 1 / sqrt(D);
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < n; j++) {
+        let s = 0;
+        for (let k = 0; k < D; k++) s += Q[i * D + k] * K[j * D + k];
+        S[i * n + j] = s * scale;
+      }
+    }
+    this._softmaxRows(S, n, n);
+    this._matmul(S, n, n, V, D, A);
+    this._matmul(A, n, D, Wo, D, P);
+  }
+
+  // Transformer block: PreLN → Attention → Residual → PreLN → FFN → Residual
+  _transformerBlock(H, n, D, Wq, Wk, Wv, Wo, WffA, bffA, WffB, bffB) {
+    const ND = n * D;
+    const TMP = this._TMP;
+    const FF = this._FF;
+    const FFO = this._FFO;
+    const P = this._P;
+
+    // Pre-LN + Self-Attention
+    TMP.set(H.subarray(0, ND));
+    this._layerNorm(TMP, n, D);
+    this._selfAttention(TMP, n, D, Wq, Wk, Wv, Wo);
+    for (let i = 0; i < ND; i++) H[i] += P[i]; // residual
+
+    // Pre-LN + FFN
+    TMP.set(H.subarray(0, ND));
+    this._layerNorm(TMP, n, D);
+    this._matmul(TMP, n, D, WffA, Config.aiFFDim, FF);
+    this._addBias(FF, bffA, n, Config.aiFFDim);
+    this._gelu(FF, n * Config.aiFFDim);
+    this._matmul(FF, n, Config.aiFFDim, WffB, D, FFO);
+    this._addBias(FFO, bffB, n, D);
+    for (let i = 0; i < ND; i++) H[i] += FFO[i]; // residual
+  }
+
+  forward(features, nTargets) {
+    const t0 = performance.now();
+    const n = min(nTargets, Config.aiMaxTargets);
+    const D = Config.aiEmbedDim;
+    const ND = n * D;
+    const H = this._H;
+
+    // Input projection + GELU
+    this._matmul(features, n, Config.aiInputDim, this.Wi, D, H);
+    this._addBias(H, this.bi, n, D);
+    this._gelu(H, ND);
+
+    // Sinusoidal positional encoding
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < D; j += 2) {
+        const freq = 1 / pow(10000, j / D);
+        H[i * D + j] += sin(i * freq) * 0.1;
+        if (j + 1 < D) H[i * D + j + 1] += cos(i * freq) * 0.1;
+      }
+    }
+
+    // Transformer Layer 1
+    this._transformerBlock(H, n, D, this.Wq1, this.Wk1, this.Wv1, this.Wo1,
+      this.Wff1a, this.bff1a, this.Wff1b, this.bff1b);
+
+    // Transformer Layer 2
+    this._transformerBlock(H, n, D, this.Wq2, this.Wk2, this.Wv2, this.Wo2,
+      this.Wff2a, this.bff2a, this.Wff2b, this.bff2b);
+
+    // Store attention map from last block
+    if (!this.lastAttnMap || this.lastAttnMap.length < n * n) {
+      this.lastAttnMap = new Float32Array(n * n);
+    }
+    this.lastAttnMap.set(this._S.subarray(0, n * n));
+    this.lastAttnSize = n;
+
+    // Final LayerNorm
+    this._layerNorm(H, n, D);
 
     // Policy head
-    this._mm(H,n,D,this.Wp1,20,this._PH);this._ab(this._PH,this.bp1,n,20);this._gelu(this._PH,n*20);
-    this._mm(this._PH,n,20,this.Wp2,this.OUT,this._POL);this._ab(this._POL,this.bp2,n,this.OUT);
+    this._matmul(H, n, D, this.Wp1, 20, this._PH1);
+    this._addBias(this._PH1, this.bp1, n, 20);
+    this._gelu(this._PH1, n * 20);
+    this._matmul(this._PH1, n, 20, this.Wp2, Config.aiOutputDim, this._POL);
+    this._addBias(this._POL, this.bp2, n, Config.aiOutputDim);
 
     // World model head
-    this._mm(H,n,D,this.Ww1,20,this._WH);this._ab(this._WH,this.bw1,n,20);this._gelu(this._WH,n*20);
-    this._mm(this._WH,n,20,this.Ww2,4,this._WM);this._ab(this._WM,this.bw2,n,4);
+    this._matmul(H, n, D, this.Wwm1, 20, this._WH1);
+    this._addBias(this._WH1, this.bwm1, n, 20);
+    this._gelu(this._WH1, n * 20);
+    this._matmul(this._WH1, n, 20, this.Wwm2, 4, this._WM);
+    this._addBias(this._WM, this.bwm2, n, 4);
 
-    // Value head (mean pool)
-    const pooled=new Float32Array(D);
-    for(let i=0;i<n;i++)for(let j=0;j<D;j++)pooled[j]+=H[i*D+j]/n;
-    const vh=new Float32Array(20);
-    for(let i=0;i<20;i++){let s=this.bvh1[i];for(let j=0;j<D;j++)s+=pooled[j]*this.Wvh1[j*20+i];vh[i]=max(0,s)}
-    let val=this.bvh2[0];for(let i=0;i<20;i++)val+=vh[i]*this.Wvh2[i];
+    // Value head (mean pool → FC → scalar)
+    const pool = this._POOL;
+    pool.fill(0);
+    for (let i = 0; i < n; i++) for (let j = 0; j < D; j++) pool[j] += H[i * D + j] / n;
+    const vh = this._VH;
+    for (let i = 0; i < 20; i++) {
+      let s = this.bvh1[i];
+      for (let j = 0; j < D; j++) s += pool[j] * this.Wvh1[j * 20 + i];
+      vh[i] = max(0, s); // ReLU
+    }
+    let value = this.bvh2[0];
+    for (let i = 0; i < 20; i++) value += vh[i] * this.Wvh2[i];
 
-    this.inferenceTime=performance.now()-t0;
-    return val;
+    this.inferenceTime = performance.now() - t0;
+    return value;
   }
 
-  decide(targets,n){
-    if(!n)return;
-    const feats=new Float32Array(n*this.IN);
-    for(let i=0;i<n;i++){
-      const t=targets[i];
-      const d=hypot(t.x-BX,t.y-BY),sp=hypot(t.vx,t.vy),hd=atan2(t.vy,t.vx);
-      const cr=-((t.x-BX)*t.vx+(t.y-BY)*t.vy)/(d*sp+1);
-      const j=i*this.IN;
-      feats[j]=t.x/WS;feats[j+1]=t.y/WS;feats[j+2]=t.vx/2000;feats[j+3]=t.vy/2000;
-      feats[j+4]=(t.ax||0)/300;feats[j+5]=(t.ay||0)/300;feats[j+6]=sp/2000;feats[j+7]=hd/PI;
-      feats[j+8]=d/WS;feats[j+9]=t.threat;feats[j+10]=t.type/4;feats[j+11]=min((simTime-t.born)/60,1);
-      feats[j+12]=t.maneuvering?1:0;feats[j+13]=cr;feats[j+14]=t.engaged?1:0;feats[j+15]=t.assigned/3;
-      feats[j+16]=simTime/300;feats[j+17]=d/(sp*max(.1,cr)+1)/30;
+  makeDecisions(targets, nTargets, simTime) {
+    if (nTargets === 0) return [];
+    const n = min(nTargets, Config.aiMaxTargets);
+    const IN = Config.aiInputDim;
+    const features = new Float32Array(n * IN);
+
+    for (let i = 0; i < n; i++) {
+      const t = targets[i];
+      const dBase = hypot(t.x - Config.baseX, t.y - Config.baseY);
+      const speed = hypot(t.vx, t.vy);
+      const heading = atan2(t.vy, t.vx);
+      const closing = -((t.x - Config.baseX) * t.vx + (t.y - Config.baseY) * t.vy) / (dBase * speed + 1);
+      const off = i * IN;
+      features[off] = t.x / Config.worldSize;
+      features[off+1] = t.y / Config.worldSize;
+      features[off+2] = t.vx / 2000;
+      features[off+3] = t.vy / 2000;
+      features[off+4] = (t.ax || 0) / 300;
+      features[off+5] = (t.ay || 0) / 300;
+      features[off+6] = speed / 2000;
+      features[off+7] = heading / PI;
+      features[off+8] = dBase / Config.worldSize;
+      features[off+9] = t.threat;
+      features[off+10] = t.type / 4;
+      features[off+11] = min((simTime - t.spawnTime) / 60, 1);
+      features[off+12] = t.maneuvering ? 1 : 0;
+      features[off+13] = closing;
+      features[off+14] = t.engaged ? 1 : 0;
+      features[off+15] = t.assignedCount / 3;
+      features[off+16] = simTime / 300;
+      features[off+17] = dBase / (speed * max(0.1, closing) + 1) / 30;
     }
-    this.forward(feats,n);
-    const hz=+$('cHz').value;
-    aiDecisions.length=0;
-    let tc=0;
-    for(let i=0;i<n;i++){
-      const pr=this._sig(this._POL[i*this.OUT]);
-      const cf=this._sig(this._POL[i*this.OUT+4]);
-      tc+=cf;
-      aiDecisions.push({
-        tgtPoolIdx:targets[i]._poolIdx,
-        pri:pr,conf:cf,
-        ix:targets[i].x+this._WM[i*4]*hz*350,
-        iy:targets[i].y+this._WM[i*4+1]*hz*350
+
+    this.forward(features, n);
+    const hz = UI.val('cfgHz');
+
+    const decisions = [];
+    let totalConf = 0;
+    for (let i = 0; i < n; i++) {
+      const priority = this._sigmoid(this._POL[i * Config.aiOutputDim]);
+      const conf = this._sigmoid(this._POL[i * Config.aiOutputDim + 4]);
+      totalConf += conf;
+      decisions.push({
+        targetIndex: i,
+        targetEntity: targets[i],
+        priority,
+        confidence: conf,
+        interceptX: targets[i].x + this._WM[i * 4] * hz * 350,
+        interceptY: targets[i].y + this._WM[i * 4 + 1] * hz * 350,
       });
     }
-    this.confidence=n?tc/n:0;
-    aiDecisions.sort((a,b)=>b.pri-a.pri);
+    this.confidence = n > 0 ? totalConf / n : 0;
+    decisions.sort((a, b) => b.priority - a.priority);
+    return decisions;
   }
 
-  addExp(e){this.buffer.push(e);if(this.buffer.length>this.maxBuffer)this.buffer.shift()}
+  addExperience(exp) {
+    this.replayBuffer.push(exp);
+    if (this.replayBuffer.length > this.maxReplaySize) this.replayBuffer.shift();
+  }
 
-  train(iters=1){
-    if(this.buffer.length<20)return;
-    const lr=+$('cLR').value,bs=min(+$('cBS').value,this.buffer.length);
-    for(let it=0;it<iters;it++){
-      this._adamT++;
-      const grads=this._allW.map(w=>new Float32Array(w.length));
-      let tpL=0,tvL=0,cnt=0;
-      for(let b=0;b<bs;b++){
-        const s=this.buffer[rI(0,this.buffer.length-1)];
-        if(!s.f||s.f.length!==this.IN)continue;
-        const f=new Float32Array(this.IN);f.set(s.f);
-        const val=this.forward(f,1);
-        const pred=this._sig(this._POL[0]);
-        const err=pred-s.thr;
-        tpL+=err*err;tvL+=(val-s.rwd)*(val-s.rwd);cnt++;
-        const eps=.001;
-        for(let wi=0;wi<this._allW.length;wi++){
-          const w=this._allW[wi];
-          const np=min(3,w.length);
-          for(let p=0;p<np;p++){
-            const idx=rI(0,w.length-1),old=w[idx];
-            w[idx]=old+eps;
-            const val2=this.forward(f,1);
-            const pr2=this._sig(this._POL[0]),e2=pr2-s.thr;
-            const l2=e2*e2+.5*(val2-s.rwd)*(val2-s.rwd)-(s.hit?s.rwd*pr2:0)*.2;
-            const l1=err*err+.5*(val-s.rwd)*(val-s.rwd)-(s.hit?s.rwd*pred:0)*.2;
-            grads[wi][idx]+=(l2-l1)/eps;w[idx]=old;
+  train(iterations = 1) {
+    const batchSize = min(UI.val('cfgBatch'), this.replayBuffer.length);
+    if (batchSize < 16) return;
+    const lr = UI.val('cfgLR');
+
+    for (let iter = 0; iter < iterations; iter++) {
+      this._adamStep++;
+      const grads = this._weights.map(w => new Float32Array(w.length));
+      let totalPL = 0, totalVL = 0, count = 0;
+
+      for (let b = 0; b < batchSize; b++) {
+        const sample = this.replayBuffer[randInt(0, this.replayBuffer.length - 1)];
+        if (!sample.features || sample.features.length !== Config.aiInputDim) continue;
+
+        const f = new Float32Array(Config.aiInputDim);
+        f.set(sample.features);
+        const value = this.forward(f, 1);
+        const pred = this._sigmoid(this._POL[0]);
+        const err = pred - sample.actualThreat;
+        totalPL += err * err;
+        totalVL += (value - sample.reward) * (value - sample.reward);
+        count++;
+
+        // SPSA gradient approximation
+        const epsilon = 0.001;
+        for (let wi = 0; wi < this._weights.length; wi++) {
+          const w = this._weights[wi];
+          const nPerturb = min(3, w.length);
+          for (let p = 0; p < nPerturb; p++) {
+            const idx = randInt(0, w.length - 1);
+            const original = w[idx];
+            w[idx] = original + epsilon;
+            const v2 = this.forward(f, 1);
+            const p2 = this._sigmoid(this._POL[0]);
+            const e2 = p2 - sample.actualThreat;
+            const lossPert = e2*e2 + 0.5*(v2-sample.reward)*(v2-sample.reward) - (sample.wasHit ? sample.reward*p2 : 0)*0.2;
+            const lossBase = err*err + 0.5*(value-sample.reward)*(value-sample.reward) - (sample.wasHit ? sample.reward*pred : 0)*0.2;
+            grads[wi][idx] += (lossPert - lossBase) / epsilon;
+            w[idx] = original;
           }
         }
       }
-      if(!cnt)continue;
-      let gn=0;for(const g of grads)for(let i=0;i<g.length;i++)gn+=g[i]*g[i];
-      gn=sqrt(gn);const cs=gn>2?2/gn:1;
-      for(let wi=0;wi<this._allW.length;wi++){
-        const w=this._allW[wi],g=grads[wi],m=this._adamM[wi],v=this._adamV[wi];
-        for(let i=0;i<w.length;i++){
-          const gi=g[i]*cs/cnt;
-          m[i]=.9*m[i]+.1*gi;v[i]=.999*v[i]+.001*gi*gi;
-          w[i]-=lr*(m[i]/(1-pow(.9,this._adamT)))/(sqrt(v[i]/(1-pow(.999,this._adamT)))+1e-8);
-          w[i]=cl(w[i],-3,3);
+
+      if (count === 0) continue;
+
+      // Gradient norm + clipping
+      let gNorm = 0;
+      for (const g of grads) for (let i = 0; i < g.length; i++) gNorm += g[i] * g[i];
+      gNorm = sqrt(gNorm);
+      const clipScale = gNorm > 2.0 ? 2.0 / gNorm : 1.0;
+
+      // Adam update
+      const beta1 = 0.9, beta2 = 0.999, eps = 1e-8;
+      for (let wi = 0; wi < this._weights.length; wi++) {
+        const w = this._weights[wi], g = grads[wi];
+        const m = this._adamM[wi], v = this._adamV[wi];
+        for (let i = 0; i < w.length; i++) {
+          const gi = g[i] * clipScale / count;
+          m[i] = beta1 * m[i] + (1 - beta1) * gi;
+          v[i] = beta2 * v[i] + (1 - beta2) * gi * gi;
+          const mHat = m[i] / (1 - pow(beta1, this._adamStep));
+          const vHat = v[i] / (1 - pow(beta2, this._adamStep));
+          w[i] -= lr * mHat / (sqrt(vHat) + eps);
+          w[i] = clamp(w[i], -3, 3);
         }
       }
-      this.pLoss=tpL/cnt;this.vLoss=tvL/cnt;this.gradNorm=gn*cs;this.epoch++;
+
+      this.policyLoss = totalPL / count;
+      this.valueLoss = totalVL / count;
+      this.gradientNorm = gNorm * clipScale;
+      this.epoch++;
     }
   }
 }
 
-let ai=new TransformerAI();
+// ================================================================
+// PART 7: GAME SYSTEMS — Spawner, Defense, Effects, AI Controller
+// ================================================================
+
+// Global pools
+const enemies = new EntityPool(Config.maxEnemies, createEnemyEntity);
+const missiles = new EntityPool(Config.maxMissiles, createMissileEntity);
+const particles = new EntityPool(Config.maxParticles, createParticleEntity);
+const explosions = new EntityPool(Config.maxExplosions, createExplosionEntity);
+const debris = new EntityPool(Config.maxDebris, createDebrisEntity);
+
+let launchers = [];
+let aiDecisions = [];
+
+// Global state
+const GameState = {
+  active: false,
+  time: 0,
+  frame: 0,
+  lastWaveTime: 0,
+  lastAITime: 0,
+  enemyCounter: 0,
+  missileCounter: 0,
+  radarAngle: 0,
+  fps: 0,
+  fpsCount: 0,
+  fpsTimer: 0,
+  quality: 1.0,
+  stats: { incoming: 0, kills: 0, leakers: 0, fired: 0 },
+  historyAccuracy: [],
+  historyLoss: [],
+};
+
+let aiNetwork = new TransformerNetwork();
+
+// ===== Spawner =====
+const Spawner = {
+  _getEnabledTypes() {
+    const types = [];
+    if (UI.checked('cfgThrBallistic')) types.push(0);
+    if (UI.checked('cfgThrCruise')) types.push(1);
+    if (UI.checked('cfgThrManeuver')) types.push(2);
+    if (UI.checked('cfgThrHyper')) types.push(3);
+    if (UI.checked('cfgThrDecoy')) types.push(4);
+    return types.length > 0 ? types : [0];
+  },
+
+  spawn(forceType) {
+    const e = enemies.acquire();
+    if (!e) return null;
+
+    const types = this._getEnabledTypes();
+    const type = forceType != null ? forceType : types[randInt(0, types.length - 1)];
+    const td = Config.threats[type];
+    const speed = clamp(rand(td.speedRange[0], td.speedRange[1]), UI.val('cfgMinSpd'), UI.val('cfgMaxSpd'));
+
+    // Position from edges
+    const side = randInt(0, 2);
+    if (side === 0) { e.x = rand(100, Config.worldSize - 100); e.y = rand(-110, -10); }
+    else if (side === 1) { e.x = rand(-110, -10); e.y = rand(100, Config.worldSize * 0.45); }
+    else { e.x = rand(Config.worldSize + 10, Config.worldSize + 110); e.y = rand(100, Config.worldSize * 0.45); }
+
+    // Aim toward base
+    const tx = Config.baseX + rand(-300, 300);
+    const ty = Config.baseY + rand(-150, 50);
+    const angle = atan2(ty - e.y, tx - e.x);
+
+    e.id = 'T' + (++GameState.enemyCounter);
+    GameState.stats.incoming++;
+    e.vx = cos(angle) * speed; e.vy = sin(angle) * speed;
+    e.ax = 0; e.ay = 0; e.speed = speed; e.type = type;
+    e.alive = true; e.spawnTime = GameState.time;
+    e.threat = 0.5; e.maneuvering = td.maneuvers;
+    e.maneuverTimer = 0; e.maneuverFreq = rand(0.3, 2.5); e.maneuverAmp = rand(40, 200);
+    e.engaged = false; e.assignedCount = 0;
+    e.size = td.size; e.flameFlicker = rand(0.7, 1.2);
+    e.trailLen = 0; e.trailHead = 0;
+
+    // Type-specific init
+    if (type === 0) { e.vy = -speed * 0.2; e.vx = (tx - e.x) / hypot(tx - e.x, ty - e.y) * speed; e.ay = rand(3, 10); }
+    if (type === 1) { e.y = rand(Config.worldSize * 0.3, Config.worldSize * 0.6); e.vy = rand(-10, 10); }
+    if (type === 3) { e.speed = rand(1200, 2500); e.vx = cos(angle) * e.speed; e.vy = sin(angle) * e.speed; }
+
+    Logger.warn(`⚠ ${e.id} [${td.name}] V=${round(speed)}m/s heading ${round(angle * 180 / PI)}°`);
+    return e;
+  },
+
+  wave() {
+    const n = UI.val('cfgWaveN');
+    for (let i = 0; i < n; i++) setTimeout(() => this.spawn(), i * 100);
+    Logger.warn(`WAVE ATTACK: ${n} inbound threats`);
+  },
+
+  single() { this.spawn(); },
+
+  massive() {
+    for (let i = 0; i < 20; i++) setTimeout(() => this.spawn(), i * 50);
+    Logger.warn('MASSIVE STRIKE: 20 threats inbound!');
+  },
+};
+
+// ===== Defense =====
+const Defense = {
+  rebuild(count) {
+    launchers = [];
+    const spacing = Config.worldSize * 0.5 / (count + 1);
+    const startX = Config.worldSize * 0.25;
+    const mpu = UI.val('cfgMPU');
+    for (let i = 0; i < count; i++) {
+      launchers.push({
+        id: i,
+        x: startX + spacing * (i + 1),
+        y: Config.baseY + 50,
+        missiles: mpu, maxMissiles: mpu,
+        reloadTimer: 0, status: 'ready',
+        turretAngle: -PI / 2, fireAnim: 0,
+      });
+    }
+  },
+
+  fire(launcher, target, interceptPt) {
+    if (launcher.missiles <= 0 || launcher.status !== 'ready') return false;
+    const m = missiles.acquire();
+    if (!m) return false;
+
+    const intSpeed = UI.val('cfgIntSpd');
+    const angle = atan2(interceptPt.y - launcher.y, interceptPt.x - launcher.x);
+
+    m.id = 'M' + (++GameState.missileCounter);
+    GameState.stats.fired++;
+    m.x = launcher.x; m.y = launcher.y - 6;
+    m.vx = cos(angle) * intSpeed; m.vy = sin(angle) * intSpeed;
+    m.speed = intSpeed; m.targetPoolIndex = target._poolIndex;
+    m.alive = true; m.age = 0; m.guidancePhase = 'midcourse';
+    m.prevLOS = atan2(target.y - launcher.y, target.x - launcher.x);
+    m.flameFlicker = rand(0.6, 1.0); m.smokeTimer = 0;
+    m.trailLen = 0; m.trailHead = 0;
+
+    launcher.missiles--;
+    launcher.status = 'reloading';
+    launcher.reloadTimer = UI.val('cfgReload');
+    launcher.fireAnim = 1.0;
+
+    target.engaged = true;
+    target.assignedCount++;
+
+    EffectsSystem.createExplosion(launcher.x, launcher.y - 6, 0, 204, 255, 10, 0.3);
+    EffectsSystem.createSmoke(launcher.x, launcher.y, 15);
+    Logger.fire(`→ LAUNCH: ${m.id} → ${target.id} from PU-${launcher.id}`);
+    return true;
+  },
+
+  findBestLauncher(targetX, targetY) {
+    let best = null, bestDist = Infinity;
+    for (const l of launchers) {
+      if (l.missiles > 0 && l.status === 'ready') {
+        const d = hypot(l.x - targetX, l.y - targetY);
+        if (d < bestDist) { bestDist = d; best = l; }
+      }
+    }
+    return best;
+  },
+};
+
+// ===== Effects System =====
+const EffectsSystem = {
+  createExplosion(x, y, r, g, b, size, duration) {
+    const e = explosions.acquire();
+    if (!e) return;
+    e.x = x; e.y = y; e.r = r; e.g = g; e.b = b;
+    e.size = size; e.duration = duration; e.elapsed = 0;
+  },
+
+  createSparks(x, y, count, r, g, b) {
+    if (!UI.checked('cfgEffects')) return;
+    for (let i = 0; i < count; i++) {
+      const p = particles.acquire();
+      if (!p) return;
+      const a = rand(0, TAU), s = rand(30, 200);
+      p.x = x; p.y = y; p.vx = cos(a) * s; p.vy = sin(a) * s;
+      p.life = rand(0.2, 1.0); p.maxLife = 1.0;
+      p.size = rand(1, 3.5); p.type = 0;
+      p.r = r; p.g = g; p.b = b;
+    }
+  },
+
+  createSmoke(x, y, count) {
+    if (!UI.checked('cfgEffects')) return;
+    for (let i = 0; i < count; i++) {
+      const p = particles.acquire();
+      if (!p) return;
+      const a = rand(PI * 0.2, PI * 0.8), s = rand(12, 70);
+      p.x = x; p.y = y; p.vx = cos(a) * s; p.vy = -abs(sin(a)) * s * 0.4;
+      p.life = rand(0.4, 1.5); p.maxLife = 1.5;
+      p.size = rand(2, 5); p.type = 1;
+      p.r = 160; p.g = 160; p.b = 160;
+    }
+  },
+
+  createDebris(x, y, count) {
+    for (let i = 0; i < count; i++) {
+      const d = debris.acquire();
+      if (!d) return;
+      const a = rand(0, TAU), s = rand(50, 250);
+      d.x = x; d.y = y; d.vx = cos(a) * s; d.vy = sin(a) * s;
+      d.life = rand(0.4, 2.0); d.maxLife = 2.0;
+      d.size = rand(1, 4); d.rotation = rand(0, TAU); d.rotSpeed = rand(-8, 8);
+    }
+  },
+};
+
+// ===== AI System =====
+const AISystem = {
+  reset() {
+    aiNetwork = new TransformerNetwork();
+    UI.set('dParams', aiNetwork.countParams().toLocaleString());
+    Logger.ai('AI Transformer reinitialized');
+  },
+
+  trainBurst(n) {
+    const t0 = performance.now();
+    aiNetwork.train(n);
+    const ms = round(performance.now() - t0);
+    Logger.ai(`Train ×${n}: ep=${aiNetwork.epoch} pL=${aiNetwork.policyLoss.toFixed(5)} vL=${aiNetwork.valueLoss.toFixed(5)} g=${aiNetwork.gradientNorm.toFixed(3)} [${ms}ms]`);
+  },
+
+  runCycle() {
+    if (GameState.time - GameState.lastAITime < Config.aiInferenceInterval) return;
+    GameState.lastAITime = GameState.time;
+
+    // Update all threat levels
+    enemies.forEach(e => {
+      if (!e.alive) return;
+      e.threat = Physics.computeThreat(e, Config.baseX, Config.baseY, GameState.time);
+    });
+
+    const targets = enemies.toArray().filter(e => e.alive);
+    if (targets.length === 0) { aiDecisions = []; return; }
+
+    if (UI.checked('cfgAIEnabled')) {
+      aiDecisions = aiNetwork.makeDecisions(targets, targets.length, GameState.time);
+      for (const dec of aiDecisions) {
+        const t = dec.targetEntity;
+        if (!t.alive || t.assignedCount >= 2 || t.type === 4 || dec.priority < 0.2) continue;
+        const d = hypot(t.x - Config.baseX, t.y - Config.baseY);
+        if (d > Config.worldSize * 1.1 || d < 20) continue;
+        const launcher = Defense.findBestLauncher(t.x, t.y);
+        if (!launcher) continue;
+        const ip = Physics.solveIntercept(t, launcher, UI.val('cfgIntSpd'));
+        if (ip) { Defense.fire(launcher, t, ip); break; }
+      }
+    } else {
+      // Greedy fallback
+      aiDecisions = [];
+      const sorted = [...targets].filter(e => !e.engaged && e.type !== 4)
+        .sort((a, b) => hypot(a.x - Config.baseX, a.y - Config.baseY) - hypot(b.x - Config.baseX, b.y - Config.baseY));
+      for (const t of sorted) {
+        if (hypot(t.x - Config.baseX, t.y - Config.baseY) > Config.worldSize * 0.7) continue;
+        const launcher = Defense.findBestLauncher(t.x, t.y);
+        if (!launcher) continue;
+        const ip = Physics.solveIntercept(t, launcher, UI.val('cfgIntSpd'));
+        if (ip) { Defense.fire(launcher, t, ip); break; }
+      }
+    }
+  },
+
+  makeExperience(target, wasHit, error) {
+    const d = hypot(target.x - Config.baseX, target.y - Config.baseY);
+    const speed = hypot(target.vx, target.vy);
+    const heading = atan2(target.vy, target.vx);
+    const closing = -((target.x - Config.baseX) * target.vx + (target.y - Config.baseY) * target.vy) / (d * speed + 1);
+    const reward = wasHit ? (1.0 + d / Config.worldSize * 0.5) : (d < 50 ? -2.0 : -0.5);
+
+    const f = new Float32Array(Config.aiInputDim);
+    f[0] = target.x / Config.worldSize; f[1] = target.y / Config.worldSize;
+    f[2] = target.vx / 2000; f[3] = target.vy / 2000;
+    f[4] = (target.ax||0) / 300; f[5] = (target.ay||0) / 300;
+    f[6] = speed / 2000; f[7] = heading / PI;
+    f[8] = d / Config.worldSize; f[9] = target.threat;
+    f[10] = target.type / 4; f[11] = min((GameState.time - target.spawnTime) / 60, 1);
+    f[12] = target.maneuvering ? 1 : 0; f[13] = closing;
+    f[14] = target.engaged ? 1 : 0; f[15] = target.assignedCount / 3;
+    f[16] = GameState.time / 300; f[17] = d / (speed * max(0.1, closing) + 1) / 30;
+
+    return { features: f, actualThreat: target.threat, wasHit, reward };
+  },
+};
+
+// ===== Logger =====
+const Logger = {
+  _maxEntries: 150,
+  _add(msg, cls) {
+    const wrap = UI.el('logWrap');
+    if (!wrap) return;
+    const el = document.createElement('div');
+    el.className = 'log-line ' + cls;
+    el.textContent = `[${GameState.time.toFixed(1)}] ${msg}`;
+    wrap.appendChild(el);
+    while (wrap.children.length > this._maxEntries) wrap.removeChild(wrap.firstChild);
+    wrap.scrollTop = wrap.scrollHeight;
+  },
+  hit(msg) { this._add(msg, 'log-hit'); },
+  fire(msg) { this._add(msg, 'log-fire'); },
+  miss(msg) { this._add(msg, 'log-miss'); },
+  warn(msg) { this._add(msg, 'log-warn'); },
+  ai(msg) { this._add(msg, 'log-ai'); },
+  sys(msg) { this._add(msg, 'log-sys'); },
+};
 
 // ================================================================
-// TRAIL SYSTEM (circular buffer, no allocation)
+// PART 8: SIMULATION UPDATE
 // ================================================================
-function trailPush(entity,x,y){
-  const t=entity.trail;
-  const idx=(entity.trailHead*2)%t.length;
-  t[idx]=x;t[idx+1]=y;
-  entity.trailHead++;
-  if(entity.trailLen<t.length/2)entity.trailLen++;
-}
-function trailDraw(ctx,entity,color,maxPts){
-  const t=entity.trail,len=min(entity.trailLen,maxPts||80);
-  if(len<2)return;
-  ctx.beginPath();
-  for(let i=0;i<len;i++){
-    const idx=((entity.trailHead-len+i)*2+t.length*2)%t.length;
-    const px=t[idx]*scX,py=t[idx+1]*scY;
-    if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+function updateSimulation(dt) {
+  const WS = Config.worldSize;
+  const BX = Config.baseX, BY = Config.baseY;
+
+  // ===== ENEMIES =====
+  enemies.forEach(e => {
+    if (!e.alive) { e._markedForRelease = true; return; }
+    // Maneuver physics
+    if (e.maneuvering) {
+      e.maneuverTimer += dt;
+      const force = sin(e.maneuverTimer * e.maneuverFreq * TAU) * e.maneuverAmp;
+      const hdg = atan2(e.vy, e.vx);
+      e.ax = cos(hdg + PI / 2) * force;
+      e.ay = sin(hdg + PI / 2) * force;
+    }
+    if (e.type === 0) e.ay = (e.ay || 0) + 1.5 * dt; // gravity for ballistic
+
+    e.vx += (e.ax || 0) * dt;
+    e.vy += (e.ay || 0) * dt;
+    e.x += e.vx * dt;
+    e.y += e.vy * dt;
+
+    if (UI.checked('cfgTrails') && GameState.quality > 0.4) TrailSystem.push(e, e.x, e.y);
+
+    // Base hit
+    if (hypot(e.x - BX, e.y - BY) < 22) {
+      e.alive = false; e._markedForRelease = true;
+      GameState.stats.leakers++;
+      EffectsSystem.createExplosion(e.x, e.y, 255, 0, 0, 40, 1.8);
+      EffectsSystem.createSparks(e.x, e.y, 25, 255, 100, 0);
+      EffectsSystem.createDebris(e.x, e.y, 12);
+      Logger.miss(`✗ LEAKER: ${e.id} struck the base!`);
+      aiNetwork.addExperience(AISystem.makeExperience(e, false, 999));
+    }
+
+    // Out of bounds
+    if (e.x < -350 || e.x > WS + 350 || e.y < -350 || e.y > WS + 350) {
+      e.alive = false; e._markedForRelease = true;
+    }
+  });
+  enemies.sweepReleased();
+
+  // ===== MISSILES =====
+  missiles.forEach(m => {
+    if (!m.alive) { m._markedForRelease = true; return; }
+    m.age += dt;
+
+    // Find target
+    const target = enemies.find(e => e._poolIndex === m.targetPoolIndex && e.alive);
+    if (!target) { m._markedForRelease = true; return; }
+
+    const range = Physics.updateProNav(m, target, dt);
+    m.x += m.vx * dt;
+    m.y += m.vy * dt;
+
+    if (UI.checked('cfgTrails') && GameState.quality > 0.4) TrailSystem.push(m, m.x, m.y);
+
+    // Smoke trail
+    if (UI.checked('cfgEffects') && GameState.quality > 0.6) {
+      m.smokeTimer -= dt;
+      if (m.smokeTimer <= 0) {
+        m.smokeTimer = 0.05;
+        const p = particles.acquire();
+        if (p) {
+          p.x = m.x - m.vx * 0.005; p.y = m.y - m.vy * 0.005;
+          p.vx = rand(-5, 5); p.vy = rand(-5, 5);
+          p.life = rand(0.2, 0.5); p.maxLife = 0.5;
+          p.size = rand(1, 2); p.type = 1;
+          p.r = 140; p.g = 140; p.b = 140;
+        }
+      }
+    }
+
+    // Kill check
+    const killR = UI.val('cfgKillR');
+    if (range < killR) {
+      target.alive = false; target._markedForRelease = true;
+      m.alive = false; m._markedForRelease = true;
+      GameState.stats.kills++;
+      const cx = (target.x + m.x) / 2, cy = (target.y + m.y) / 2;
+      EffectsSystem.createExplosion(cx, cy, 255, 136, 0, 35, 1.3);
+      EffectsSystem.createExplosion(cx, cy, 255, 255, 200, 14, 0.3);
+      EffectsSystem.createSparks(cx, cy, 20, 255, 200, 50);
+      EffectsSystem.createDebris(cx, cy, 10);
+      Logger.hit(`✓ KILL: ${m.id} destroyed ${target.id} at ${round(range)}m`);
+      aiNetwork.addExperience(AISystem.makeExperience(target, true, range));
+      return;
+    }
+
+    // Timeout / out of bounds
+    if (m.age > 32 || m.x < -250 || m.x > WS + 250 || m.y < -250 || m.y > WS + 250) {
+      m.alive = false; m._markedForRelease = true;
+      Logger.miss(`✗ ${m.id} self-destruct`);
+    }
+  });
+  missiles.sweepReleased();
+
+  // ===== LAUNCHERS =====
+  for (const l of launchers) {
+    if (l.status === 'reloading') {
+      l.reloadTimer -= dt;
+      if (l.reloadTimer <= 0) { l.status = 'ready'; l.reloadTimer = 0; }
+    }
+    if (l.fireAnim > 0) l.fireAnim = max(0, l.fireAnim - dt * 3);
   }
-  ctx.strokeStyle=color;ctx.lineWidth=1;ctx.stroke();
-}
 
-// ================================================================
-// INITIALIZATION
-// ================================================================
-function init(){
-  bgCanvas=$('cBg');mainCanvas=$('cMain');
-  bgCtx=bgCanvas.getContext('2d',{alpha:false});
-  mainCtx=mainCanvas.getContext('2d');
-  handleResize();
-  window.addEventListener('resize',handleResize);
-  buildLaunchers(4);
-  O('oParams',ai.nParams().toLocaleString());
-  requestAnimationFrame(mainLoop);
-  logMsg('AEGIS-AI v8.0 Production initialized','a');
-}
+  // ===== EFFECTS =====
+  explosions.forEach(e => { e.elapsed += dt; if (e.elapsed >= e.duration) e._markedForRelease = true; });
+  explosions.sweepReleased();
 
-function handleResize(){
-  const v=$('vp');vW=v.clientWidth;vH=v.clientHeight;
-  bgCanvas.width=vW;bgCanvas.height=vH;
-  mainCanvas.width=vW;mainCanvas.height=vH;
-  scX=vW/WS;scY=vH/WS;
-  bgNeedsRedraw=true;starCache=null;
-}
+  particles.forEach(p => {
+    p.x += p.vx * dt; p.y += p.vy * dt;
+    if (p.type === 1) { p.vx *= 0.92; p.vy *= 0.92; p.vy -= 12 * dt; }
+    else { p.vx *= 0.95; p.vy *= 0.95; p.vy += 20 * dt; }
+    p.life -= dt;
+    if (p.life <= 0) p._markedForRelease = true;
+  });
+  particles.sweepReleased();
 
-function buildLaunchers(n){
-  launchers=[];
-  const sp=WS*.5/(n+1),sx=WS*.25,mp=+$('cML').value;
-  for(let i=0;i<n;i++)launchers.push({id:i,x:sx+sp*(i+1),y:BY+50,m:mp,mx:mp,rt:0,st:'ok',ang:-PI/2,fa:0});
-}
+  debris.forEach(d => {
+    d.x += d.vx * dt; d.y += d.vy * dt;
+    d.vy += 60 * dt; d.rotation += d.rotSpeed * dt;
+    d.life -= dt;
+    if (d.life <= 0) d._markedForRelease = true;
+  });
+  debris.sweepReleased();
 
-// ================================================================
-// BACKGROUND (rendered once, cached)
-// ================================================================
-function renderBackground(){
-  if(!bgNeedsRedraw)return;bgNeedsRedraw=false;
-  const c=bgCtx;
-  const g=c.createLinearGradient(0,0,0,vH);
-  g.addColorStop(0,'#030508');g.addColorStop(.5,'#060a12');g.addColorStop(.82,'#0a1810');g.addColorStop(1,'#061006');
-  c.fillStyle=g;c.fillRect(0,0,vW,vH);
+  // ===== AI =====
+  AISystem.runCycle();
 
-  if(!starCache){starCache=[];for(let i=0;i<80;i++)starCache.push({x:rand(0,vW),y:rand(0,vH*.72),s:rand(.3,1.5),b:rand(.3,.9)})}
-  for(const s of starCache){c.beginPath();c.arc(s.x,s.y,s.s,0,TAU);c.fillStyle=`rgba(190,210,255,${s.b})`;c.fill()}
+  // ===== TRAINING =====
+  if (GameState.frame % 50 === 0 && aiNetwork.replayBuffer.length > 30) aiNetwork.train(1);
 
-  if(ck('vGr')){
-    c.strokeStyle='rgba(10,24,40,.06)';c.lineWidth=.5;
-    for(let x=0;x<=WS;x+=200){c.beginPath();c.moveTo(x*scX,0);c.lineTo(x*scX,vH);c.stroke()}
-    for(let y=0;y<=WS;y+=200){c.beginPath();c.moveTo(0,y*scY);c.lineTo(vW,y*scY);c.stroke()}
-    const bx=BX*scX,by=BY*scY;
-    for(let r=200;r<=1200;r+=200){c.beginPath();c.arc(bx,by,r*scX,0,TAU);c.strokeStyle=`rgba(0,80,120,.06)`;c.lineWidth=1;c.stroke();c.fillStyle='rgba(0,120,180,.12)';c.font='7px monospace';c.fillText(r+'m',bx+r*scX*.71+2,by-r*scY*.71-2)}
+  // ===== AUTO WAVES =====
+  if (UI.checked('cfgAutoWave')) {
+    const interval = UI.val('cfgInterval');
+    if (GameState.time - GameState.lastWaveTime > interval) {
+      GameState.lastWaveTime = GameState.time;
+      const count = randInt(1, UI.val('cfgWaveN'));
+      for (let i = 0; i < count; i++) setTimeout(() => Spawner.spawn(), i * 80);
+    }
   }
-  const gy=(BY+55)*scY;
-  c.fillStyle='#081008';c.fillRect(0,gy,vW,vH-gy);
-  c.strokeStyle='#1a3a1a';c.lineWidth=1;c.beginPath();c.moveTo(0,gy);c.lineTo(vW,gy);c.stroke();
 
-  // Base
-  const bx=BX*scX,by=BY*scY;
-  c.save();c.translate(bx,by);
-  c.strokeStyle='#0f8';c.lineWidth=2;c.beginPath();c.arc(0,-18,14,PI+.5,TAU-.5);c.stroke();
-  c.beginPath();c.moveTo(0,-4);c.lineTo(0,-20);c.stroke();
-  c.fillStyle='#1a3a2a';c.fillRect(-22,-4,44,15);c.strokeStyle='#0f8';c.lineWidth=1.5;c.strokeRect(-22,-4,44,15);
-  c.fillStyle='#0f85';for(let i=-16;i<=10;i+=8)c.fillRect(i,0,5,4);
-  c.strokeStyle='#0f88';c.lineWidth=1;c.beginPath();c.moveTo(0,-4);c.lineTo(0,-28);c.stroke();
-  c.beginPath();c.arc(0,-28,3,0,TAU);c.fillStyle='#0f8';c.fill();
-  c.beginPath();c.arc(0,0,28,0,TAU);c.strokeStyle='#0f83';c.setLineDash([3,5]);c.stroke();c.setLineDash([]);
-  c.fillStyle='#0f8';c.font='bold 9px monospace';c.textAlign='center';c.fillText('HQ AEGIS',0,26);c.textAlign='left';
+  GameState.radarAngle = (GameState.radarAngle + dt * 1.5) % TAU;
+}
+
+// ================================================================
+// PART 9: RENDERER (separate module, depends only on state)
+// ================================================================
+let bgCanvas, bgCtx, mainCanvas, mainCtx;
+let viewW, viewH, scaleX, scaleY;
+let bgDirty = true, starCache = null;
+
+function initRenderer() {
+  bgCanvas = UI.el('canvasBg');
+  mainCanvas = UI.el('canvasMain');
+  bgCtx = bgCanvas.getContext('2d', { alpha: false });
+  mainCtx = mainCanvas.getContext('2d');
+  resizeRenderer();
+  window.addEventListener('resize', resizeRenderer);
+}
+
+function resizeRenderer() {
+  const vp = UI.el('viewport');
+  viewW = vp.clientWidth; viewH = vp.clientHeight;
+  bgCanvas.width = viewW; bgCanvas.height = viewH;
+  mainCanvas.width = viewW; mainCanvas.height = viewH;
+  scaleX = viewW / Config.worldSize;
+  scaleY = viewH / Config.worldSize;
+  bgDirty = true; starCache = null;
+}
+
+function renderBackground() {
+  if (!bgDirty) return; bgDirty = false;
+  const c = bgCtx;
+  const g = c.createLinearGradient(0, 0, 0, viewH);
+  g.addColorStop(0, '#030508'); g.addColorStop(0.5, '#060a12');
+  g.addColorStop(0.82, '#0a1810'); g.addColorStop(1, '#061006');
+  c.fillStyle = g; c.fillRect(0, 0, viewW, viewH);
+
+  // Stars
+  if (!starCache) {
+    starCache = [];
+    for (let i = 0; i < 80; i++) starCache.push({ x: rand(0, viewW), y: rand(0, viewH * 0.72), s: rand(0.3, 1.5), b: rand(0.3, 0.9) });
+  }
+  for (const s of starCache) {
+    c.beginPath(); c.arc(s.x, s.y, s.s, 0, TAU);
+    c.fillStyle = rgbaStr(190, 210, 255, s.b); c.fill();
+  }
+
+  // Grid
+  if (UI.checked('cfgGrid')) {
+    c.strokeStyle = 'rgba(10,24,40,0.06)'; c.lineWidth = 0.5;
+    for (let x = 0; x <= Config.worldSize; x += 200) { c.beginPath(); c.moveTo(x * scaleX, 0); c.lineTo(x * scaleX, viewH); c.stroke(); }
+    for (let y = 0; y <= Config.worldSize; y += 200) { c.beginPath(); c.moveTo(0, y * scaleY); c.lineTo(viewW, y * scaleY); c.stroke(); }
+    const bx = Config.baseX * scaleX, by = Config.baseY * scaleY;
+    for (let r = 200; r <= 1200; r += 200) {
+      c.beginPath(); c.arc(bx, by, r * scaleX, 0, TAU);
+      c.strokeStyle = 'rgba(0,80,120,0.06)'; c.lineWidth = 1; c.stroke();
+      c.fillStyle = 'rgba(0,120,180,0.12)'; c.font = '7px monospace';
+      c.fillText(r + 'm', bx + r * scaleX * 0.71 + 2, by - r * scaleY * 0.71 - 2);
+    }
+  }
+
+  // Ground
+  const gy = (Config.baseY + 55) * scaleY;
+  c.fillStyle = '#081008'; c.fillRect(0, gy, viewW, viewH - gy);
+  c.strokeStyle = '#1a3a1a'; c.lineWidth = 1;
+  c.beginPath(); c.moveTo(0, gy); c.lineTo(viewW, gy); c.stroke();
+
+  // Base building
+  const bx = Config.baseX * scaleX, by = Config.baseY * scaleY;
+  c.save(); c.translate(bx, by);
+  c.strokeStyle = '#0f8'; c.lineWidth = 2;
+  c.beginPath(); c.arc(0, -18, 14, PI + 0.5, TAU - 0.5); c.stroke();
+  c.beginPath(); c.moveTo(0, -4); c.lineTo(0, -20); c.stroke();
+  c.fillStyle = '#1a3a2a'; c.fillRect(-22, -4, 44, 15);
+  c.strokeStyle = '#0f8'; c.lineWidth = 1.5; c.strokeRect(-22, -4, 44, 15);
+  c.fillStyle = 'rgba(0,255,136,0.3)';
+  for (let i = -16; i <= 10; i += 8) c.fillRect(i, 0, 5, 4);
+  c.strokeStyle = 'rgba(0,255,136,0.5)'; c.lineWidth = 1;
+  c.beginPath(); c.moveTo(0, -4); c.lineTo(0, -28); c.stroke();
+  c.beginPath(); c.arc(0, -28, 3, 0, TAU); c.fillStyle = '#0f8'; c.fill();
+  c.beginPath(); c.arc(0, 0, 28, 0, TAU);
+  c.strokeStyle = 'rgba(0,255,136,0.2)'; c.setLineDash([3, 5]); c.stroke(); c.setLineDash([]);
+  c.fillStyle = '#0f8'; c.font = 'bold 9px monospace'; c.textAlign = 'center';
+  c.fillText('HQ AEGIS', 0, 26); c.textAlign = 'left';
   c.restore();
 }
 
-// ================================================================
-// SPAWN ENEMY
-// ================================================================
-function spawnEnemy(forceType){
-  const e=enemyPool.acquire();
-  if(!e)return;
-  const types=[];
-  if(ck('tBal'))types.push(0);if(ck('tCru'))types.push(1);if(ck('tMan'))types.push(2);if(ck('tHyp'))types.push(3);if(ck('tDec'))types.push(4);
-  if(!types.length)types.push(0);
-  const type=forceType!=null?forceType:types[rI(0,types.length-1)];
-  const td=THREATS[type];
-  const spd=cl(rand(td.speed[0],td.speed[1]),+$('cMinS').value,+$('cMaxS').value);
-  const side=rI(0,2);
-  if(side===0){e.x=rand(100,WS-100);e.y=rand(-100,-10)}
-  else if(side===1){e.x=rand(-100,-10);e.y=rand(100,WS*.45)}
-  else{e.x=rand(WS+10,WS+100);e.y=rand(100,WS*.45)}
-  const tx=BX+rand(-300,300),ty=BY+rand(-150,50);
-  const ang=atan2(ty-e.y,tx-e.x);
-  e.id='T'+(++globalEnemyCounter);stats.incoming++;
-  e.vx=cos(ang)*spd;e.vy=sin(ang)*spd;e.ax=0;e.ay=0;e.speed=spd;e.type=type;
-  e.alive=true;e.born=simTime;e.threat=.5;e.maneuvering=type===2;
-  e.mTimer=0;e.mFreq=rand(.3,2.5);e.mAmp=rand(40,200);
-  e.engaged=false;e.assigned=0;e.size=td.size;e.flameFlicker=rand(.7,1.2);
-  e.trailLen=0;e.trailHead=0;e.remove=false;
-  if(type===0){e.vy=-spd*.2;e.vx=(tx-e.x)/hypot(tx-e.x,ty-e.y)*spd;e.ay=rand(3,10)}
-  if(type===1){e.y=rand(WS*.3,WS*.6);e.vy=rand(-10,10)}
-  if(type===3){e.speed=rand(1200,2500);e.vx=cos(ang)*e.speed;e.vy=sin(ang)*e.speed}
-  logMsg(`⚠ ${e.id} [${td.name}] V=${round(spd)}m/s`,'w');
-}
-
-function cmdWave(){const n=+$('cWN').value;for(let i=0;i<n;i++)setTimeout(()=>spawnEnemy(),i*100)}
-function cmdOne(){spawnEnemy()}
-function cmdMass(){for(let i=0;i<20;i++)setTimeout(()=>spawnEnemy(),i*50)}
-
-// ================================================================
-// SOLVE INTERCEPT POINT
-// ================================================================
-function solveIntercept(tgt,lp,iSpd){
-  let bx=0,by=0,be=1e9,found=false;
-  const gv=THREATS[tgt.type]?.grav||0;
-  for(let s=1;s<=50;s++){
-    const t=s*.45;
-    const tx=tgt.x+tgt.vx*t+.5*(tgt.ax||0)*t*t;
-    const ty=tgt.y+tgt.vy*t+.5*((tgt.ay||0)+gv)*t*t;
-    const d=hypot(tx-lp.x,ty-lp.y);
-    const it=d/iSpd;
-    const er=abs(it-t);
-    if(er<be&&it<=t*1.3){be=er;bx=tx;by=ty;found=true}
-  }
-  return found?{x:bx,y:by}:null;
-}
-
-// ================================================================
-// FIRE INTERCEPTOR
-// ================================================================
-function fireInterceptor(la,tgt,ip){
-  if(la.m<=0||la.st!=='ok')return;
-  const m=missilePool.acquire();
-  if(!m)return;
-  const iSpd=+$('cIS').value;
-  const ang=atan2(ip.y-la.y,ip.x-la.x);
-  m.id='M'+(++globalMissileCounter);stats.fired++;
-  m.x=la.x;m.y=la.y-6;m.vx=cos(ang)*iSpd;m.vy=sin(ang)*iSpd;m.speed=iSpd;
-  m.targetIdx=tgt._poolIdx;m.alive=true;m.age=0;m.phase='mid';
-  m.prevLOS=atan2(tgt.y-la.y,tgt.x-la.x);m.flameFlicker=rand(.6,1);m.smokeTimer=0;
-  m.trailLen=0;m.trailHead=0;m.remove=false;
-  la.m--;la.st='rl';la.rt=+$('cRT').value;la.fa=1;
-  tgt.engaged=true;tgt.assigned++;
-  createExplosion(la.x,la.y-6,0,204,255,10,.3);
-  createSmoke(la.x,la.y,15);
-  logMsg(`→ ${m.id}→${tgt.id} PU-${la.id}`,'l');
-}
-
-// ================================================================
-// PN GUIDANCE
-// ================================================================
-function updateGuidance(m,dt){
-  // Find target by pool index
-  let tgt=null;
-  enemyPool.forEach(e=>{if(e._poolIdx===m.targetIdx&&e.alive)tgt=e});
-  if(!tgt){m.remove=true;return}
-  const dx=tgt.x-m.x,dy=tgt.y-m.y,r=hypot(dx,dy);
-  const LOS=atan2(dy,dx),LOSr=(LOS-m.prevLOS)/dt;
-  m.prevLOS=LOS;
-  const Vc=-((dx*(tgt.vx-m.vx)+dy*(tgt.vy-m.vy))/r);
-  if(r<220&&m.phase==='mid')m.phase='term';
-  const N=m.phase==='term'?5:3.5;
-  const ac=N*Vc*LOSr;
-  const va=atan2(m.vy,m.vx);
-  let ax=-sin(va)*ac,ay=cos(va)*ac;
-  const am=hypot(ax,ay);if(am>450){const s=450/am;ax*=s;ay*=s}
-  m.vx+=ax*dt;m.vy+=ay*dt;
-  const cs=hypot(m.vx,m.vy);if(cs>0){m.vx=m.vx/cs*m.speed;m.vy=m.vy/cs*m.speed}
-  const kr=+$('cKR').value;
-  if(r<kr){
-    tgt.alive=false;tgt.remove=true;m.remove=true;stats.kills++;
-    const cx=(tgt.x+m.x)/2,cy=(tgt.y+m.y)/2;
-    createExplosion(cx,cy,255,136,0,35,1.3);
-    createExplosion(cx,cy,255,255,200,14,.3);
-    createDebris(cx,cy,10);
-    logMsg(`✓ KILL ${m.id}→${tgt.id} D=${round(r)}m`,'h');
-    ai.addExp(makeExperience(tgt,true,r));
-    return;
-  }
-  if(m.age>32||m.x<-250||m.x>WS+250||m.y<-250||m.y>WS+250){
-    m.remove=true;logMsg(`✗ ${m.id} miss`,'m');
-  }
-}
-
-function makeExperience(t,hit,err){
-  const d=hypot(t.x-BX,t.y-BY),sp=hypot(t.vx,t.vy),hd=atan2(t.vy,t.vx);
-  const cr=-((t.x-BX)*t.vx+(t.y-BY)*t.vy)/(d*sp+1);
-  const f=new Float32Array(ai.IN);
-  f[0]=t.x/WS;f[1]=t.y/WS;f[2]=t.vx/2000;f[3]=t.vy/2000;
-  f[4]=(t.ax||0)/300;f[5]=(t.ay||0)/300;f[6]=sp/2000;f[7]=hd/PI;
-  f[8]=d/WS;f[9]=t.threat;f[10]=t.type/4;f[11]=min((simTime-t.born)/60,1);
-  f[12]=t.maneuvering?1:0;f[13]=cr;f[14]=t.engaged?1:0;f[15]=t.assigned/3;
-  f[16]=simTime/300;f[17]=d/(sp*max(.1,cr)+1)/30;
-  return{f,thr:t.threat,hit,rwd:hit?(1+d/WS*.5):(d<50?-2:-.5)};
-}
-
-// ================================================================
-// EFFECTS (using pools)
-// ================================================================
-function createExplosion(x,y,r,g,b,sz,dur){
-  const e=explosionPool.acquire();
-  if(!e)return;
-  e.x=x;e.y=y;e.r=r;e.g=g;e.b=b;e.size=sz;e.duration=dur;e.elapsed=0;e.remove=false;
-}
-function createSmoke(x,y,count){
-  if(!ck('vSm'))return;
-  for(let i=0;i<count;i++){
-    const p=particlePool.acquire();if(!p)return;
-    const a=rand(PI*.2,PI*.8),s=rand(12,70);
-    p.x=x;p.y=y;p.vx=cos(a)*s;p.vy=-abs(sin(a))*s*.4;p.life=rand(.4,1.5);p.maxLife=1.5;
-    p.size=rand(2,5);p.type=1;p.r=160;p.g=160;p.b=160;p.remove=false;
-  }
-}
-function createSparks(x,y,count,r,g,b){
-  if(!ck('vSm'))return;
-  for(let i=0;i<count;i++){
-    const p=particlePool.acquire();if(!p)return;
-    const a=rand(0,TAU),s=rand(30,180);
-    p.x=x;p.y=y;p.vx=cos(a)*s;p.vy=sin(a)*s;p.life=rand(.2,.9);p.maxLife=.9;
-    p.size=rand(1,3.5);p.type=0;p.r=r;p.g=g;p.b=b;p.remove=false;
-  }
-}
-function createDebris(x,y,count){
-  for(let i=0;i<count;i++){
-    const d=debrisPool.acquire();if(!d)return;
-    const a=rand(0,TAU),s=rand(50,250);
-    d.x=x;d.y=y;d.vx=cos(a)*s;d.vy=sin(a)*s;d.life=rand(.4,2);d.maxLife=2;
-    d.size=rand(1,4);d.rot=rand(0,TAU);d.rotSpd=rand(-8,8);d.remove=false;
-  }
-}
-
-// ================================================================
-// AI DECISION CYCLE (throttled to max 2Hz)
-// ================================================================
-let lastAITime=0;
-function runAI(){
-  if(simTime-lastAITime<.4)return;
-  lastAITime=simTime;
-
-  // Update threats
-  enemyPool.forEach(e=>{
-    if(!e.alive)return;
-    const d=hypot(e.x-BX,e.y-BY),sp=hypot(e.vx,e.vy);
-    const cr=-((e.x-BX)*e.vx+(e.y-BY)*e.vy)/(d*sp+1);
-    e.threat=cl(.22*(1-d/WS)+.22*(sp/1500)+.22*max(0,cr)+.15*(e.maneuvering?1:0)+.1*(e.type===3?1:0)+(e.type===4?-.1:0),0,1);
-  });
-
-  const targets=[];
-  enemyPool.forEach(e=>{if(e.alive)targets.push(e)});
-  if(!targets.length){aiDecisions.length=0;return}
-
-  if(ck('cAI')){
-    ai.decide(targets,min(targets.length,20));
-    for(const dec of aiDecisions){
-      const tgt=enemyPool.items[dec.tgtPoolIdx];
-      if(!tgt||!tgt.alive||tgt.assigned>=2||tgt.type===4||dec.pri<.2)continue;
-      const d=hypot(tgt.x-BX,tgt.y-BY);
-      if(d>WS*1.1||d<20)continue;
-      let bl=null,bd=1e9;
-      for(const l of launchers){if(l.m>0&&l.st==='ok'){const d2=hypot(l.x-tgt.x,l.y-tgt.y);if(d2<bd){bd=d2;bl=l}}}
-      if(!bl)continue;
-      const ip=solveIntercept(tgt,bl,+$('cIS').value);
-      if(ip){fireInterceptor(bl,tgt,ip);break}
-    }
-  }else{
-    // Greedy
-    targets.sort((a,b)=>hypot(a.x-BX,a.y-BY)-hypot(b.x-BX,b.y-BY));
-    for(const t of targets){
-      if(t.engaged||t.type===4)continue;
-      if(hypot(t.x-BX,t.y-BY)>WS*.7)continue;
-      let bl=null;for(const l of launchers)if(l.m>0&&l.st==='ok')if(!bl||l.m>bl.m)bl=l;
-      if(!bl)continue;
-      const ip=solveIntercept(t,bl,+$('cIS').value);
-      if(ip){fireInterceptor(bl,t,ip);break}
-    }
-  }
-}
-
-// ================================================================
-// SIMULATION UPDATE
-// ================================================================
-function update(dt){
-  // Enemies
-  enemyPool.forEach((e,i)=>{
-    if(!e.alive){e.remove=true;return}
-    if(e.type===2){e.mTimer+=dt;const a=sin(e.mTimer*e.mFreq*TAU)*e.mAmp;const h=atan2(e.vy,e.vx);e.ax=cos(h+PI/2)*a;e.ay=sin(h+PI/2)*a}
-    if(e.type===0)e.ay=(e.ay||0)+1.5*dt;
-    e.vx+=(e.ax||0)*dt;e.vy+=(e.ay||0)*dt;e.x+=e.vx*dt;e.y+=e.vy*dt;
-    if(ck('vTr')&&qualityLevel>.4)trailPush(e,e.x,e.y);
-    const dB=hypot(e.x-BX,e.y-BY);
-    if(dB<22){e.alive=false;e.remove=true;stats.leakers++;createExplosion(e.x,e.y,255,0,0,40,1.8);createSparks(e.x,e.y,20,255,100,0);logMsg(`✗ LEAKER ${e.id}!`,'m');ai.addExp(makeExperience(e,false,999))}
-    if(e.x<-350||e.x>WS+350||e.y<-350||e.y>WS+350){e.alive=false;e.remove=true}
-  });
-  enemyPool.releaseWhere(e=>e.remove);
-
-  // Missiles
-  missilePool.forEach((m,i)=>{
-    if(!m.alive){m.remove=true;return}
-    m.age+=dt;updateGuidance(m,dt);
-    m.x+=m.vx*dt;m.y+=m.vy*dt;
-    if(ck('vTr')&&qualityLevel>.4)trailPush(m,m.x,m.y);
-    if(ck('vSm')&&qualityLevel>.6){m.smokeTimer-=dt;if(m.smokeTimer<=0){m.smokeTimer=.05;const p=particlePool.acquire();if(p){p.x=m.x-m.vx*.005;p.y=m.y-m.vy*.005;p.vx=rand(-5,5);p.vy=rand(-5,5);p.life=rand(.2,.5);p.maxLife=.5;p.size=rand(1,2);p.type=1;p.r=140;p.g=140;p.b=140;p.remove=false}}}
-  });
-  missilePool.releaseWhere(m=>m.remove);
-
-  // Launchers
-  for(const l of launchers){if(l.st==='rl'){l.rt-=dt;if(l.rt<=0){l.st='ok';l.rt=0}}if(l.fa>0)l.fa=max(0,l.fa-dt*3)}
-
-  // Effects
-  explosionPool.forEach(e=>{e.elapsed+=dt;if(e.elapsed>=e.duration)e.remove=true});
-  explosionPool.releaseWhere(e=>e.remove);
-  particlePool.forEach(p=>{
-    p.x+=p.vx*dt;p.y+=p.vy*dt;
-    if(p.type===1){p.vx*=.92;p.vy*=.92;p.vy-=12*dt}else{p.vx*=.95;p.vy*=.95;p.vy+=20*dt}
-    p.life-=dt;if(p.life<=0)p.remove=true;
-  });
-  particlePool.releaseWhere(p=>p.remove);
-  debrisPool.forEach(d=>{d.x+=d.vx*dt;d.y+=d.vy*dt;d.vy+=60*dt;d.rot+=d.rotSpd*dt;d.life-=dt;if(d.life<=0)d.remove=true});
-  debrisPool.releaseWhere(d=>d.remove);
-
-  runAI();
-
-  // Training (infrequent)
-  if(frameNum%50===0&&ai.buffer.length>30)ai.train(1);
-
-  // Auto waves
-  if(ck('cAW')){const iv=+$('cInt').value;if(simTime-lastWaveTime>iv){lastWaveTime=simTime;const n=rI(1,+$('cWN').value);for(let i=0;i<n;i++)setTimeout(()=>spawnEnemy(),i*80)}}
-
-  radarAngle=(radarAngle+dt*1.5)%TAU;
-}
-
-// ================================================================
-// MAIN RENDER
-// ================================================================
-function render(){
-  renderBackground();
-  const c=mainCtx;
-  c.clearRect(0,0,vW,vH);
-  const bx=BX*scX,by=BY*scY;
+function renderMain() {
+  const c = mainCtx;
+  c.clearRect(0, 0, viewW, viewH);
+  const sx = scaleX, sy = scaleY;
+  const bx = Config.baseX * sx, by = Config.baseY * sy;
 
   // Zones
-  if(ck('vZn')){
-    c.beginPath();c.arc(bx,by,WS*.55*scX,PI*.05,PI*.95);c.strokeStyle='#0f82';c.lineWidth=1;c.setLineDash([5,8]);c.stroke();c.setLineDash([]);
-    c.beginPath();c.arc(bx,by,WS*.28*scX,0,TAU);c.strokeStyle='#f802';c.setLineDash([3,6]);c.stroke();c.setLineDash([]);
+  if (UI.checked('cfgZones')) {
+    c.beginPath(); c.arc(bx, by, Config.worldSize * 0.55 * sx, PI * 0.05, PI * 0.95);
+    c.strokeStyle = 'rgba(0,255,136,0.12)'; c.lineWidth = 1; c.setLineDash([5, 8]); c.stroke(); c.setLineDash([]);
+    c.beginPath(); c.arc(bx, by, Config.worldSize * 0.28 * sx, 0, TAU);
+    c.strokeStyle = 'rgba(255,136,0,0.08)'; c.setLineDash([3, 6]); c.stroke(); c.setLineDash([]);
   }
 
   // Radar sweep
-  c.save();c.globalAlpha=.05;c.beginPath();c.moveTo(bx,by);c.arc(bx,by,WS*.7*scX,radarAngle-.2,radarAngle);c.closePath();c.fillStyle='#0f8';c.fill();c.restore();
+  c.save(); c.globalAlpha = 0.05;
+  c.beginPath(); c.moveTo(bx, by);
+  c.arc(bx, by, Config.worldSize * 0.7 * sx, GameState.radarAngle - 0.2, GameState.radarAngle);
+  c.closePath(); c.fillStyle = '#0f8'; c.fill(); c.restore();
 
   // Trails
-  if(ck('vTr')){
-    enemyPool.forEach(e=>{if(!e.alive)return;const td=THREATS[e.type];trailDraw(c,e,`rgba(${td.color[0]},${td.color[1]},${td.color[2]},.3)`,40)});
-    missilePool.forEach(m=>{if(!m.alive)return;trailDraw(c,m,'rgba(0,204,255,.3)',30)});
+  if (UI.checked('cfgTrails')) {
+    enemies.forEach(e => {
+      if (!e.alive) return;
+      const td = Config.threats[e.type];
+      TrailSystem.draw(c, e, rgbaStr(td.color[0], td.color[1], td.color[2], 0.3), sx, sy, 40);
+    });
+    missiles.forEach(m => {
+      if (!m.alive) return;
+      TrailSystem.draw(c, m, 'rgba(0,204,255,0.3)', sx, sy, 30);
+    });
   }
 
   // AI Predictions
-  if(ck('vPr')){
-    for(const d of aiDecisions){
-      const tgt=enemyPool.items[d.tgtPoolIdx];
-      if(!tgt||!tgt.alive)continue;
-      const tx=tgt.x*scX,ty=tgt.y*scY,ix=cl(d.ix,0,WS)*scX,iy=cl(d.iy,0,WS)*scY;
-      c.beginPath();c.moveTo(tx,ty);c.lineTo(ix,iy);c.strokeStyle=`rgba(180,120,255,${d.conf*.4})`;c.lineWidth=1;c.setLineDash([3,4]);c.stroke();c.setLineDash([]);
-      c.beginPath();c.arc(ix,iy,5,0,TAU);c.strokeStyle='rgba(180,120,255,.5)';c.lineWidth=1.5;c.stroke();
-      c.beginPath();c.moveTo(ix-4,iy);c.lineTo(ix+4,iy);c.moveTo(ix,iy-4);c.lineTo(ix,iy+4);c.stroke();
-      if(d.pri>.3&&ck('vLb')){c.fillStyle=`rgba(255,${round(255*(1-d.pri))},0,.8)`;c.font='bold 8px monospace';c.fillText(`P:${(d.pri*100)|0}%`,tx+12,ty-12);c.fillStyle='rgba(180,120,255,.6)';c.font='7px monospace';c.fillText(`C:${(d.conf*100)|0}%`,tx+12,ty-3)}
+  if (UI.checked('cfgPredictions') && aiDecisions.length > 0) {
+    for (const dec of aiDecisions) {
+      const t = dec.targetEntity;
+      if (!t || !t.alive) continue;
+      const tx = t.x * sx, ty = t.y * sy;
+      const ix = clamp(dec.interceptX, 0, Config.worldSize) * sx;
+      const iy = clamp(dec.interceptY, 0, Config.worldSize) * sy;
+      c.beginPath(); c.moveTo(tx, ty); c.lineTo(ix, iy);
+      c.strokeStyle = rgbaStr(180, 120, 255, dec.confidence * 0.4);
+      c.lineWidth = 1; c.setLineDash([3, 4]); c.stroke(); c.setLineDash([]);
+      c.beginPath(); c.arc(ix, iy, 5, 0, TAU);
+      c.strokeStyle = rgbaStr(180, 120, 255, 0.5); c.lineWidth = 1.5; c.stroke();
+      c.beginPath(); c.moveTo(ix - 4, iy); c.lineTo(ix + 4, iy);
+      c.moveTo(ix, iy - 4); c.lineTo(ix, iy + 4); c.stroke();
+      if (dec.priority > 0.3 && UI.checked('cfgLabels')) {
+        c.fillStyle = rgbaStr(255, round(255 * (1 - dec.priority)), 0, 0.8);
+        c.font = 'bold 8px monospace';
+        c.fillText(`P:${(dec.priority * 100) | 0}%`, tx + 12, ty - 12);
+        c.fillStyle = rgbaStr(180, 120, 255, 0.6); c.font = '7px monospace';
+        c.fillText(`C:${(dec.confidence * 100) | 0}%`, tx + 12, ty - 3);
+      }
     }
   }
 
   // Launchers
-  for(const l of launchers){
-    const lx=l.x*scX,ly=l.y*scY;
-    c.save();c.translate(lx,ly);
-    c.fillStyle='#182818';c.fillRect(-15,-5,30,16);c.strokeStyle=l.st==='ok'?'#0f8':'#fa0';c.lineWidth=1.5;c.strokeRect(-15,-5,30,16);
-    // VLS cells
-    for(let i=0;i<l.mx;i++){c.beginPath();c.arc(-l.mx*2.2+i*4.4,15,1.5,0,TAU);c.fillStyle=i<l.m?'#0f8':'#333';c.fill()}
-    // Turret
-    let ta=-PI/2,nd=1e9;
-    enemyPool.forEach(e=>{if(!e.alive)return;const d=hypot(e.x-l.x,e.y-l.y);if(d<nd){nd=d;ta=atan2(e.y-l.y,e.x-l.x)}});
-    l.ang=lr(l.ang,ta,.06);
-    c.save();c.rotate(l.ang);c.fillStyle='#3a6a3a';c.fillRect(0,-2.5,18,5);c.fillStyle='#4a8a4a';c.fillRect(14,-2,6,4);
-    if(l.fa>0){const gr=c.createRadialGradient(22,0,0,22,0,5+l.fa*12);gr.addColorStop(0,`rgba(0,255,200,${l.fa})`);gr.addColorStop(1,'transparent');c.beginPath();c.arc(22,0,5+l.fa*12,0,TAU);c.fillStyle=gr;c.fill()}
+  for (const l of launchers) {
+    const lx = l.x * sx, ly = l.y * sy;
+    c.save(); c.translate(lx, ly);
+    c.fillStyle = '#182818'; c.fillRect(-15, -5, 30, 16);
+    c.strokeStyle = l.status === 'ready' ? '#0f8' : '#fa0';
+    c.lineWidth = 1.5; c.strokeRect(-15, -5, 30, 16);
+    for (let i = 0; i < l.maxMissiles; i++) {
+      c.beginPath(); c.arc(-l.maxMissiles * 2.2 + i * 4.4, 15, 1.5, 0, TAU);
+      c.fillStyle = i < l.missiles ? '#0f8' : '#333'; c.fill();
+    }
+    let ta = -PI / 2, nd = Infinity;
+    enemies.forEach(e => { if (!e.alive) return; const d = hypot(e.x - l.x, e.y - l.y); if (d < nd) { nd = d; ta = atan2(e.y - l.y, e.x - l.x); } });
+    l.turretAngle = lerp(l.turretAngle, ta, 0.06);
+    c.save(); c.rotate(l.turretAngle);
+    c.fillStyle = '#3a6a3a'; c.fillRect(0, -2.5, 18, 5);
+    c.fillStyle = '#4a8a4a'; c.fillRect(14, -2, 6, 4);
+    if (l.fireAnim > 0) {
+      const gr = c.createRadialGradient(22, 0, 0, 22, 0, 5 + l.fireAnim * 12);
+      gr.addColorStop(0, rgbaStr(0, 255, 200, l.fireAnim)); gr.addColorStop(1, 'transparent');
+      c.beginPath(); c.arc(22, 0, 5 + l.fireAnim * 12, 0, TAU); c.fillStyle = gr; c.fill();
+    }
     c.restore();
-    c.fillStyle=l.st==='ok'?'#0f8':'#fa0';c.font='bold 7px monospace';c.textAlign='center';c.fillText(`PU-${l.id}`,0,24);
-    if(l.st==='rl')c.fillText(`⟳${l.rt.toFixed(1)}s`,0,32);
-    c.textAlign='left';c.restore();
+    c.fillStyle = l.status === 'ready' ? '#0f8' : '#fa0';
+    c.font = 'bold 7px monospace'; c.textAlign = 'center';
+    c.fillText(`PU-${l.id}`, 0, 24);
+    if (l.status === 'reloading') c.fillText(`⟳${l.reloadTimer.toFixed(1)}s`, 0, 32);
+    c.textAlign = 'left'; c.restore();
   }
 
   // Enemies
-  enemyPool.forEach(e=>{
-    if(!e.alive)return;
-    const ex=e.x*scX,ey=e.y*scY;
-    if(ex<-30||ex>vW+30||ey<-30||ey>vH+30)return; // culling
-    const td=THREATS[e.type],hd=atan2(e.vy,e.vx),sz=e.size;
-    const cr=td.color,fr=td.flame,ir=td.inner;
+  enemies.forEach(e => {
+    if (!e.alive) return;
+    const ex = e.x * sx, ey = e.y * sy;
+    if (ex < -30 || ex > viewW + 30 || ey < -30 || ey > viewH + 30) return;
+    const td = Config.threats[e.type];
+    const cr = td.color, fr = td.flame, ir = td.inner;
+    const hdg = atan2(e.vy, e.vx), sz = e.size;
 
-    // Glow
-    if(ck('vGl')){const gr=c.createRadialGradient(ex,ey,0,ex,ey,12+e.threat*15);gr.addColorStop(0,`rgba(${cr[0]},${cr[1]},${cr[2]},.2)`);gr.addColorStop(1,'transparent');c.beginPath();c.arc(ex,ey,12+e.threat*15,0,TAU);c.fillStyle=gr;c.fill()}
+    if (UI.checked('cfgGlow')) {
+      const gr = c.createRadialGradient(ex, ey, 0, ex, ey, 12 + e.threat * 15);
+      gr.addColorStop(0, rgbaStr(cr[0], cr[1], cr[2], 0.2)); gr.addColorStop(1, 'transparent');
+      c.beginPath(); c.arc(ex, ey, 12 + e.threat * 15, 0, TAU); c.fillStyle = gr; c.fill();
+    }
 
-    c.save();c.translate(ex,ey);c.rotate(hd);
-    // Body
-    c.beginPath();c.moveTo(sz*2.2,0);c.lineTo(sz*.6,-sz*.85);c.lineTo(-sz,-sz*.65);c.lineTo(-sz*1.4,-sz);c.lineTo(-sz*1.1,-sz*.35);c.lineTo(-sz*1.6,0);c.lineTo(-sz*1.1,sz*.35);c.lineTo(-sz*1.4,sz);c.lineTo(-sz,sz*.65);c.lineTo(sz*.6,sz*.85);c.closePath();
-    c.fillStyle=`rgb(${cr[0]},${cr[1]},${cr[2]})`;c.fill();c.strokeStyle='rgba(255,255,255,.15)';c.lineWidth=.5;c.stroke();
-    // Nose
-    c.beginPath();c.moveTo(sz*2.2,0);c.lineTo(sz,-sz*.3);c.lineTo(sz,sz*.3);c.closePath();c.fillStyle='rgba(255,255,255,.12)';c.fill();
-    // Flame
-    const fl=e.flameFlicker*(1+rand(-.15,.15));
-    c.beginPath();c.moveTo(-sz*1.6,0);c.lineTo(-sz*1.6-sz*fl*2.5,-sz*.45*fl);c.lineTo(-sz*1.6-sz*fl*3.3,0);c.lineTo(-sz*1.6-sz*fl*2.5,sz*.45*fl);c.closePath();
-    c.fillStyle=`rgb(${fr[0]},${fr[1]},${fr[2]})`;c.fill();
-    c.beginPath();c.moveTo(-sz*1.6,0);c.lineTo(-sz*1.6-sz*fl,-sz*.15*fl);c.lineTo(-sz*1.6-sz*fl*1.5,0);c.lineTo(-sz*1.6-sz*fl,sz*.15*fl);c.closePath();
-    c.fillStyle=`rgb(${ir[0]},${ir[1]},${ir[2]})`;c.fill();
+    c.save(); c.translate(ex, ey); c.rotate(hdg);
+    c.beginPath();
+    c.moveTo(sz * 2.2, 0); c.lineTo(sz * 0.6, -sz * 0.85); c.lineTo(-sz, -sz * 0.65);
+    c.lineTo(-sz * 1.4, -sz); c.lineTo(-sz * 1.1, -sz * 0.35); c.lineTo(-sz * 1.6, 0);
+    c.lineTo(-sz * 1.1, sz * 0.35); c.lineTo(-sz * 1.4, sz); c.lineTo(-sz, sz * 0.65);
+    c.lineTo(sz * 0.6, sz * 0.85); c.closePath();
+    c.fillStyle = `rgb(${cr[0]},${cr[1]},${cr[2]})`; c.fill();
+    c.strokeStyle = 'rgba(255,255,255,0.15)'; c.lineWidth = 0.5; c.stroke();
+    c.beginPath(); c.moveTo(sz * 2.2, 0); c.lineTo(sz, -sz * 0.3); c.lineTo(sz, sz * 0.3); c.closePath();
+    c.fillStyle = 'rgba(255,255,255,0.12)'; c.fill();
+    const fl = e.flameFlicker * (1 + rand(-0.15, 0.15));
+    c.beginPath(); c.moveTo(-sz * 1.6, 0);
+    c.lineTo(-sz * 1.6 - sz * fl * 2.5, -sz * 0.45 * fl);
+    c.lineTo(-sz * 1.6 - sz * fl * 3.3, 0);
+    c.lineTo(-sz * 1.6 - sz * fl * 2.5, sz * 0.45 * fl); c.closePath();
+    c.fillStyle = `rgb(${fr[0]},${fr[1]},${fr[2]})`; c.fill();
+    c.beginPath(); c.moveTo(-sz * 1.6, 0);
+    c.lineTo(-sz * 1.6 - sz * fl, -sz * 0.15 * fl);
+    c.lineTo(-sz * 1.6 - sz * fl * 1.5, 0);
+    c.lineTo(-sz * 1.6 - sz * fl, sz * 0.15 * fl); c.closePath();
+    c.fillStyle = `rgb(${ir[0]},${ir[1]},${ir[2]})`; c.fill();
     c.restore();
 
-    // Velocity vector
-    c.beginPath();c.moveTo(ex,ey);c.lineTo(ex+e.vx*.03*scX,ey+e.vy*.03*scY);c.strokeStyle=`rgba(${cr[0]},${cr[1]},${cr[2]},.35)`;c.lineWidth=1;c.stroke();
+    c.beginPath(); c.moveTo(ex, ey);
+    c.lineTo(ex + e.vx * 0.03 * sx, ey + e.vy * 0.03 * sy);
+    c.strokeStyle = rgbaStr(cr[0], cr[1], cr[2], 0.35); c.lineWidth = 1; c.stroke();
 
-    // Threat ring
-    if(e.threat>.45){c.beginPath();c.arc(ex,ey,sz*3.5,0,TAU*e.threat);c.strokeStyle=e.threat>.7?'#f44':'#fa0';c.lineWidth=1.5;c.stroke()}
+    if (e.threat > 0.45) {
+      c.beginPath(); c.arc(ex, ey, sz * 3.5, 0, TAU * e.threat);
+      c.strokeStyle = e.threat > 0.7 ? '#f44' : '#fa0'; c.lineWidth = 1.5; c.stroke();
+    }
 
-    // Labels
-    if(ck('vLb')){
-      const lx=ex+sz*3.5,ly=ey-sz*2.5;
-      c.fillStyle=`rgb(${cr[0]},${cr[1]},${cr[2]})`;c.font='bold 7px monospace';c.fillText(e.id,lx,ly);
-      c.fillStyle='#aaa';c.font='7px monospace';c.fillText(`${td.name} V:${round(hypot(e.vx,e.vy))}`,lx,ly+9);
-      c.fillText(`THR:${(e.threat*100)|0}%`,lx,ly+17);
-      if(e.engaged){c.fillStyle='#0cf';c.fillText('⚔ ENGAGED',lx,ly+25)}
+    if (UI.checked('cfgLabels')) {
+      const lx2 = ex + sz * 3.5, ly2 = ey - sz * 2.5;
+      c.fillStyle = `rgb(${cr[0]},${cr[1]},${cr[2]})`; c.font = 'bold 7px monospace';
+      c.fillText(e.id, lx2, ly2);
+      c.fillStyle = '#aaa'; c.font = '7px monospace';
+      c.fillText(`${td.name} V:${round(hypot(e.vx, e.vy))}`, lx2, ly2 + 9);
+      c.fillText(`THR:${(e.threat * 100) | 0}%`, lx2, ly2 + 17);
+      if (e.engaged) { c.fillStyle = '#0cf'; c.fillText('⚔ ENGAGED', lx2, ly2 + 25); }
     }
   });
 
   // Interceptors
-  missilePool.forEach(m=>{
-    if(!m.alive)return;
-    const mx=m.x*scX,my=m.y*scY;
-    if(mx<-30||mx>vW+30||my<-30||my>vH+30)return;
-    const hd=atan2(m.vy,m.vx),isTerm=m.phase==='term';
+  missiles.forEach(m => {
+    if (!m.alive) return;
+    const mx = m.x * sx, my = m.y * sy;
+    if (mx < -30 || mx > viewW + 30 || my < -30 || my > viewH + 30) return;
+    const hdg = atan2(m.vy, m.vx);
+    const isTerm = m.guidancePhase === 'terminal';
 
-    if(ck('vGl')){const gr=c.createRadialGradient(mx,my,0,mx,my,12);gr.addColorStop(0,isTerm?'rgba(0,255,136,.25)':'rgba(0,204,255,.25)');gr.addColorStop(1,'transparent');c.beginPath();c.arc(mx,my,12,0,TAU);c.fillStyle=gr;c.fill()}
+    if (UI.checked('cfgGlow')) {
+      const gr = c.createRadialGradient(mx, my, 0, mx, my, 12);
+      gr.addColorStop(0, isTerm ? 'rgba(0,255,136,0.25)' : 'rgba(0,204,255,0.25)');
+      gr.addColorStop(1, 'transparent');
+      c.beginPath(); c.arc(mx, my, 12, 0, TAU); c.fillStyle = gr; c.fill();
+    }
 
-    c.save();c.translate(mx,my);c.rotate(hd);
-    c.beginPath();c.moveTo(8,0);c.lineTo(3,-3);c.lineTo(-3,-2.5);c.lineTo(-5,-4.5);c.lineTo(-4,-1.5);c.lineTo(-7,0);c.lineTo(-4,1.5);c.lineTo(-5,4.5);c.lineTo(-3,2.5);c.lineTo(3,3);c.closePath();
-    c.fillStyle=isTerm?'#0f8':'#0cf';c.fill();c.strokeStyle='rgba(255,255,255,.15)';c.lineWidth=.5;c.stroke();
-    const fl=m.flameFlicker*(1+rand(-.2,.2));
-    c.beginPath();c.moveTo(-7,0);c.lineTo(-7-fl*10,-2*fl);c.lineTo(-7-fl*14,0);c.lineTo(-7-fl*10,2*fl);c.closePath();c.fillStyle='#0fc';c.fill();
-    c.beginPath();c.moveTo(-7,0);c.lineTo(-7-fl*5,-1*fl);c.lineTo(-7-fl*7,0);c.lineTo(-7-fl*5,1*fl);c.closePath();c.fillStyle='rgba(255,255,255,.5)';c.fill();
+    c.save(); c.translate(mx, my); c.rotate(hdg);
+    c.beginPath();
+    c.moveTo(8, 0); c.lineTo(3, -3); c.lineTo(-3, -2.5); c.lineTo(-5, -4.5);
+    c.lineTo(-4, -1.5); c.lineTo(-7, 0); c.lineTo(-4, 1.5); c.lineTo(-5, 4.5);
+    c.lineTo(-3, 2.5); c.lineTo(3, 3); c.closePath();
+    c.fillStyle = isTerm ? '#0f8' : '#0cf'; c.fill();
+    c.strokeStyle = 'rgba(255,255,255,0.15)'; c.lineWidth = 0.5; c.stroke();
+    const fl = m.flameFlicker * (1 + rand(-0.2, 0.2));
+    c.beginPath(); c.moveTo(-7, 0);
+    c.lineTo(-7 - fl * 10, -2 * fl); c.lineTo(-7 - fl * 14, 0);
+    c.lineTo(-7 - fl * 10, 2 * fl); c.closePath();
+    c.fillStyle = '#0fc'; c.fill();
+    c.beginPath(); c.moveTo(-7, 0);
+    c.lineTo(-7 - fl * 5, -1 * fl); c.lineTo(-7 - fl * 7, 0);
+    c.lineTo(-7 - fl * 5, 1 * fl); c.closePath();
+    c.fillStyle = 'rgba(255,255,255,0.5)'; c.fill();
     c.restore();
 
-    // Guidance line
-    let tgt=null;enemyPool.forEach(e=>{if(e._poolIdx===m.targetIdx&&e.alive)tgt=e});
-    if(tgt){c.beginPath();c.moveTo(mx,my);c.lineTo(tgt.x*scX,tgt.y*scY);c.strokeStyle=isTerm?'rgba(0,255,136,.1)':'rgba(0,204,255,.08)';c.lineWidth=.5;c.setLineDash([2,3]);c.stroke();c.setLineDash([])}
+    const target = enemies.find(e => e._poolIndex === m.targetPoolIndex && e.alive);
+    if (target) {
+      c.beginPath(); c.moveTo(mx, my); c.lineTo(target.x * sx, target.y * sy);
+      c.strokeStyle = isTerm ? 'rgba(0,255,136,0.1)' : 'rgba(0,204,255,0.08)';
+      c.lineWidth = 0.5; c.setLineDash([2, 3]); c.stroke(); c.setLineDash([]);
+    }
 
-    if(ck('vLb')){c.fillStyle=isTerm?'#0f8':'#0cf';c.font='7px monospace';c.fillText(m.id,mx+10,my-4);c.fillStyle='#888';c.fillText(isTerm?'TERMINAL':'MIDCOURSE',mx+10,my+5)}
+    if (UI.checked('cfgLabels')) {
+      c.fillStyle = isTerm ? '#0f8' : '#0cf'; c.font = '7px monospace';
+      c.fillText(m.id, mx + 10, my - 4);
+      c.fillStyle = '#888'; c.fillText(isTerm ? 'TERMINAL' : 'MIDCOURSE', mx + 10, my + 5);
+    }
   });
 
   // Explosions
-  explosionPool.forEach(e=>{
-    const p=e.elapsed/e.duration,r=e.size*(1+p*2.5)*(1-p*.2),a=1-p;
-    const px=e.x*scX,py=e.y*scY;
-    const gr=c.createRadialGradient(px,py,0,px,py,r);
-    gr.addColorStop(0,`rgba(255,255,220,${a})`);gr.addColorStop(.3,`rgba(${e.r},${e.g},${e.b},${a})`);gr.addColorStop(.7,`rgba(${e.r},${e.g},${e.b},${a*.4})`);gr.addColorStop(1,'transparent');
-    c.beginPath();c.arc(px,py,r,0,TAU);c.fillStyle=gr;c.fill();
-    if(e.size>18){c.beginPath();c.arc(px,py,r*2.2*p,0,TAU);c.strokeStyle=`rgba(${e.r},${e.g},${e.b},${a*.2})`;c.lineWidth=2;c.stroke()}
+  explosions.forEach(e => {
+    const progress = e.elapsed / e.duration;
+    const radius = e.size * (1 + progress * 2.5) * (1 - progress * 0.2);
+    const alpha = 1 - progress;
+    const px = e.x * sx, py = e.y * sy;
+    const gr = c.createRadialGradient(px, py, 0, px, py, radius);
+    gr.addColorStop(0, rgbaStr(255, 255, 220, alpha));
+    gr.addColorStop(0.3, rgbaStr(e.r, e.g, e.b, alpha));
+    gr.addColorStop(0.7, rgbaStr(e.r, e.g, e.b, alpha * 0.4));
+    gr.addColorStop(1, 'transparent');
+    c.beginPath(); c.arc(px, py, radius, 0, TAU); c.fillStyle = gr; c.fill();
+    if (e.size > 18) {
+      c.beginPath(); c.arc(px, py, radius * 2.2 * progress, 0, TAU);
+      c.strokeStyle = rgbaStr(e.r, e.g, e.b, alpha * 0.2); c.lineWidth = 2; c.stroke();
+    }
   });
 
   // Debris
-  debrisPool.forEach(d=>{
-    const a=cl(d.life/d.maxLife,0,1);
-    c.save();c.translate(d.x*scX,d.y*scY);c.rotate(d.rot);
-    c.fillStyle=`rgba(200,150,80,${a})`;c.fillRect(-d.size,-d.size*.5,d.size*2,d.size);c.restore();
+  debris.forEach(d => {
+    const alpha = clamp(d.life / d.maxLife, 0, 1);
+    c.save(); c.translate(d.x * sx, d.y * sy); c.rotate(d.rotation);
+    c.fillStyle = rgbaStr(200, 150, 80, alpha);
+    c.fillRect(-d.size, -d.size * 0.5, d.size * 2, d.size);
+    c.restore();
   });
 
   // Particles
-  particlePool.forEach(p=>{
-    const a=cl(p.life/p.maxLife,0,1);
-    if(p.type===1){c.beginPath();c.arc(p.x*scX,p.y*scY,p.size*(1.8-a*.8),0,TAU);c.fillStyle=`rgba(${p.r},${p.g},${p.b},${a*.2})`;c.fill()}
-    else{c.beginPath();c.arc(p.x*scX,p.y*scY,p.size*a,0,TAU);c.fillStyle=`rgba(${p.r},${p.g},${p.b},${a*.85})`;c.fill()}
+  particles.forEach(p => {
+    const alpha = clamp(p.life / p.maxLife, 0, 1);
+    if (p.type === 1) {
+      c.beginPath(); c.arc(p.x * sx, p.y * sy, p.size * (1.8 - alpha * 0.8), 0, TAU);
+      c.fillStyle = rgbaStr(p.r, p.g, p.b, alpha * 0.2); c.fill();
+    } else {
+      c.beginPath(); c.arc(p.x * sx, p.y * sy, p.size * alpha, 0, TAU);
+      c.fillStyle = rgbaStr(p.r, p.g, p.b, alpha * 0.85); c.fill();
+    }
   });
 
   // HUD
-  c.fillStyle='rgba(0,204,255,.35)';c.font='8px monospace';
-  c.fillText(`T+${simTime.toFixed(1)}s | FPS:${fps} | Q:${qualityLevel.toFixed(1)} | Tgts:${enemyPool.count} | Msls:${missilePool.count} | Ptcls:${particlePool.count} | AI:${ai.inferenceTime.toFixed(1)}ms`,6,12);
+  c.fillStyle = 'rgba(0,204,255,0.35)'; c.font = '8px monospace';
+  c.fillText(`T+${GameState.time.toFixed(1)}s | FPS:${GameState.fps} | Q:${GameState.quality.toFixed(1)} | Tgts:${enemies.count} | Msls:${missiles.count} | Ptcls:${particles.count} | AI:${aiNetwork.inferenceTime.toFixed(1)}ms | Ep:${aiNetwork.epoch}`, 6, 12);
 
   // Compass
-  c.save();c.translate(vW-38,38);c.beginPath();c.arc(0,0,24,0,TAU);c.strokeStyle='rgba(26,58,92,.4)';c.lineWidth=1;c.stroke();
-  ['N','E','S','W'].forEach((l,i)=>{const a=i*PI/2-PI/2;c.fillStyle='rgba(0,204,255,.3)';c.font='7px monospace';c.textAlign='center';c.fillText(l,cos(a)*30,sin(a)*30+2)});
-  c.textAlign='left';c.restore();
+  c.save(); c.translate(viewW - 38, 38);
+  c.beginPath(); c.arc(0, 0, 24, 0, TAU); c.strokeStyle = 'rgba(26,58,92,0.4)'; c.lineWidth = 1; c.stroke();
+  ['N', 'E', 'S', 'W'].forEach((l, i) => {
+    const a = i * PI / 2 - PI / 2;
+    c.fillStyle = 'rgba(0,204,255,0.3)'; c.font = '7px monospace'; c.textAlign = 'center';
+    c.fillText(l, cos(a) * 30, sin(a) * 30 + 2);
+  });
+  c.textAlign = 'left'; c.restore();
 }
 
 // ================================================================
-// UI UPDATES (throttled, no excessive DOM manipulation)
+// PART 10: UI UPDATE
 // ================================================================
-let uiDirty=true;
-function updateUI(){
-  O('sIn',stats.incoming);O('sKl',stats.kills);O('sLk',stats.leakers);O('sFr',stats.fired);
-  const tot=stats.kills+stats.leakers;const acc=tot?round(stats.kills/tot*100):0;
-  $('sAc').textContent=acc+'%';
-  const eff=stats.fired?round(stats.kills/stats.fired*100):0;O('sEf',eff+'%');
+function updateUIPanel() {
+  const s = GameState.stats;
+  UI.set('statIncoming', s.incoming); UI.set('statKills', s.kills);
+  UI.set('statLeakers', s.leakers); UI.set('statFired', s.fired);
+  const total = s.kills + s.leakers;
+  const acc = total > 0 ? round(s.kills / total * 100) : 0;
+  UI.set('statAccuracy', acc + '%');
+  const eff = s.fired > 0 ? round(s.kills / s.fired * 100) : 0;
+  UI.set('statEfficiency', eff + '%');
 
-  let mt=0;enemyPool.forEach(e=>{if(e.alive)mt=max(mt,e.threat)});
-  const bt=$('bThr');
-  if(mt>.7){bt.textContent='▲ CRITICAL';bt.className='badge c'}
-  else if(mt>.3){bt.textContent='▲ ELEVATED';bt.className='badge w'}
-  else if(enemyPool.count){bt.textContent='▲ LOW';bt.className='badge'}
-  else{bt.textContent='▲ CLEAR';bt.className='badge'}
-  O('bTm','T+'+simTime.toFixed(1));
+  let maxThreat = 0;
+  enemies.forEach(e => { if (e.alive) maxThreat = max(maxThreat, e.threat); });
+  const tb = UI.el('badgeThreat');
+  if (maxThreat > 0.7) { tb.textContent = '▲ CRITICAL'; tb.className = 'badge badge-crit'; }
+  else if (maxThreat > 0.3) { tb.textContent = '▲ ELEVATED'; tb.className = 'badge badge-warn'; }
+  else if (enemies.count > 0) { tb.textContent = '▲ LOW'; tb.className = 'badge badge-ok'; }
+  else { tb.textContent = '▲ ALL CLEAR'; tb.className = 'badge badge-ok'; }
+  UI.set('badgeTime', 'T+ ' + GameState.time.toFixed(1) + 's');
 
-  // Target list
-  const targets=[];enemyPool.forEach(e=>{if(e.alive)targets.push(e)});
-  targets.sort((a,b)=>b.threat-a.threat);
-  let html='';
-  for(let i=0;i<min(targets.length,6);i++){
-    const t=targets[i],td=THREATS[t.type];
-    const d=round(hypot(t.x-BX,t.y-BY)),sp=round(hypot(t.vx,t.vy)),tp=round(t.threat*100);
-    const tc=t.threat>.7?'#f44':t.threat>.4?'#fa0':'#0f8';
-    html+=`<div class="ti" style="border-left:2px solid ${tc}"><div style="display:flex;justify-content:space-between"><span style="color:${tc};font-weight:600">● ${t.id}</span><span style="color:#567">${td.name}</span></div><div style="color:#567;font-size:7px">D:${d}m V:${sp}m/s ${t.engaged?'⚔':''} ${t.maneuvering?'↻':''}</div><div class="tb"><div class="tfl" style="width:${tp}%;background:${tc}"></div></div></div>`;
+  // Track list
+  const tracks = enemies.toArray().filter(e => e.alive).sort((a, b) => b.threat - a.threat).slice(0, 6);
+  let trackHTML = '';
+  for (const t of tracks) {
+    const td = Config.threats[t.type];
+    const d = round(hypot(t.x - Config.baseX, t.y - Config.baseY));
+    const spd = round(hypot(t.vx, t.vy));
+    const tPct = round(t.threat * 100);
+    const tCol = t.threat > 0.7 ? '#f44' : t.threat > 0.4 ? '#fa0' : '#0f8';
+    trackHTML += `<div class="track-item" style="border-left:2px solid ${tCol}"><div class="track-hdr"><span style="color:${tCol};font-weight:600">● ${t.id}</span><span style="color:var(--dim)">${td.name}</span></div><div class="track-info">D:${d}m V:${spd}m/s ${t.engaged ? '⚔' : ''} ${t.maneuvering ? '↻' : ''}</div><div class="threat-bar"><div class="threat-fill" style="width:${tPct}%;background:${tCol}"></div></div></div>`;
   }
-  $('trackList').innerHTML=html;
+  UI.el('trackListEl').innerHTML = trackHTML;
 
-  // Launchers
-  let lhtml='';
-  for(const l of launchers){const cl=l.st==='ok'?'#0f8':'#fa0';lhtml+=`<div class="dr"><span class="dl">PU-${l.id}</span><span class="dv" style="color:${cl}">${l.m}/${l.mx} ${l.st==='rl'?'⟳'+l.rt.toFixed(1)+'s':'✓'}</span></div>`}
-  $('launcherPanel').innerHTML=lhtml;
+  // Launcher panel
+  let launcherHTML = '';
+  for (const l of launchers) {
+    const col = l.status === 'ready' ? '#0f8' : '#fa0';
+    launcherHTML += `<div class="data-row"><span class="data-lbl">PU-${l.id}</span><span class="data-val" style="color:${col}">${l.missiles}/${l.maxMissiles} ${l.status === 'reloading' ? '⟳' + l.reloadTimer.toFixed(1) + 's' : '✓'}</span></div>`;
+  }
+  UI.el('launcherStatusEl').innerHTML = launcherHTML;
 
   // AI meters
-  $('mC').style.width=(ai.confidence*100)+'%';O('mCv',round(ai.confidence*100)+'%');
-  $('mPL').style.width=min(100,ai.pLoss*25)+'%';O('mPLv',ai.pLoss.toFixed(4));
-  $('mVL').style.width=min(100,ai.vLoss*25)+'%';O('mVLv',ai.vLoss.toFixed(4));
-  $('mGr').style.width=min(100,ai.gradNorm*8)+'%';O('mGrv',ai.gradNorm.toFixed(3));
-  $('mEp').style.width=min(100,ai.epoch/5)+'%';O('mEpv',ai.epoch);
-  $('mIn').style.width=min(100,ai.inferenceTime/20*100)+'%';O('mInv',round(ai.inferenceTime)+'ms');
-  O('oBuf',ai.buffer.length);O('rTrk',enemyPool.count);O('rMsl',missilePool.count);
+  UI.el('mConf').style.width = (aiNetwork.confidence * 100) + '%'; UI.set('mConfV', round(aiNetwork.confidence * 100) + '%');
+  UI.el('mPLoss').style.width = min(100, aiNetwork.policyLoss * 25) + '%'; UI.set('mPLossV', aiNetwork.policyLoss.toFixed(4));
+  UI.el('mVLoss').style.width = min(100, aiNetwork.valueLoss * 25) + '%'; UI.set('mVLossV', aiNetwork.valueLoss.toFixed(4));
+  UI.el('mGrad').style.width = min(100, aiNetwork.gradientNorm * 8) + '%'; UI.set('mGradV', aiNetwork.gradientNorm.toFixed(3));
+  UI.el('mEpoch').style.width = min(100, aiNetwork.epoch / 5) + '%'; UI.set('mEpochV', aiNetwork.epoch);
+  UI.el('mInfer').style.width = min(100, aiNetwork.inferenceTime / 20 * 100) + '%'; UI.set('mInferV', round(aiNetwork.inferenceTime) + 'ms');
+  UI.set('dBuffer', aiNetwork.replayBuffer.length);
+  UI.set('sensorTracks', enemies.count);
+  UI.set('sensorMissiles', missiles.count);
+  UI.set('sensorParticles', particles.count);
 
-  // Charts (every ~20 updates)
-  if(frameNum%20===0){
-    histAcc.push(acc);if(histAcc.length>100)histAcc.shift();
-    histLoss.push(ai.pLoss);if(histLoss.length>100)histLoss.shift();
-    miniChart('ch1',histAcc,'#0f8');miniChart('ch2',histLoss,'#f80');drawAttention('ch3');
+  // Charts
+  if (GameState.frame % 20 === 0) {
+    GameState.historyAccuracy.push(acc);
+    if (GameState.historyAccuracy.length > 100) GameState.historyAccuracy.shift();
+    GameState.historyLoss.push(aiNetwork.policyLoss);
+    if (GameState.historyLoss.length > 100) GameState.historyLoss.shift();
+    renderMiniChart('chartAcc', GameState.historyAccuracy, '#0f8');
+    renderMiniChart('chartLoss', GameState.historyLoss, '#f80');
+    renderAttentionMap('chartAttn');
   }
 }
 
-function miniChart(id,data,color){
-  const cv=$(id);if(!cv||data.length<2)return;
-  const r=cv.parentElement.getBoundingClientRect();
-  cv.width=r.width;cv.height=r.height;
-  const c=cv.getContext('2d'),w=cv.width,h=cv.height;
-  c.clearRect(0,0,w,h);
-  const mx=max(...data,.01),mn=min(...data,0),rg=mx-mn||1;
-  c.beginPath();
-  for(let i=0;i<data.length;i++){const x=i/(data.length-1)*w,y=h-((data[i]-mn)/rg)*h*.82-h*.05;i?c.lineTo(x,y):c.moveTo(x,y)}
-  c.strokeStyle=color;c.lineWidth=1.5;c.stroke();
-  c.lineTo(w,h);c.lineTo(0,h);c.closePath();c.fillStyle=color+'10';c.fill();
-  c.fillStyle=color;c.font='bold 8px monospace';c.fillText(data[data.length-1].toFixed(2),2,9);
-}
-
-function drawAttention(id){
-  const cv=$(id);if(!cv||!ai.lastAttnData)return;
-  const r=cv.parentElement.getBoundingClientRect();cv.width=r.width;cv.height=r.height;
-  const c=cv.getContext('2d'),w=cv.width,h=cv.height;c.clearRect(0,0,w,h);
-  const n=ai.lastAttnN;if(n<1||n>20)return;
-  const cs=min(w/n,h/n,13),ox=(w-n*cs)/2,oy=(h-n*cs)/2;
-  for(let i=0;i<n;i++)for(let j=0;j<n;j++){const v=cl(ai.lastAttnData[i*n+j],0,1);c.fillStyle=`rgb(${round(v*255)},${round(v*80)},${round(255-v*200)})`;c.fillRect(ox+j*cs,oy+i*cs,cs-1,cs-1)}
-  c.fillStyle='#678';c.font='7px monospace';c.fillText(`${n}×${n}`,2,h-2);
-}
-
-// ================================================================
-// LOG (ring buffer, minimal DOM)
-// ================================================================
-const logBuffer=[];
-const MAX_LOG=120;
-function logMsg(msg,cls=''){
-  logBuffer.push({msg:`[${simTime.toFixed(1)}] ${msg}`,cls});
-  if(logBuffer.length>MAX_LOG)logBuffer.shift();
-  const box=$('logBox');
-  const el=document.createElement('div');el.className='le '+cls;el.textContent=logBuffer[logBuffer.length-1].msg;
-  box.appendChild(el);
-  while(box.children.length>MAX_LOG)box.removeChild(box.firstChild);
-  box.scrollTop=box.scrollHeight;
-}
-
-// ================================================================
-// CONTROLS
-// ================================================================
-function toggleSim(){simActive=!simActive;$('btnP').textContent=simActive?'❚❚ PAUSE':'▶ START';$('btnP').classList.toggle('on',simActive)}
-function resetAll(){
-  simActive=false;simTime=0;frameNum=0;lastWaveTime=0;lastAITime=0;
-  // Release all pool items
-  while(enemyPool.active>0)enemyPool.release(0);
-  while(missilePool.active>0)missilePool.release(0);
-  while(particlePool.active>0)particlePool.release(0);
-  while(explosionPool.active>0)explosionPool.release(0);
-  while(debrisPool.active>0)debrisPool.release(0);
-  aiDecisions=[];
-  stats.incoming=0;stats.kills=0;stats.leakers=0;stats.fired=0;
-  globalEnemyCounter=0;globalMissileCounter=0;
-  histAcc=[];histLoss=[];bgNeedsRedraw=true;starCache=null;
-  buildLaunchers(+$('cNL').value);
-  $('btnP').textContent='▶ START';$('btnP').classList.remove('on');
-  $('logBox').innerHTML='';logBuffer.length=0;
-  logMsg('System reset complete','a');
-}
-function cmdResetAI(){ai=new TransformerAI();O('oParams',ai.nParams().toLocaleString());logMsg('AI Transformer reinitialized','a')}
-function cmdTrain(n){const t0=performance.now();ai.train(n);logMsg(`Train ×${n}: ep=${ai.epoch} pL=${ai.pLoss.toFixed(5)} vL=${ai.vLoss.toFixed(5)} g=${ai.gradNorm.toFixed(3)} [${(performance.now()-t0)|0}ms]`,'a')}
-
-// ================================================================
-// MAIN LOOP — frame-budget aware, never blocks
-// ================================================================
-let lastTs=0;
-function mainLoop(ts){
-  const rawDt=(ts-lastTs)/1000;lastTs=ts;
-
-  // FPS tracking
-  fpsCount++;fpsTimer+=rawDt;
-  if(fpsTimer>=1){fps=fpsCount;fpsCount=0;fpsTimer=0;O('bFps',fps+' FPS');
-    // Auto quality
-    if(fps<25&&qualityLevel>.3)qualityLevel-=.1;
-    else if(fps>50&&qualityLevel<1)qualityLevel+=.05;
-    qualityLevel=cl(qualityLevel,.3,1);
-    const pb=$('bPerf');
-    if(qualityLevel<.8){pb.style.display='';pb.textContent=`⚡ Q:${qualityLevel.toFixed(1)}`}
-    else pb.style.display='none';
+function renderMiniChart(canvasId, data, color) {
+  const cv = UI.el(canvasId);
+  if (!cv || data.length < 2) return;
+  const rect = cv.parentElement.getBoundingClientRect();
+  cv.width = rect.width; cv.height = rect.height;
+  const ctx = cv.getContext('2d'), w = cv.width, h = cv.height;
+  ctx.clearRect(0, 0, w, h);
+  const mx = max(...data, 0.01), mn = min(...data, 0), rg = mx - mn || 1;
+  ctx.beginPath();
+  for (let i = 0; i < data.length; i++) {
+    const x = (i / (data.length - 1)) * w;
+    const y = h - ((data[i] - mn) / rg) * h * 0.82 - h * 0.05;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
   }
-
-  if(simActive){
-    const dt=min(rawDt,.04)*CFG.speed;
-    simTime+=dt;frameNum++;
-    update(dt);
-  }
-
-  render();
-
-  // UI updates at 10Hz max
-  if(frameNum%6===0)updateUI();
-
-  requestAnimationFrame(mainLoop);
+  ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath();
+  ctx.fillStyle = color + '10'; ctx.fill();
+  ctx.fillStyle = color; ctx.font = 'bold 8px monospace';
+  ctx.fillText(data[data.length - 1].toFixed(2), 2, 9);
 }
 
-window.addEventListener('load',init);
+function renderAttentionMap(canvasId) {
+  const cv = UI.el(canvasId);
+  if (!cv || !aiNetwork.lastAttnMap) return;
+  const rect = cv.parentElement.getBoundingClientRect();
+  cv.width = rect.width; cv.height = rect.height;
+  const ctx = cv.getContext('2d'), w = cv.width, h = cv.height;
+  ctx.clearRect(0, 0, w, h);
+  const n = aiNetwork.lastAttnSize;
+  if (n < 1 || n > 20) return;
+  const cs = min(w / n, h / n, 13);
+  const ox = (w - n * cs) / 2, oy = (h - n * cs) / 2;
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+    const v = clamp(aiNetwork.lastAttnMap[i * n + j], 0, 1);
+    ctx.fillStyle = `rgb(${round(v * 255)},${round(v * 80)},${round(255 - v * 200)})`;
+    ctx.fillRect(ox + j * cs, oy + i * cs, cs - 1, cs - 1);
+  }
+  ctx.fillStyle = '#678'; ctx.font = '7px monospace';
+  ctx.fillText(`${n}×${n}`, 2, h - 2);
+}
+
+// ================================================================
+// PART 11: ENGINE (Main Loop)
+// ================================================================
+const Engine = {
+  _lastTs: 0,
+
+  toggle() {
+    GameState.active = !GameState.active;
+    const btn = UI.el('btnPlay');
+    btn.textContent = GameState.active ? '❚❚ PAUSE' : '▶ START';
+    btn.classList.toggle('active', GameState.active);
+    Logger.sys(GameState.active ? 'Simulation started' : 'Simulation paused');
+  },
+
+  reset() {
+    GameState.active = false;
+    GameState.time = 0; GameState.frame = 0;
+    GameState.lastWaveTime = 0; GameState.lastAITime = 0;
+    GameState.enemyCounter = 0; GameState.missileCounter = 0;
+    GameState.radarAngle = 0;
+    GameState.stats = { incoming: 0, kills: 0, leakers: 0, fired: 0 };
+    GameState.historyAccuracy = []; GameState.historyLoss = [];
+
+    // Release all pool entities
+    while (enemies.activeCount > 0) enemies.release(0);
+    while (missiles.activeCount > 0) missiles.release(0);
+    while (particles.activeCount > 0) particles.release(0);
+    while (explosions.activeCount > 0) explosions.release(0);
+    while (debris.activeCount > 0) debris.release(0);
+    aiDecisions = [];
+
+    Defense.rebuild(UI.val('cfgLaunchers'));
+    bgDirty = true; starCache = null;
+    const btn = UI.el('btnPlay');
+    btn.textContent = '▶ START'; btn.classList.remove('active');
+    UI.el('logWrap').innerHTML = '';
+    Logger.sys('System reset complete');
+  },
+
+  loop(ts) {
+    const rawDt = (ts - Engine._lastTs) / 1000;
+    Engine._lastTs = ts;
+
+    // FPS
+    GameState.fpsCount++;
+    GameState.fpsTimer += rawDt;
+    if (GameState.fpsTimer >= 1) {
+      GameState.fps = GameState.fpsCount;
+      GameState.fpsCount = 0; GameState.fpsTimer = 0;
+      UI.set('badgeFps', GameState.fps + ' FPS');
+      // Auto quality
+      if (GameState.fps < 25 && GameState.quality > 0.3) GameState.quality -= 0.1;
+      else if (GameState.fps > 50 && GameState.quality < 1) GameState.quality += 0.05;
+      GameState.quality = clamp(GameState.quality, 0.3, 1.0);
+    }
+
+    // Update
+    if (GameState.active) {
+      const dt = min(rawDt, 0.04) * Config.simSpeed;
+      GameState.time += dt;
+      GameState.frame++;
+      updateSimulation(dt);
+    }
+
+    // Render
+    renderBackground();
+    renderMain();
+
+    // UI at 10Hz
+    if (GameState.frame % 6 === 0) updateUIPanel();
+
+    requestAnimationFrame(Engine.loop);
+  }
+};
+
+// ================================================================
+// STARTUP
+// ================================================================
+window.addEventListener('load', () => {
+  initRenderer();
+  Defense.rebuild(4);
+  UI.set('dParams', aiNetwork.countParams().toLocaleString());
+  Logger.sys('AEGIS-AI v9.0 Production Grade — Online');
+  Logger.sys(`AI Transformer: ${aiNetwork.countParams()} parameters, 2-layer, ${Config.aiEmbedDim}D embed`);
+  requestAnimationFrame(Engine.loop);
+});
 </script>
 </body>
-        </html>
+                                                                       </html>
